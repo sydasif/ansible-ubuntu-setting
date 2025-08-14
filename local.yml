@@ -33,44 +33,16 @@
         key: "/org/gnome/desktop/background/picture-options"
         value: "'fit'"
 
-    - name: copy .bashrc file
+    - name: copy dotfiles and config files
       copy:
-        src: files/.bashrc
-        dest: /home/zulu/.bashrc
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
         owner: zulu
         group: zulu
-
-    - name: copy .vimrc file
-      copy:
-        src: files/.vimrc
-        dest: /home/zulu/.vimrc
-        owner: zulu
-        group: zulu
-
-    - name: copy .zshrc file
-      copy:
-        src: files/.zshrc
-        dest: /home/zulu/.zshrc
-        owner: zulu
-        group: zulu
-
-    - name: copy .gitconfig file
-      copy:
-        src: files/.gitconfig
-        dest: /home/zulu/.gitconfig
-        owner: zulu
-        group: zulu
-
-    - name: copy .p10k.zsh file
-      copy:
-        src: files/.p10k.zsh
-        dest: /home/zulu/.p10k.zsh
-        owner: zulu
-        group: zulu
-
-    - name: copy ruff.toml file
-      copy:
-        src: files/ruff.toml
-        dest: /home/zulu/.config/ruff/ruff.toml
-        owner: zulu
-        group: zulu
+      loop:
+        - { src: "files/.bashrc", dest: "/home/zulu/.bashrc" }
+        - { src: "files/.vimrc", dest: "/home/zulu/.vimrc" }
+        - { src: "files/.zshrc", dest: "/home/zulu/.zshrc" }
+        - { src: "files/.gitconfig", dest: "/home/zulu/.gitconfig" }
+        - { src: "files/.p10k.zsh", dest: "/home/zulu/.p10k.zsh" }
+        - { src: "files/ruff.toml", dest: "/home/zulu/.config/ruff/ruff.toml" }
