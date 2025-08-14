@@ -37,3 +37,10 @@
         dest: /home/zulu/.bashrc
         owner: zulu
         group: zulu
+
+    - name: copy .vimrc file
+      copy:
+        src: files/.vimrc
+        dest: /home/zulu/.vimrc
+        owner: zulu
+        group: zulu
