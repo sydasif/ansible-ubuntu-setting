@@ -1,4 +1,7 @@
 ---
 - import_playbook: packages.yml
+  tags: packages
 - import_playbook: dotfiles.yml
+  tags: dotfiles
 - import_playbook: system_settings.yml
+  tags: settings

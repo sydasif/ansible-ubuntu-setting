@@ -6,3 +6,24 @@
     - name: install packages
       package:
         name: "{{ packages_to_install }}"
+
+    - name: check if batcat exists
+      ansible.builtin.stat:
+        path: /usr/bin/batcat
+      register: batcat_stat
+
+    - name: check if bat symlink exists
+      ansible.builtin.stat:
+        path: /usr/local/bin/bat
+      register: bat_symlink_stat
+
+    - name: create bat symlink if batcat exists
+      ansible.builtin.file:
+        src: /usr/bin/batcat
+        dest: /usr/local/bin/bat
+        state: link
+      when:
+        - ansible_facts.distribution == 'Ubuntu'
+        - ansible_facts.distribution_major_version is version('20.04', '>=')
+        - batcat_stat.stat.exists
+        - not bat_symlink_stat.stat.exists
