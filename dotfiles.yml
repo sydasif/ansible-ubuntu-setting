@@ -1,0 +1,12 @@
+---
+- hosts: all
+  connection: local
+  become: true
+  tasks:
+    - name: copy dotfiles and config files
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ dotfiles_base_dest }}/{{ item.dest_suffix }}"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      loop: "{{ dotfiles_items }}"

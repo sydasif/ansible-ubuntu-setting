@@ -1,0 +1,8 @@
+---
+- hosts: all
+  connection: local
+  become: true
+  tasks:
+    - name: install packages
+      package:
+        name: "{{ packages_to_install }}"
