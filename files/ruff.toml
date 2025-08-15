@@ -10,7 +10,7 @@
 # Core ruff behavior and output configuration
 # --------------------------------------------------------------------------
 output-format = "grouped" # Clean, organized error reporting
-target-version = "py313"  # Latest Python features and syntax
+target-version = "py312"  # Latest Python features and syntax
 line-length = 88          # Explicit line length setting
 preview = true            # Enable preview rules for cutting-edge features
 
