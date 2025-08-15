@@ -11,27 +11,30 @@
           - tmux
           - vim
           - python3-psutil
-          - git
           - zsh
+          - bat
 
     - name: copy wallpaper file
       copy:
-        src: files/wallpaper.jpg
+        src: wallpaper/wallpaper.jpg
         dest: /usr/share/backgrounds/wallpaper.jpg
         owner: root
         group: root
 
-    - name: set wallpaper
+    - name: set gnome desktop background settings
       become_user: zulu
       dconf:
-        key: "/org/gnome/desktop/background/picture-uri"
-        value: "'file:///usr/share/backgrounds/wallpaper.jpg'"
-
-    - name: set wallpaper position
-      become_user: zulu
-      dconf:
-        key: "/org/gnome/desktop/background/picture-options"
-        value: "'fit'"
+        key: "{{ item.key }}"
+        value: "{{ item.value }}"
+      loop:
+        - {
+            key: "/org/gnome/desktop/background/picture-uri",
+            value: "'file:///usr/share/backgrounds/wallpaper.jpg'",
+          }
+        - {
+            key: "/org/gnome/desktop/background/picture-options",
+            value: "'fit'",
+          }
 
     - name: copy dotfiles and config files
       copy:
@@ -40,9 +43,12 @@
         owner: zulu
         group: zulu
       loop:
-        - { src: "files/.bashrc", dest: "/home/zulu/.bashrc" }
-        - { src: "files/.vimrc", dest: "/home/zulu/.vimrc" }
-        - { src: "files/.zshrc", dest: "/home/zulu/.zshrc" }
-        - { src: "files/.gitconfig", dest: "/home/zulu/.gitconfig" }
-        - { src: "files/.p10k.zsh", dest: "/home/zulu/.p10k.zsh" }
-        - { src: "files/ruff.toml", dest: "/home/zulu/.config/ruff/ruff.toml" }
+        - { src: "dotfiles/.bashrc", dest: "/home/zulu/.bashrc" }
+        - { src: "dotfiles/.vimrc", dest: "/home/zulu/.vimrc" }
+        - { src: "dotfiles/.zshrc", dest: "/home/zulu/.zshrc" }
+        - { src: "dotfiles/.gitconfig", dest: "/home/zulu/.gitconfig" }
+        - { src: "dotfiles/.p10k.zsh", dest: "/home/zulu/.p10k.zsh" }
+        - {
+            src: "dotfiles/ruff.toml",
+            dest: "/home/zulu/.config/ruff/ruff.toml",
+          }
