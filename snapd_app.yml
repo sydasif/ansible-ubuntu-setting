@@ -1,5 +1,6 @@
 - hosts: all
   become: true
+  gather_facts: false
   tasks:
     - name: Install Snap packages
       community.general.snap:

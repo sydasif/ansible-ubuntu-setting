@@ -2,6 +2,7 @@
 - hosts: all
   connection: local
   become: true
+  gather_facts: false
   tasks:
     - name: copy dotfiles and config files
       copy:
