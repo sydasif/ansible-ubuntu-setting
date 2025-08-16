@@ -2,12 +2,18 @@
 ansible_user: zulu
 
 packages_to_install:
-  - htop
-  - tmux
   - vim
-  - python3-psutil
   - zsh
   - bat
+  - tmux
+  - qemu-kvm
+  - virtinst
+  - cloud-utils
+  - bridge-utils
+  - virt-manager
+  - python3-psutil
+  - libvirt-daemon-system
+  - libvirt-clients
 
 dotfiles_base_dest: "/home/{{ ansible_user }}"
 dotfiles_items:
