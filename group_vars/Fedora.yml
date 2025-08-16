@@ -24,9 +24,9 @@ dotfiles_items:
   - { src: "dotfiles/.p10k.zsh", dest_suffix: ".p10k.zsh" }
   - { src: "dotfiles/ruff.toml", dest_suffix: ".config/ruff/ruff.toml" }
 
-wallpaper_src: "wallpaper/wallpaper.jpg"
-wallpaper_dest: "/usr/share/backgrounds/wallpaper.jpg"
-gnome_background_picture_uri: "'file:///usr/share/backgrounds/wallpaper.jpg'"
+wallpaper_src: "wallpaper/fedora_wallpaper.jpg"
+wallpaper_dest: "/usr/share/backgrounds/fedora_wallpaper.jpg"
+gnome_background_picture_uri: "'file:///usr/share/backgrounds/fedora_wallpaper.jpg'"
 gnome_background_picture_options: "'fit'"
 
 snap_packages_to_install:
