@@ -1,0 +1,17 @@
+---
+- name: Ensure .fonts directory exists in user home
+  ansible.builtin.file:
+    path: "{{ dotfiles_base_dest }}/.fonts"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+
+- name: Copy fonts from project's fonts directory
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ dotfiles_base_dest }}/.fonts/"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  with_fileglob:
+    - "{{ playbook_dir }}/fonts/*"
