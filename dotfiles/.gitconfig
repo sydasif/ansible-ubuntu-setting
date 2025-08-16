@@ -1,8 +1,0 @@
-[user]
-	name = Syed Asif
-	email = sydasif78@gmail.com
-[core]
-	editor = vim
-	autocrlf = input
-[init]
-	defaultBranch = main

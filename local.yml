@@ -4,15 +4,11 @@
   become: true
   pre_tasks:
     - name: pre-run | update package cache (Ubuntu)
-      apt: update_cache=yes
-      changed_when: False
+      ansible.builtin.apt: update_cache=yes
+      changed_when: false
       when: ansible_distribution == "Ubuntu"
 
-- import_playbook: packages.yml
-  tags: packages
-- import_playbook: dotfiles.yml
-  tags: dotfiles
-- import_playbook: system_settings.yml
-  tags: settings
-- import_playbook: snapd_app.yml
-  tags: snapd
+  roles:
+    - common
+    - dotfiles
+    - desktop_settings

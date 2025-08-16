@@ -102,3 +102,4 @@ alias lt='ls --tree'
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export LIBVIRT_DEFAULT_URI="qemu:///system"
+export PATH="$PATH:$HOME/go/bin"

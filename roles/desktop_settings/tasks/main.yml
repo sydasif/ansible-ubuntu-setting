@@ -1,0 +1,30 @@
+---
+- name: copy wallpaper file
+  ansible.builtin.copy:
+    src: default_wallpaper.jpg
+    dest: "{{ wallpaper_dest }}"
+    owner: root
+    group: root
+  delegate_to: localhost
+  become: true
+
+- name: set gnome desktop background settings
+  become_user: "{{ ansible_user }}"
+  community.general.dconf:
+    key: "{{ item.key }}"
+    value: "{{ item.value }}"
+  loop:
+    - {
+        key: "/org/gnome/desktop/background/picture-uri",
+        value: "{{ gnome_background_picture_uri }}",
+      }
+    - {
+        key: "/org/gnome/desktop/background/picture-options",
+        value: "{{ gnome_background_picture_options }}",
+      }
+
+- name: Install Snap packages
+  community.general.snap:
+    name: "{{ item.name }}"
+    classic: "{{ item.classic | default(false) }}"
+  loop: "{{ snap_packages_to_install }}"

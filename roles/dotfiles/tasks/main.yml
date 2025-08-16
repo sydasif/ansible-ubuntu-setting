@@ -1,0 +1,15 @@
+---
+- name: copy dotfiles and config files
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ dotfiles_base_dest }}/{{ item.dest_suffix }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  loop: "{{ dotfiles_items | rejectattr('src', 'equalto', 'dotfiles/.gitconfig') }}"
+
+- name: Template .gitconfig from variables
+  ansible.builtin.template:
+    src: .gitconfig.j2
+    dest: "{{ dotfiles_base_dest }}/.gitconfig"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
