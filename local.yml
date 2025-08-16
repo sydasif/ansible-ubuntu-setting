@@ -1,4 +1,18 @@
 ---
+# tasks to complete before running roles
+- hosts: all
+  become: true
+  pre_tasks:
+    - name: pre-run | update package cache (Fedora)
+      pacman: update_cache=yes
+      changed_when: False
+      when: ansible_distribution == "Fedora"
+
+    - name: pre-run | update package cache (Ubuntu)
+      apt: update_cache=yes
+      changed_when: False
+      when: ansible_distribution == "Ubuntu"
+
 - import_playbook: packages.yml
   tags: packages
 - import_playbook: dotfiles.yml
