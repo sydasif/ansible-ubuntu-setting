@@ -22,3 +22,7 @@ wallpaper_src: "wallpaper/wallpaper.jpg"
 wallpaper_dest: "/usr/share/backgrounds/wallpaper.jpg"
 gnome_background_picture_uri: "'file:///usr/share/backgrounds/wallpaper.jpg'"
 gnome_background_picture_options: "'fit'"
+
+snap_packages_to_install:
+  - { name: "code", classic: true }
+  - { name: "postman", classic: false }

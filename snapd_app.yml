@@ -1,0 +1,8 @@
+- hosts: all
+  become: true
+  tasks:
+    - name: Install Snap packages
+      community.general.snap:
+        name: "{{ item.name }}"
+        classic: "{{ item.classic | default(false) }}"
+      loop: "{{ snap_packages_to_install }}"

@@ -19,3 +19,5 @@
   tags: dotfiles
 - import_playbook: system_settings.yml
   tags: settings
+- import_playbook: snapd_app.yml
+  tags: snapd
