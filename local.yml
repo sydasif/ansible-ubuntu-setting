@@ -3,11 +3,6 @@
 - hosts: all
   become: true
   pre_tasks:
-    - name: pre-run | update package cache (Fedora)
-      dnf: update_cache=yes
-      changed_when: False
-      when: ansible_distribution == "Fedora"
-
     - name: pre-run | update package cache (Ubuntu)
       apt: update_cache=yes
       changed_when: False
