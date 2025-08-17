@@ -13,8 +13,8 @@ packages_to_install:
   - bridge-utils
   - virt-manager
   - python3-psutil
-  - libvirt-daemon-system
   - libvirt-clients
+  - libvirt-daemon-system
 
 dotfiles_base_dest: "/home/{{ ansible_user }}"
 dotfiles_items:

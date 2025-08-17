@@ -4,7 +4,7 @@ profile:
   settings:
     - { key: "audible-bell", value: "true" }
     - { key: "background-color", value: "'#1e1e2e'" }
-    - { key: "background-transparency-percent", value: "10" }
+    - { key: "background-transparency-percent", value: "20" }
     - { key: "bold-is-bright", value: "true" }
     - { key: "cursor-background-color", value: "'#f5e0dc'" }
     - { key: "cursor-colors-set", value: "true" }

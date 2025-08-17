@@ -8,6 +8,10 @@ profile:
     - { key: "cursor-background-color", value: "'rgb(216,222,233)'" }
     - { key: "cursor-colors-set", value: "true" }
     - { key: "cursor-foreground-color", value: "'rgb(59,66,82)'" }
+    - { key: "cursor-shape", value: "'underline'" }
+    - { key: "default-size-columns", value: "125" }
+    - { key: "default-size-rows", value: "25" }
+    - { key: "font", value: "'JetBrains Mono 13'" }
     - { key: "foreground-color", value: "'#D8DEE9'" }
     - { key: "highlight-background-color", value: "'rgb(136,192,208)'" }
     - { key: "highlight-colors-set", value: "true" }
