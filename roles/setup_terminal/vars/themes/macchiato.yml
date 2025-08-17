@@ -1,0 +1,28 @@
+---
+profile:
+  visible_name: "Macchiato"
+  settings:
+    - { key: "audible-bell", value: "true" }
+    - { key: "background-color", value: "'#1e1e2e'" }
+    - { key: "background-transparency-percent", value: "10" }
+    - { key: "bold-is-bright", value: "true" }
+    - { key: "cursor-background-color", value: "'#f5e0dc'" }
+    - { key: "cursor-colors-set", value: "true" }
+    - { key: "cursor-foreground-color", value: "'#1e1e2e'" }
+    - { key: "cursor-shape", value: "'ibeam'" }
+    - { key: "default-size-columns", value: "125" }
+    - { key: "default-size-rows", value: "25" }
+    - { key: "font", value: "'MesloLGS NF 13'" }
+    - { key: "foreground-color", value: "'rgb(202,211,245)'" }
+    - { key: "highlight-background-color", value: "'#f5e0dc'" }
+    - { key: "highlight-colors-set", value: "true" }
+    - { key: "highlight-foreground-color", value: "'#585b70'" }
+    - {
+        key: "palette",
+        value: "['#45475a', '#f38ba8', '#a6e3a1', '#f9e2af', '#89b4fa', '#f5c2e7', '#94e2d5', '#a6adc8', '#585b70', '#f37799', '#89d88b', '#ebd391', '#74a8fc', '#f2aede', '#6bd7ca', '#bac2de']",
+      }
+    - { key: "use-system-font", value: "false" }
+    - { key: "use-theme-colors", value: "false" }
+    - { key: "use-theme-transparency", value: "false" }
+    - { key: "use-transparent-background", value: "true" }
+    - { key: "visible-name", value: "'Macchiato'" }

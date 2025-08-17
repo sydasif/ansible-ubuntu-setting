@@ -1,0 +1,57 @@
+---
+- name: "Load profile variables for {{ theme_name }}"
+  include_vars:
+    file: "vars/themes/{{ theme_name }}.yml"
+
+- name: "Ensure terminal profile '{{ profile.visible_name }}' exists and get its UUID"
+  shell: |
+    set -e
+    set -o pipefail
+    PROFILE_NAME="{{ profile.visible_name }}"
+
+    # First, try to find the profile by name
+    PROFILES_LIST=$(dconf list /org/gnome/terminal/legacy/profiles:/)
+    for PROFILE_PATH in $PROFILES_LIST; do
+      VISIBLE_NAME=$(dconf read "/org/gnome/terminal/legacy/profiles:/${PROFILE_PATH}visible-name" | tr -d "'")
+      if [ "$VISIBLE_NAME" = "$PROFILE_NAME" ]; then
+        echo "found:${PROFILE_PATH%/}"
+        exit 0
+      fi
+    done
+
+    # If we're here, the profile was not found. Let's create it.
+    NEW_UUID=$(uuidgen)
+
+    CURRENT_PROFILES_STR=$(dconf read /org/gnome/terminal/legacy/profiles:/list)
+
+    if [[ "$CURRENT_PROFILES_STR" == "@as []" || "$CURRENT_PROFILES_STR" == "[]" ]]; then
+      NEW_PROFILES_LIST="['$NEW_UUID']"
+    else
+      NEW_PROFILES_LIST="${CURRENT_PROFILES_STR%]*}, '$NEW_UUID']"
+    fi
+
+    dconf write /org/gnome/terminal/legacy/profiles:/list "$NEW_PROFILES_LIST"
+
+    # Set the visible name for the new profile so we can find it next time
+    dconf write "/org/gnome/terminal/legacy/profiles:/:$NEW_UUID/visible-name" "'$PROFILE_NAME'"
+
+    echo "created:$NEW_UUID"
+  args:
+    executable: /bin/bash
+  register: profile_script_result
+  changed_when: "'created:' in profile_script_result.stdout"
+  become: true
+  become_user: "{{ ansible_user }}"
+
+- name: Set terminal profile UUID fact
+  set_fact:
+    target_profile_uuid: "{{ profile_script_result.stdout | regex_replace('^(found|created):', '') }}"
+
+- name: "Set terminal profile settings for {{ profile.visible_name }}"
+  become: true
+  become_user: "{{ ansible_user }}"
+  community.general.dconf:
+    key: "/org/gnome/terminal/legacy/profiles:/:{{ target_profile_uuid }}/{{ item.key }}"
+    value: "{{ item.value }}"
+  loop: "{{ profile.settings }}"
+  when: target_profile_uuid is defined and target_profile_uuid
