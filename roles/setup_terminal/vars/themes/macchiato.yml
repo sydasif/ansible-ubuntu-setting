@@ -10,9 +10,9 @@ profile:
     - { key: "cursor-colors-set", value: "true" }
     - { key: "cursor-foreground-color", value: "'#1e1e2e'" }
     - { key: "cursor-shape", value: "'ibeam'" }
+    - { key: "font", value: "'MesloLGS NF 13'" }
     - { key: "default-size-columns", value: "125" }
     - { key: "default-size-rows", value: "25" }
-    - { key: "font", value: "'MesloLGS NF 13'" }
     - { key: "foreground-color", value: "'rgb(202,211,245)'" }
     - { key: "highlight-background-color", value: "'#f5e0dc'" }
     - { key: "highlight-colors-set", value: "true" }

@@ -24,14 +24,18 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
 
-- name: Check if Dracula vim theme is already installed
-  ansible.builtin.stat:
-    path: "{{ dotfiles_base_dest }}/.vim/pack/themes/start/dracula"
-  register: dracula_vim_theme_status
+- name: Ensure Vim plugin directory exists
+  ansible.builtin.file:
+    path: "{{ dotfiles_base_dest }}/.vim/pack/themes/start"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
 
 - name: Install Dracula vim theme
   ansible.builtin.git:
     repo: "https://github.com/dracula/vim.git"
     dest: "{{ dotfiles_base_dest }}/.vim/pack/themes/start/dracula"
+    version: master
+    update: no
   become_user: "{{ ansible_user }}"
-  when: not dracula_vim_theme_status.stat.exists

@@ -86,7 +86,8 @@ zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
 # Aliases
 # ------------------------------
 alias ip='ip -c'
-alias ls="lsd"
+alias lsd="lsd -F"
+alias ls="lsd -F"
 
 alias ll='ls -l'
 alias la='ls -a'

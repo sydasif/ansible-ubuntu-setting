@@ -34,16 +34,13 @@ set wildmenu            " Enable command-line completion menu
 set wildmode=list:longest " Bash-like completion behavior
 set wildignore=*.docx,*.jpg,*.png,*.gif,*.pdf,*.pyc,*.exe,*.flv,*.img,*.xlsx " Ignore these files
 
-if v:version < 802
-    packadd! dracula
-endif
-syntax enable
 colorscheme dracula
-    
+set termguicolors
+set background=dark
+
 " ---- STATUS LINE SETTINGS ----
 set statusline=          " Clear status line before setup
 set statusline+=\ %F\ %M\ %Y\ %R   " File name, modified flag, file type, readonly
 set statusline+=%=       " Separator between left/right
 set statusline+=\ row:\ %l\ col:\ %c\ percent:\ %p%% " Right side info
 set laststatus=2         " Always show status line
-

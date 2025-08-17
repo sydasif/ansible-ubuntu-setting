@@ -117,6 +117,3 @@ if ! shopt -oq posix; then
 fi
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
-alias ls="lsd"
-
-
