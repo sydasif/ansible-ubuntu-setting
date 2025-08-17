@@ -1,0 +1,64 @@
+---
+- name: Find UUID for the specified terminal profile name
+  shell: |
+    set -o pipefail
+    PROFILE_NAME="{{ gnome_terminal_profile_name }}"
+    PROFILES_LIST=$(dconf list /org/gnome/terminal/legacy/profiles:/)
+    for PROFILE in $PROFILES_LIST; do
+      VISIBLE_NAME=$(dconf read "/org/gnome/terminal/legacy/profiles:/${PROFILE}visible-name" | tr -d "'")
+      if [ "$VISIBLE_NAME" = "$PROFILE_NAME" ]; then
+        echo "${PROFILE%/}"
+        exit 0
+      fi
+    done
+    exit 1
+  args:
+    executable: /bin/bash
+  register: profile_uuid_result
+  changed_when: false
+  failed_when: profile_uuid_result.rc != 0 and profile_uuid_result.rc != 1
+  become: true
+  become_user: "{{ ansible_user }}"
+
+- name: Set terminal profile UUID fact
+  set_fact:
+    target_profile_uuid: "{{ profile_uuid_result.stdout }}"
+  when: profile_uuid_result.rc == 0 and profile_uuid_result.stdout | length > 0
+
+- name: Set terminal profile settings
+  become: true
+  become_user: "{{ ansible_user }}"
+  community.general.dconf:
+    key: "/org/gnome/terminal/legacy/profiles:/:{{ target_profile_uuid }}/{{ item.key }}"
+    value: "{{ item.value }}"
+  loop:
+    - { key: "audible-bell", value: "true" }
+    - { key: "background-color", value: "'#1e1e2e'" }
+    - { key: "background-transparency-percent", value: "10" }
+    - { key: "bold-is-bright", value: "true" }
+    - { key: "cursor-background-color", value: "'#f5e0dc'" }
+    - { key: "cursor-colors-set", value: "true" }
+    - { key: "cursor-foreground-color", value: "'#1e1e2e'" }
+    - { key: "cursor-shape", value: "'ibeam'" }
+    - { key: "default-size-columns", value: "125" }
+    - { key: "default-size-rows", value: "25" }
+    - { key: "font", value: "'MesloLGS NF 13'" }
+    - { key: "foreground-color", value: "'rgb(202,211,245)'" }
+    - { key: "highlight-background-color", value: "'#f5e0dc'" }
+    - { key: "highlight-colors-set", value: "true" }
+    - { key: "highlight-foreground-color", value: "'#585b70'" }
+    - {
+        key: "palette",
+        value: "['#45475a', '#f38ba8', '#a6e3a1', '#f9e2af', '#89b4fa', '#f5c2e7', '#94e2d5', '#a6adc8', '#585b70', '#f37799', '#89d88b', '#ebd391', '#74a8fc', '#f2aede', '#6bd7ca', '#bac2de']",
+      }
+    - { key: "use-system-font", value: "false" }
+    - { key: "use-theme-colors", value: "false" }
+    - { key: "use-theme-transparency", value: "false" }
+    - { key: "use-transparent-background", value: "true" }
+    - { key: "visible-name", value: "'{{ gnome_terminal_profile_name }}'" }
+  when: target_profile_uuid is defined and target_profile_uuid
+
+- name: Fail if profile was not found
+  fail:
+    msg: "GNOME Terminal profile named '{{ gnome_terminal_profile_name }}' not found. Please check the name in group_vars/Ubuntu.yml."
+  when: target_profile_uuid is not defined or not target_profile_uuid

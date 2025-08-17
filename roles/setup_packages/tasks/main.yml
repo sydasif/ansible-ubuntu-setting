@@ -1,0 +1,25 @@
+---
+- name: install packages
+  ansible.builtin.package:
+    name: "{{ packages_to_install }}"
+
+- name: Check if 'batcat' binary exists (for Debian/Ubuntu based systems)
+  ansible.builtin.stat:
+    path: /usr/bin/batcat
+  register: batcat_stat
+
+- name: Check if 'bat' command is already in PATH
+  ansible.builtin.command: which bat
+  register: bat_command
+  changed_when: false
+  failed_when: false
+
+- name: Create 'bat' symlink if 'batcat' exists and 'bat' command does not
+  ansible.builtin.file:
+    src: /usr/bin/batcat
+    dest: /usr/local/bin/bat
+    state: link
+    mode: "0755"
+  when:
+    - batcat_stat.stat.exists
+    - bat_command.rc != 0

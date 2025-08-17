@@ -9,7 +9,8 @@
       when: ansible_distribution == "Ubuntu"
 
   roles:
-    - common
-    - dotfiles
-    - desktop_settings
-    - install_fonts
+    - setup_packages
+    - setup_dotfiles
+    - setup_desktop
+    - setup_fonts
+    - setup_terminal

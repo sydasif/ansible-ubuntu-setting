@@ -1,5 +1,15 @@
 ---
-- name: copy dotfiles and config files
+- name: Ensure parent directories for config files exist
+  ansible.builtin.file:
+    path: "{{ dotfiles_base_dest }}/{{ item.dest_suffix | dirname }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+  loop: "{{ dotfiles_items | rejectattr('src', 'equalto', 'dotfiles/.gitconfig') }}"
+  when: item.dest_suffix | dirname != '.'
+
+- name: Copy dotfiles and config files
   ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ dotfiles_base_dest }}/{{ item.dest_suffix }}"

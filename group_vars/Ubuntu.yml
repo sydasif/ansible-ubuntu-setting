@@ -31,6 +31,9 @@ wallpaper_dest: "/usr/share/backgrounds/default_wallpaper.jpg"
 gnome_background_picture_uri: "'file:///usr/share/backgrounds/default_wallpaper.jpg'"
 gnome_background_picture_options: "'fit'"
 
+# GNOME Terminal profile settings
+gnome_terminal_profile_name: "default" # The 'visible name' of the terminal profile to configure
+
 snap_packages_to_install:
   - { name: "code", classic: true }
   - { name: "postman", classic: false }
