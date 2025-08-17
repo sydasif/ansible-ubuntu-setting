@@ -23,3 +23,15 @@
     dest: "{{ dotfiles_base_dest }}/.gitconfig"
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
+
+- name: Check if Dracula vim theme is already installed
+  ansible.builtin.stat:
+    path: "{{ dotfiles_base_dest }}/.vim/pack/themes/start/dracula"
+  register: dracula_vim_theme_status
+
+- name: Install Dracula vim theme
+  ansible.builtin.git:
+    repo: "https://github.com/dracula/vim.git"
+    dest: "{{ dotfiles_base_dest }}/.vim/pack/themes/start/dracula"
+  become_user: "{{ ansible_user }}"
+  when: not dracula_vim_theme_status.stat.exists

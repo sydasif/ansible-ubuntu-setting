@@ -2,6 +2,7 @@
 - name: install packages
   ansible.builtin.package:
     name: "{{ packages_to_install }}"
+    state: present
 
 - name: Check if 'batcat' binary exists (for Debian/Ubuntu based systems)
   ansible.builtin.stat:
@@ -23,3 +24,63 @@
   when:
     - batcat_stat.stat.exists
     - bat_command.rc != 0
+
+- name: Docker | Create directory for GPG key
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Docker | Add Docker's official GPG key
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: "0644"
+    force: true
+
+- name: Docker | Add Docker repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+    filename: docker
+
+- name: Docker | Install Docker Engine
+  ansible.builtin.package:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+    update_cache: true
+
+- name: Terraform | Add HashiCorp GPG key
+  ansible.builtin.shell:
+    cmd: wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor > /usr/share/keyrings/hashicorp-archive-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+  changed_when: false
+
+- name: Terraform | Add HashiCorp repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+    state: present
+    filename: hashicorp
+
+- name: Terraform | Install Terraform
+  ansible.builtin.package:
+    name: terraform
+    state: present
+    update_cache: true
+
+- name: Vagrant | Install Vagrant
+  ansible.builtin.package:
+    name: vagrant
+    state: present
+
+- name: User | Add user to libvirt and docker groups
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: libvirt,docker
+    append: yes

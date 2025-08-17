@@ -52,6 +52,6 @@
   become_user: "{{ ansible_user }}"
   community.general.dconf:
     key: "/org/gnome/terminal/legacy/profiles:/:{{ target_profile_uuid }}/{{ item.key }}"
-    value: "{{ item.value }}"
+    value: "{{ item.value | string }}"
   loop: "{{ profile.settings }}"
   when: target_profile_uuid is defined and target_profile_uuid
