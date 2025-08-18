@@ -54,11 +54,6 @@ dotfiles_items:
   - { src: ".gitconfig", dest_suffix: ".gitconfig" }
   - { src: "settings.json", dest_suffix: ".config/Code/User/settings.json" }
 
-wallpaper_src: "default_wallpaper.jpg" # This path is relative to roles/desktop_settings/files/
-wallpaper_dest: "/usr/share/backgrounds/default_wallpaper.jpg"
-gnome_background_picture_uri: "'file:///usr/share/backgrounds/default_wallpaper.jpg'"
-gnome_background_picture_options: "'fit'"
-
 snap_packages_to_install:
   - { name: "code", classic: true }
   - { name: "postman", classic: false }
