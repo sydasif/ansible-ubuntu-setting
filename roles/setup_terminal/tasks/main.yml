@@ -1,6 +1,0 @@
----
-- name: Configure GNOME Terminal profiles
-  include_tasks: profile.yml
-  loop: "{{ gnome_terminal_themes_to_install }}"
-  loop_control:
-    loop_var: theme_name
