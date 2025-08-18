@@ -4,10 +4,10 @@
     name: "{{ packages_to_install }}"
     state: present
 
-- name: Check if 'batcat' binary exists (for Debian/Ubuntu based systems)
-  ansible.builtin.stat:
-    path: /usr/bin/batcat
-  register: batcat_stat
+# - name: Check if 'batcat' binary exists (for Debian/Ubuntu based systems)
+#   ansible.builtin.stat:
+#     path: /usr/bin/batcat
+#   register: batcat_stat
 
 - name: Check if 'bat' command is already in PATH
   ansible.builtin.command: which bat

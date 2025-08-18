@@ -15,9 +15,8 @@
     group: "{{ ansible_user }}"
   with_fileglob:
     - "{{ playbook_dir }}/fonts/*"
-
-- name: Refresh font cache
-  ansible.builtin.command: fc-cache -fv
-  changed_when: false
-  become: false
-  become_user: "{{ ansible_user }}"
+# - name: Refresh font cache
+#   ansible.builtin.command: fc-cache -fv
+#   changed_when: false
+#   become: false
+#   become_user: "{{ ansible_user }}"
