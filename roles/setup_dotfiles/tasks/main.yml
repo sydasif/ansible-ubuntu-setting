@@ -1,28 +1,32 @@
 ---
-- name: Ensure parent directories for config files exist
+- name: Ensure dotfiles destination directory exists
   ansible.builtin.file:
-    path: "{{ dotfiles_base_dest }}/{{ item.dest_suffix | dirname }}"
+    path: "{{ dotfiles_dest }}"
     state: directory
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: "0755"
-  loop: "{{ dotfiles_items | rejectattr('src', 'equalto', 'dotfiles/.gitconfig') }}"
-  when: item.dest_suffix | dirname != '.'
 
-- name: Copy dotfiles and config files
-  ansible.builtin.copy:
-    src: "{{ item.src }}"
+- name: Clone dotfiles repository using command
+  ansible.builtin.command: "git clone {{ dotfiles_repo }} {{ dotfiles_dest }}"
+  args:
+    creates: "{{ dotfiles_dest }}/.git" # Only run if the repo hasn't been cloned
+  become_user: "{{ ansible_user }}"
+
+- name: Update dotfiles repository
+  ansible.builtin.command: "git -C {{ dotfiles_dest }} pull"
+  become_user: "{{ ansible_user }}"
+
+- name: Create symlinks for dotfiles
+  ansible.builtin.file:
+    src: "{{ dotfiles_dest }}/{{ item.src }}"
     dest: "{{ dotfiles_base_dest }}/{{ item.dest_suffix }}"
+    state: link
+    force: yes
+    follow: no
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
-  loop: "{{ dotfiles_items | rejectattr('src', 'equalto', 'dotfiles/.gitconfig') }}"
-
-- name: Template .gitconfig from variables
-  ansible.builtin.template:
-    src: .gitconfig.j2
-    dest: "{{ dotfiles_base_dest }}/.gitconfig"
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+  loop: "{{ dotfiles_items }}"
 
 - name: Ensure Vim plugin directory exists
   ansible.builtin.file:
