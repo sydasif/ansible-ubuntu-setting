@@ -1,0 +1,11 @@
+dotfiles_base_dest: "/home/{{ ansible_user }}"
+dotfiles_items:
+  - { src: ".bashrc", dest_suffix: ".bashrc" }
+  - { src: ".vimrc", dest_suffix: ".vimrc" }
+  - { src: ".zshrc", dest_suffix: ".zshrc" }
+  - { src: ".p10k.zsh", dest_suffix: ".p10k.zsh" }
+  - { src: "ruff.toml", dest_suffix: ".config/ruff/ruff.toml" }
+  - { src: ".gitconfig", dest_suffix: ".gitconfig" }
+  - { src: "settings.json", dest_suffix: ".config/Code/User/settings.json" }
+dotfiles_repo: "git@github.com:sydasif/dotfiles.git"
+dotfiles_dest: "/home/{{ ansible_user }}/.dotfiles"

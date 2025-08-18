@@ -1,0 +1,42 @@
+packages_to_install:
+  # Base utils
+  - bat
+  - build-essential
+  - ca-certificates
+  - curl
+  - git
+  - gnupg
+  - htop
+  - iperf3
+  - net-tools
+  - nmap
+  - python3-pip
+  - python3-psutil
+  - python3-venv
+  - software-properties-common
+  - tar
+  - tmux
+  - traceroute
+  - tree
+  - unzip
+  - vim
+  - wget
+  - zsh
+  # Virtualization
+  - bridge-utils
+  - cloud-init
+  - cloud-utils
+  - dnsmasq
+  - genisoimage
+  - libguestfs-tools
+  - libvirt-clients
+  - libvirt-daemon-system
+  - libvirt-dev
+  - qemu-kvm
+  - qemu-utils
+  - virt-manager
+  - virtinst
+  # Vagrant deps
+  - gcc
+  - make
+  - ruby-dev
