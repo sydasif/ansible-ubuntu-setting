@@ -3,14 +3,14 @@
 - hosts: all
   become: true
   pre_tasks:
-    - name: pre-run | update package cache (Ubuntu)
+    - name: Update Package Cache
       ansible.builtin.apt: update_cache=yes
       changed_when: false
       when: ansible_distribution == "Ubuntu"
 
   roles:
-    - setup_packages
     - setup_dotfiles
-    - setup_snaps
     - setup_fonts
+    - setup_packages
+    - setup_snaps
     - setup_terminal
