@@ -1,21 +1,23 @@
 ---
-- name: Ensure dotfiles destination directory exists
+- name: Ensure required directories exist
   ansible.builtin.file:
-    path: "{{ dotfiles_dest }}"
+    path: "{{ item }}"
     state: directory
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
-    mode: "0755"
+    mode: "0700"
+  loop:
+    - "{{ dotfiles_dest }}"
+    - "{{ dotfiles_base_dest }}/.vim/pack/themes/start"
+    - "{{ dotfiles_base_dest }}/.config/ruff"
 
-- name: Clone dotfiles repository using command
-  ansible.builtin.command: "git clone {{ dotfiles_repo }} {{ dotfiles_dest }}"
-  args:
-    creates: "{{ dotfiles_dest }}/.git" # Only run if the repo hasn't been cloned
-  become_user: "{{ ansible_user }}"
-
-# - name: Update dotfiles repository
-#   ansible.builtin.command: "git -C {{ dotfiles_dest }} pull"
-#   become_user: "{{ ansible_user }}"
+- name: Clone dotfiles repository
+  ansible.builtin.git:
+    repo: "{{ dotfiles_repo }}"
+    dest: "{{ dotfiles_dest }}"
+    update: no
+    accept_hostkey: yes
+  register: git_clone
 
 - name: Create symlinks for dotfiles
   ansible.builtin.file:
@@ -28,18 +30,8 @@
     group: "{{ ansible_user }}"
   loop: "{{ dotfiles_items }}"
 
-- name: Ensure Vim plugin directory exists
-  ansible.builtin.file:
-    path: "{{ dotfiles_base_dest }}/.vim/pack/themes/start"
-    state: directory
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    mode: "0755"
-
 - name: Install Dracula vim theme
   ansible.builtin.git:
     repo: "https://github.com/dracula/vim.git"
     dest: "{{ dotfiles_base_dest }}/.vim/pack/themes/start/dracula"
-    version: master
     update: no
-  become_user: "{{ ansible_user }}"
