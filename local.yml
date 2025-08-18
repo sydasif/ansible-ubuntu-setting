@@ -11,6 +11,6 @@
   roles:
     - setup_packages
     - setup_dotfiles
-    - setup_desktop
+    - setup_snaps
     - setup_fonts
     - setup_terminal
