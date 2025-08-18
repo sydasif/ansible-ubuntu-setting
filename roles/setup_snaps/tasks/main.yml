@@ -1,5 +1,10 @@
 ---
-- name: Install Snap packages
+- name: Ensure snapd is installed
+  ansible.builtin.package:
+    name: snapd
+    state: present
+
+- name: Install snap packages
   community.general.snap:
     name: "{{ item.name }}"
     classic: "{{ item.classic | default(false) }}"
