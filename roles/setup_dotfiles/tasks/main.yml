@@ -35,3 +35,11 @@
     repo: "https://github.com/dracula/vim.git"
     dest: "{{ dotfiles_base_dest }}/.vim/pack/themes/start/dracula"
     update: no
+
+- name: Copy terminal profiles
+  copy:
+    src: "{{ dotfiles_dest }}/{{ item.src }}"
+    dest: /tmp/terminal-profiles.ini
+
+- name: Apply terminal profiles
+  shell: dconf load /org/gnome/terminal/ < /tmp/terminal-profiles.ini
