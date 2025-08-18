@@ -43,19 +43,19 @@
       - ruby-dev
   when: ansible_distribution == 'Ubuntu'
 
-- name: Remove conflicting Docker packages
-  ansible.builtin.apt:
-    name: "{{ item }}"
-    state: absent
-    purge: yes
-  loop:
-    - docker.io
-    - docker-doc
-    - docker-compose
-    - podman-docker
-    - containerd
-    - runc
-  when: ansible_distribution == 'Ubuntu'
+# - name: Remove conflicting Docker packages
+#   ansible.builtin.apt:
+#     name: "{{ item }}"
+#     state: absent
+#     purge: yes
+#   loop:
+#     - docker.io
+#     - docker-doc
+#     - docker-compose
+#     - podman-docker
+#     - containerd
+#     - runc
+#   when: ansible_distribution == 'Ubuntu'
 
 - name: Install Docker prerequisites
   ansible.builtin.apt:

@@ -38,8 +38,9 @@
 
 - name: Copy terminal profiles
   copy:
-    src: "{{ dotfiles_dest }}/{{ item.src }}"
-    dest: /tmp/terminal-profiles.ini
+    src: "{{ dotfiles_dest }}/terminal-profiles.ini"
+    dest: "/tmp/terminal-profiles.ini"
+    remote_src: yes
 
 - name: Apply terminal profiles
   shell: dconf load /org/gnome/terminal/ < /tmp/terminal-profiles.ini

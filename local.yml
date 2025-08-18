@@ -19,4 +19,3 @@
     - setup_snaps
     - setup_fonts
     - setup_dotfiles
-    - setup_terminal
