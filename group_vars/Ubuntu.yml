@@ -59,7 +59,6 @@ snap_packages_to_install:
   - { name: "postman", classic: false }
 
 gnome_terminal_themes_to_install:
-  - macchiato
   - nord
 
 dotfiles_repo: "git@github.com:sydasif/dotfiles.git"
