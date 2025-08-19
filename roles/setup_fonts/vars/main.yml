@@ -1,0 +1,6 @@
+---
+fonts_base_dir: "/home/{{ ansible_user }}/.fonts"
+jetbrains_mono_font_name: "JetBrainsMonoNerdFont-Regular.ttf"
+jetbrains_mono_download_url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/JetBrainsMono.tar.xz"
+meslo_font_name: "MesloLGS NF Regular.ttf"
+meslo_download_url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Meslo.tar.xz"

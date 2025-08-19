@@ -1,0 +1,32 @@
+- name: Ensure fonts directory
+  file:
+    path: "{{ fonts_base_dir }}"
+    state: directory
+
+- name: Check if JetBrainsMono is installed
+  ansible.builtin.stat:
+    path: "{{ fonts_base_dir }}/{{ jetbrains_mono_font_name }}"
+  register: jetbrains_mono_stat
+
+- name: Download JetBrainsMono
+  when: not jetbrains_mono_stat.stat.exists
+  ansible.builtin.unarchive:
+    src: "{{ jetbrains_mono_download_url }}"
+    dest: "{{ fonts_base_dir }}/"
+    remote_src: yes
+
+- name: Check if Meslo is installed
+  ansible.builtin.stat:
+    path: "{{ fonts_base_dir }}/{{ meslo_font_name }}"
+  register: meslo_stat
+
+- name: Download Meslo
+  when: not meslo_stat.stat.exists
+  ansible.builtin.unarchive:
+    src: "{{ meslo_download_url }}"
+    dest: "{{ fonts_base_dir }}/"
+    remote_src: yes
+
+- name: Refresh font cache
+  command: fc-cache -fv
+  become: false
