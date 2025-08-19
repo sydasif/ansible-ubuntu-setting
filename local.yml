@@ -16,3 +16,4 @@
     - setup_packages
     - setup_dotfiles
     - setup_fonts
+    - setup_docker
