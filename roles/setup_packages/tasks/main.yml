@@ -48,17 +48,9 @@
     mode: "0755"
   when: ansible_distribution == 'Ubuntu'
 
-- name: Add Docker GPG key
-  ansible.builtin.get_url:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    dest: /tmp/docker.gpg
-    mode: "0644"
-    force: no
-  when: ansible_distribution == 'Ubuntu'
-
-- name: Dearmor Docker GPG key
-  ansible.builtin.command:
-    cmd: gpg --dearmor -o /etc/apt/keyrings/docker.gpg /tmp/docker.gpg
+- name: Download and Dearmor Docker GPG key
+  ansible.builtin.shell:
+    cmd: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
     creates: /etc/apt/keyrings/docker.gpg
   when: ansible_distribution == 'Ubuntu'
 
