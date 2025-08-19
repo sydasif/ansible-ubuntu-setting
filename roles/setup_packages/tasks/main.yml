@@ -1,71 +1,44 @@
 ---
 - name: Install base packages
   ansible.builtin.apt:
-    name: "{{ packages_to_install }}"
+    name: "{{ base_packages }}"
     state: present
     update_cache: yes
   when:
     - ansible_distribution == 'Ubuntu'
-    - packages_to_install is defined
-    - packages_to_install | length > 0
+
+- name: Install networking utilities
+  ansible.builtin.apt:
+    name: "{{ network_packages }}"
+    state: present
+  when:
+    - ansible_distribution == 'Ubuntu'
+
+- name: Install Python development packages
+  ansible.builtin.apt:
+    name: "{{ python_packages }}"
+    state: present
+  when:
+    - ansible_distribution == 'Ubuntu'
+
+- name: Install Vagrant dependencies
+  ansible.builtin.apt:
+    name: "{{ vagrant_dep_packages }}"
+    state: present
+  when:
+    - ansible_distribution == 'Ubuntu'
+
+- name: Install Docker prerequisites
+  ansible.builtin.apt:
+    name: "{{ docker_prereq_packages }}"
+    state: present
+  when:
+    - ansible_distribution == 'Ubuntu'
 
 - name: Install virtualization packages
   ansible.builtin.apt:
     name: "{{ virtualization_packages }}"
     state: present
-    update_cache: yes
-  vars:
-    virtualization_packages:
-      - bridge-utils
-      - cloud-init
-      - cloud-utils
-      - dnsmasq
-      - genisoimage
-      - libguestfs-tools
-      - libvirt-clients
-      - libvirt-daemon-system
-      - libvirt-dev
-      - qemu-kvm
-      - qemu-utils
-      - virt-manager
-      - virtinst
-  when: ansible_distribution == 'Ubuntu'
-
-- name: Install Vagrant dependency packages
-  ansible.builtin.apt:
-    name: "{{ vagrant_dep_packages }}"
-    state: present
-    update_cache: yes
-  vars:
-    vagrant_dep_packages:
-      - gcc
-      - make
-      - ruby-dev
-  when: ansible_distribution == 'Ubuntu'
-
-# - name: Remove conflicting Docker packages
-#   ansible.builtin.apt:
-#     name: "{{ item }}"
-#     state: absent
-#     purge: yes
-#   loop:
-#     - docker.io
-#     - docker-doc
-#     - docker-compose
-#     - podman-docker
-#     - containerd
-#     - runc
-#   when: ansible_distribution == 'Ubuntu'
-
-- name: Install Docker prerequisites
-  ansible.builtin.apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: yes
-  loop:
-    - ca-certificates
-    - curl
-    - gnupg
   when: ansible_distribution == 'Ubuntu'
 
 - name: Create APT keyrings directory

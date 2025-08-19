@@ -1,6 +1,6 @@
 ---
-packages_to_install:
-  # Base utils
+# Base system utilities
+base_packages:
   - bat
   - git
   - tar
@@ -9,14 +9,48 @@ packages_to_install:
   - htop
   - tmux
   - tree
-  - nmap
   - wget
   - unzip
+  - build-essential
+  - software-properties-common
+
+# Networking utilities
+network_packages:
+  - nmap
   - iperf3
   - net-tools
   - traceroute
+
+# Python development
+python_packages:
   - python3-pip
   - python3-venv
   - python3-psutil
-  - build-essential
-  - software-properties-common
+
+# Vagrant dependencies
+vagrant_dep_packages:
+  - gcc
+  - make
+  - ruby-dev
+
+# Docker prerequisites
+docker_prereq_packages:
+  - ca-certificates
+  - curl
+  - gnupg
+
+# Virtualization packages
+virtualization_packages:
+  - bridge-utils
+  - cloud-init
+  - cloud-utils
+  - dnsmasq
+  - genisoimage
+  - libguestfs-tools
+  - libvirt-clients
+  - libvirt-daemon-system
+  - libvirt-dev
+  - qemu-kvm
+  - qemu-utils
+  - virt-manager
+  - virtinst
