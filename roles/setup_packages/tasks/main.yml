@@ -1,139 +1,22 @@
 ---
-- name: Install prerequisite packages for Docker
-  ansible.builtin.apt:
-    name:
-      - ca-certificates
-      - gnupg
-    state: present
-    update_cache: yes
-  when:
-    - ansible_distribution == 'Ubuntu'
-
 - name: Install base packages
   ansible.builtin.apt:
     name: "{{ base_packages }}"
     state: present
     update_cache: yes
-  when:
-    - ansible_distribution == 'Ubuntu'
 
 - name: Install networking utilities
   ansible.builtin.apt:
     name: "{{ network_packages }}"
     state: present
-  when:
-    - ansible_distribution == 'Ubuntu'
 
 - name: Install Python development packages
   ansible.builtin.apt:
     name: "{{ python_packages }}"
     state: present
-  when:
-    - ansible_distribution == 'Ubuntu'
-
-- name: Install Vagrant dependencies
-  ansible.builtin.apt:
-    name: "{{ vagrant_dep_packages }}"
-    state: present
-  when:
-    - ansible_distribution == 'Ubuntu'
-
-- name: Install Docker prerequisites
-  ansible.builtin.apt:
-    name: "{{ docker_prereq_packages }}"
-    state: present
-  when:
-    - ansible_distribution == 'Ubuntu'
 
 - name: Install virtualization packages
   ansible.builtin.apt:
     name: "{{ virtualization_packages }}"
     state: present
   when: ansible_distribution == 'Ubuntu'
-
-- name: Create APT keyrings directory
-  ansible.builtin.file:
-    path: /etc/apt/keyrings
-    state: directory
-    mode: "0755"
-  when: ansible_distribution == 'Ubuntu'
-
-- name: Download and dearmor Docker GPG key
-  ansible.builtin.shell:
-    cmd: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/docker.gpg > /dev/null
-    creates: /usr/share/keyrings/docker.gpg
-  when: ansible_distribution == 'Ubuntu'
-
-- name: Add Docker APT repository
-  ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable"
-    state: present
-    filename: docker
-    update_cache: yes
-  when: ansible_distribution == 'Ubuntu'
-
-- name: Install Docker Engine packages
-  ansible.builtin.apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: yes
-  loop:
-    - docker-ce
-    - docker-ce-cli
-    - containerd.io
-    - docker-buildx-plugin
-    - docker-compose-plugin
-  when: ansible_distribution == 'Ubuntu'
-
-- name: Add HashiCorp GPG key
-  ansible.builtin.get_url:
-    url: https://apt.releases.hashicorp.com/gpg
-    dest: /tmp/hashicorp.gpg
-    mode: "0644"
-    force: no
-  when: ansible_os_family == 'Debian'
-
-- name: Dearmor HashiCorp GPG key
-  ansible.builtin.command:
-    cmd: gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg /tmp/hashicorp.gpg
-    creates: /usr/share/keyrings/hashicorp-archive-keyring.gpg
-  when: ansible_os_family == 'Debian'
-
-- name: Add HashiCorp APT repository
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
-    state: present
-    filename: hashicorp
-  when: ansible_os_family == 'Debian'
-
-- name: Install Terraform
-  ansible.builtin.apt:
-    name: terraform
-    state: present
-    update_cache: yes
-  when: ansible_os_family == 'Debian'
-
-- name: Install Vagrant
-  ansible.builtin.apt:
-    name: vagrant
-    state: present
-    update_cache: yes
-  when: ansible_os_family == 'Debian'
-
-- name: Ensure libvirt and docker groups exist
-  ansible.builtin.group:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - libvirt
-    - docker
-  when: ansible_distribution == 'Ubuntu'
-
-- name: Add user to libvirt and docker groups
-  ansible.builtin.user:
-    name: "{{ ansible_user }}"
-    groups: libvirt,docker
-    append: yes
-  when:
-    - ansible_distribution == 'Ubuntu'
-    - ansible_user is defined

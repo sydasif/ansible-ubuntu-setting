@@ -1,4 +1,0 @@
-snap_packages_to_install:
-  - { name: "code", classic: true }
-  - { name: "postman", classic: false }
-  - { name: "chromium", classic: false }
