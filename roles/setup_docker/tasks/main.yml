@@ -28,6 +28,7 @@
     name: "{{ docker_engine_packages }}"
     update_cache: true
   register: docker_installation
+  notify: Start and enable docker
 
 - name: Add current user to docker group
   ansible.builtin.user:
@@ -35,6 +36,7 @@
     groups: docker
     append: true
   when: ansible_user is defined and ansible_user != 'root'
+  notify: Start and enable docker
 
 - name: Install containerlab
   ansible.builtin.shell:
