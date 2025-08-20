@@ -14,6 +14,7 @@
     src: "{{ jetbrains_mono_download_url }}"
     dest: "{{ fonts_base_dir }}/"
     remote_src: yes
+  notify: Refresh font cache
 
 - name: Check if Meslo is installed
   ansible.builtin.stat:
@@ -26,8 +27,4 @@
     src: "{{ meslo_download_url }}"
     dest: "{{ fonts_base_dir }}/"
     remote_src: yes
-
-- name: Refresh font cache
-  command: fc-cache -fv
-  become: false
-  when: not jetbrains_mono_stat.stat.exists or meslo_stat.stat.exists
+  notify: Refresh font cache
