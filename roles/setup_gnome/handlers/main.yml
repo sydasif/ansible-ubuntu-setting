@@ -1,0 +1,4 @@
+---
+- name: Update dconf
+  shell: dconf update
+  become: true

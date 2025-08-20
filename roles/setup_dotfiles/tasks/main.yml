@@ -37,19 +37,3 @@
     dest: "{{ dotfiles_base_dest }}/.vim/pack/themes/start/dracula"
     update: no
   register: dracula_clone
-
-- name: Copy terminal profiles to temporary location
-  ansible.builtin.copy:
-    src: "{{ dotfiles_dest }}/terminal-profiles.ini"
-    dest: "/tmp/terminal-profiles.ini"
-    remote_src: yes
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    mode: "0600"
-
-- name: Apply terminal profiles with dconf
-  ansible.builtin.shell:
-    cmd: dconf load /org/gnome/terminal/legacy/profiles:/ < /tmp/terminal-profiles.ini
-  environment:
-    XDG_RUNTIME_DIR: "/run/user/{{ ansible_user_uid }}"
-  changed_when: false

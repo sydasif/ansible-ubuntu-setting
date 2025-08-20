@@ -17,3 +17,4 @@
     - setup_dotfiles
     - setup_fonts
     - setup_docker
+    - setup_gnome
