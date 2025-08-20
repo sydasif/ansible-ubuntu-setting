@@ -1,18 +1,8 @@
 ---
-- name: Deploy GNOME Terminal Settings
-  copy:
-    src: dconf_terminal.ini
-    dest: /etc/dconf/db/local.d/00-gnome-terminal
-    owner: root
-    group: root
-    mode: "0644"
-  notify: Update dconf
-  become: true
-
 - name: Deploy GNOME dconf defaults
   copy:
     src: dconf_gnome.ini
-    dest: /etc/dconf/db/local.d/00-gnome
+    dest: /etc/dconf/db/local.d/00-gnome-defaults
     owner: root
     group: root
     mode: "0644"
