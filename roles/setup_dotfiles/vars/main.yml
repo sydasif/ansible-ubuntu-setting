@@ -6,6 +6,7 @@ dotfiles_items:
   - { src: ".p10k.zsh", dest_suffix: ".p10k.zsh" }
   - { src: "ruff.toml", dest_suffix: ".config/ruff/ruff.toml" }
   - { src: ".gitconfig", dest_suffix: ".gitconfig" }
+  - { src: ".gitignore", dest_suffix: ".gitignore" }
   - { src: "settings.json", dest_suffix: ".config/Code/User/settings.json" }
 dotfiles_repo: "https://github.com/sydasif/dotfiles.git"
 dotfiles_dest: "/home/{{ ansible_user }}/.dotfiles"
