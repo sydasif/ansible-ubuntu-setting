@@ -27,6 +27,7 @@
   ansible.builtin.apt:
     name: "{{ docker_engine_packages }}"
     update_cache: true
+  register: docker_installation
 
 - name: Add current user to docker group
   ansible.builtin.user:
@@ -34,3 +35,8 @@
     groups: docker
     append: true
   when: ansible_user is defined and ansible_user != 'root'
+
+- name: Install containerlab
+  ansible.builtin.shell:
+    cmd: 'bash -c "$(curl -sL https://get.containerlab.dev)"'
+  when: docker_installation is changed

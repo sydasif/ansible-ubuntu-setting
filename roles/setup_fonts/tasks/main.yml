@@ -30,3 +30,4 @@
 - name: Refresh font cache
   command: fc-cache -fv
   become: false
+  when: not jetbrains_mono_stat.stat.exists or meslo_stat.stat.exists
