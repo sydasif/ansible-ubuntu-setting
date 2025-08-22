@@ -5,6 +5,7 @@
     dest: "{{ dotfiles_dest }}"
     update: no
     accept_hostkey: yes
+  become_user: "{{ ansible_user }}"
   register: git_clone
 
 - name: Ensure required directories exist
