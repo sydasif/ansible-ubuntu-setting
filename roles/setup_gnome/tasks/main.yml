@@ -40,7 +40,7 @@
   notify: Update dconf
   become: true
 
-- name: Configure GDM dconf settings defaults
+- name: Deploy GDM dconf settings defaults
   copy:
     src: dconf_gdm.ini
     dest: /etc/dconf/db/gdm.d/00-global
@@ -49,3 +49,13 @@
     group: root
   notify: Update dconf
   become: true
+
+- name: Copy dconf user profile
+  copy:
+    src: profile
+    dest: /etc/dconf/profile/user
+    mode: "0644"
+    owner: root
+    group: root
+  become: true
+

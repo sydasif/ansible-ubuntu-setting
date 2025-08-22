@@ -12,6 +12,8 @@ base_packages:
   - wget
   - unzip
   - curl
+  - lsd
+  - gnome-tweaks
 # Networking utilities
 network_packages:
   - nmap
