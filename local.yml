@@ -13,8 +13,8 @@
       when: ansible_distribution == 'Ubuntu'
 
   roles:
-    - setup_packages
-    - setup_dotfiles
-    - setup_fonts
-    - setup_docker
-    - setup_gnome
+    - { role: setup_packages, tags: ["packages"] }
+    - { role: setup_dotfiles, tags: ["dotfiles"] }
+    - { role: setup_fonts, tags: ["fonts"] }
+    - { role: setup_docker, tags: ["docker"] }
+    - { role: setup_gnome, tags: ["gnome"] }

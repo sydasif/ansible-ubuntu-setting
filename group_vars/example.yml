@@ -1,0 +1,19 @@
+---
+# Example variables for Ubuntu targets
+ansible_user: your_username_here
+
+# Example package groups (override in your environment)
+base_packages:
+  - git
+  - curl
+  - vim
+network_packages:
+  - net-tools
+  - traceroute
+  - nmap
+python_packages:
+  - python3-pip
+  - python3-venv
+
+# Example dotfiles repository (override to your dotfiles)
+dotfiles_repo: "https://github.com/sydasif/dotfiles.git"
