@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  role_name: setup_packages
+  author: sydasif
+  description: Installs and configures common packages on Ubuntu
+  license: MIT
+  min_ansible_version: "2.13"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy    # 22.04
+        - noble    # 24.04
+
+  galaxy_tags:
+    - ubuntu
+    - desktop
+    - system
+    - packages
+
+dependencies: []
