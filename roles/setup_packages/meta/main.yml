@@ -8,8 +8,8 @@ galaxy_info:
   platforms:
     - name: Ubuntu
       versions:
-        - jammy    # 22.04
-        - noble    # 24.04
+        - jammy # 22.04
+        - noble # 24.04
 
   galaxy_tags:
     - ubuntu

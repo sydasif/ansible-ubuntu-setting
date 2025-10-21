@@ -5,9 +5,9 @@ exclude_paths:
   - .gitignore
 
 skip_list:
-  - yaml[line-length]  # Line too long
-  - no-handler  # Tasks that run when changed should likely be handlers
+  - yaml[line-length] # Line too long
+  - no-handler # Tasks that run when changed should likely be handlers
 
 warn_list:
-  - experimental  # All rules tagged as experimental
-  - yaml  # Violations reported by yamllint
+  - experimental # All rules tagged as experimental
+  - yaml # Violations reported by yamllint
