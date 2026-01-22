@@ -16,7 +16,6 @@
     group: "{{ ansible_user }}"
     mode: "0700"
   loop:
-    - "{{ dotfiles_base_dest }}/.vim/pack/themes/start"
     - "{{ dotfiles_base_dest }}/.config/ruff"
     - "{{ dotfiles_base_dest }}/.config/Code/User"
 
@@ -31,10 +30,3 @@
     group: "{{ ansible_user }}"
     mode: "0600"
   loop: "{{ dotfiles_items }}"
-
-- name: Install Dracula vim theme
-  ansible.builtin.git:
-    repo: "https://github.com/dracula/vim.git"
-    dest: "{{ dotfiles_base_dest }}/.vim/pack/themes/start/dracula"
-    update: no
-  register: dracula_clone
