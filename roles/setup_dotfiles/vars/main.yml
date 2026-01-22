@@ -6,5 +6,6 @@ dotfiles_items:
   - { src: "ruff.toml", dest_suffix: ".config/ruff/ruff.toml" }
   - { src: ".gitconfig", dest_suffix: ".gitconfig" }
   - { src: "settings.json", dest_suffix: ".config/Code/User/settings.json" }
+  - { src: "ghostty/config", dest_suffix: ".config/ghostty/config" }
 dotfiles_repo: "https://github.com/sydasif/dotfiles.git"
 dotfiles_dest: "/home/{{ ansible_user }}/.dotfiles"

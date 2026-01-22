@@ -18,6 +18,7 @@
   loop:
     - "{{ dotfiles_base_dest }}/.config/ruff"
     - "{{ dotfiles_base_dest }}/.config/Code/User"
+    - "{{ dotfiles_base_dest }}/.config/ghostty"
 
 - name: Create symlinks for dotfiles
   ansible.builtin.file:
