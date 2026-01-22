@@ -12,5 +12,6 @@ dotfiles_items:
   - { src: "ghostty/config", dest_suffix: ".config/ghostty/config" }
   - { src: "ssh/config", dest_suffix: ".ssh/config" }
   - { src: "starship/starship.toml", dest_suffix: ".config/starship.toml" }
+  - { src: "nvim", dest_suffix: ".config/nvim" }
 dotfiles_repo: "https://github.com/sydasif/dotfiles.git"
 dotfiles_dest: "/home/{{ ansible_user }}/.dotfiles"

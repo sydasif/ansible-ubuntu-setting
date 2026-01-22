@@ -20,6 +20,7 @@
     - "{{ dotfiles_base_dest }}/.config/Code/User"
     - "{{ dotfiles_base_dest }}/.config/ghostty"
     - "{{ dotfiles_base_dest }}/.ssh"
+    - "{{ dotfiles_base_dest }}/.config"
 
 - name: Create symlinks for dotfiles
   ansible.builtin.file:

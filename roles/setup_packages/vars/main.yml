@@ -12,6 +12,7 @@ base_packages:
   - curl
   - lsd
   - gnome-tweaks
+  - neovim
 # Networking utilities
 network_packages:
   - nmap
