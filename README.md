@@ -33,6 +33,8 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+Note: The inventory script requires the 'distro' package which is included in the requirements.txt file.
+
 1. Copy the example group variables and edit them for your environment:
 
 ```bash
@@ -45,6 +47,8 @@ cp group_vars/example.yml group_vars/Ubuntu.yml
 ```bash
 ansible-playbook -i scripts/inventory.py local.yml --ask-become-pass
 ```
+
+Note: The `scripts/inventory.py` is a dynamic inventory script that automatically detects your local Ubuntu system. Make sure you have the required Python dependencies installed (distro package).
 
 ### Run specific roles only
 
