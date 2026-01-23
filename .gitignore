@@ -5,6 +5,7 @@ __pycache__/
 *.so
 .Python
 env/
+.venv/
 build/
 develop-eggs/
 dist/
@@ -23,6 +24,14 @@ var/
 # Ansible
 *.retry
 ansible_fact_cache/
+.hosts
+ inventory
+*.inventory
+.secrets
+.vault_pass
+credentials
+.id_rsa
+.id_ed25519
 
 # IDEs
 .idea/
@@ -34,3 +43,8 @@ ansible_fact_cache/
 # OS
 .DS_Store
 Thumbs.db
+
+# Local configuration overrides
+group_vars/local.yml
+group_vars/secrets.yml
+hosts
