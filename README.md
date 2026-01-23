@@ -1,11 +1,11 @@
-# ansible-ubuntu-setting
+# Ansible Ubuntu Setting
 
 Automate an Ubuntu desktop setup using Ansible. This repository provides role-based playbooks that install packages, deploy dotfiles, configure Docker, install developer fonts, and apply GNOME preferences so your desktop configuration is version-controlled and repeatable.
 
 ## Quick facts
 
 - Target: Ubuntu 24.04+ (desktop)
-- Control machine: any system with Git and Ansible installed
+- Control machine: Any system with `Git` and `Ansible`
 
 ## Repository layout
 
@@ -14,9 +14,7 @@ Automate an Ubuntu desktop setup using Ansible. This repository provides role-ba
 - `group_vars/` — `example.yml` provided; copy to `Ubuntu.yml` and customize
 - `roles/` — role implementations (packages, dotfiles, docker, fonts, gnome)
 - `scripts/inventory.py` — optional dynamic inventory
-- `Makefile` — convenience targets (`make run`, `make lint`)
-- `CONTRIBUTING.md`, `LICENSE` — contribution and license guidance
-- `.github/workflows/` — CI for markdown and Ansible/YAML linters
+- `requirements.txt` — Python dependencies
 
 ## Quick start
 
@@ -25,6 +23,14 @@ Automate an Ubuntu desktop setup using Ansible. This repository provides role-ba
 ```bash
 git clone https://github.com/sydasif/ansible-ubuntu-setting.git
 cd ansible-ubuntu-setting
+```
+
+1. Create a Python virtual environment and install dependencies:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
 1. Copy the example group variables and edit them for your environment:
@@ -38,12 +44,6 @@ cp group_vars/example.yml group_vars/Ubuntu.yml
 
 ```bash
 ansible-playbook -i scripts/inventory.py local.yml --ask-become-pass
-```
-
-Or use the Makefile shortcut:
-
-```bash
-make run
 ```
 
 ### Run specific roles only
@@ -73,7 +73,7 @@ See `CONTRIBUTING.md` for contribution guidelines. This repository includes GitH
 
 ## License
 
-This project includes an MIT `LICENSE` file.
+MIT License - see the `LICENSE` file for details.
 
 ## References
 
