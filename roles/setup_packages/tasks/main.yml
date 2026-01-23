@@ -19,4 +19,4 @@
   ansible.builtin.apt:
     name: "{{ virtualization_packages }}"
     state: present
-  when: ansible_distribution == 'Ubuntu'
+  when: ansible_facts['distribution'] == 'Ubuntu'

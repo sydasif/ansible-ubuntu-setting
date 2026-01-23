@@ -7,7 +7,7 @@ docker_dependencies:
   - gnupg-agent
   - software-properties-common
 docker_gpg_key_url: https://download.docker.com/linux/ubuntu/gpg
-docker_repository_repo: deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename | lower }} stable
+docker_repository_repo: deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_facts['lsb']['codename'] | lower }} stable
 docker_engine_packages:
   - docker-ce
   - docker-ce-cli

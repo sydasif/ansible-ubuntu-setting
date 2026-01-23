@@ -2,17 +2,14 @@
 # Base system utilities
 base_packages:
   - bat
-  - git
   - tar
   - zsh
-  - htop
   - tree
   - wget
   - unzip
   - curl
   - lsd
   - gnome-tweaks
-  - neovim
 # Networking utilities
 network_packages:
   - nmap
