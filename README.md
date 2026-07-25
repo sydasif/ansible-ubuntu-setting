@@ -25,7 +25,7 @@ git clone https://github.com/sydasif/ansible-ubuntu-setting.git
 cd ansible-ubuntu-setting
 ```
 
-1. Create a Python virtual environment and install dependencies:
+2. Create a Python virtual environment and install dependencies:
 
 ```bash
 python3 -m venv .venv
@@ -35,14 +35,14 @@ pip install -r requirements.txt
 
 Note: The inventory script requires the 'distro' package which is included in the requirements.txt file.
 
-1. Copy the example group variables and edit them for your environment:
+3. Copy the example group variables and edit them for your environment:
 
 ```bash
 cp group_vars/example.yml group_vars/Ubuntu.yml
 # edit group_vars/Ubuntu.yml (ansible_user, package lists, dotfiles_repo, etc.)
 ```
 
-1. Run the full playbook (example using the included dynamic inventory):
+4. Run the full playbook (example using the included dynamic inventory):
 
 ```bash
 ansible-playbook -i scripts/inventory.py local.yml --ask-become-pass
