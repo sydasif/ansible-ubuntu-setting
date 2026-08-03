@@ -2,20 +2,11 @@
 # Base system utilities
 base_packages:
   - bat
-  - tar
   - zsh
   - tree
-  - wget
-  - unzip
   - curl
   - lsd
   - gnome-tweaks
-# Networking utilities
-network_packages:
-  - nmap
-  - iperf3
-  - net-tools
-  - traceroute
 # Python development
 python_packages:
   - python3-pip
@@ -24,7 +15,6 @@ python_packages:
 # Virtualization packages
 virtualization_packages:
   - bridge-utils
-  - cloud-init
   - cloud-utils
   - genisoimage
   - libguestfs-tools
