@@ -54,7 +54,6 @@
     filename: vscode
     repo: "{{ vscode_apt_repo }}"
     state: present
-    keyring: /etc/apt/keyrings/packages.microsoft.gpg
   notify: Update apt cache
 
 - name: Install VS Code
