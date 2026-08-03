@@ -75,6 +75,14 @@ ansible-playbook local.yml --tags vagrant
 - Edit `group_vars/Ubuntu.yml` to change package lists, dotfiles repository URL, or GNOME preferences.
 - Keep secrets out of the repository; use Ansible Vault or an external secret store.
 
+## Vagrant role
+
+The `vagrant` role installs Vagrant, libvirt/KVM, and the `vagrant-libvirt` plugin. It also moves Vagrant box storage to `/storage/vagrant/boxes` and reconfigures the libvirt default pool to `/storage/libvirt/images` if needed.
+
+A minimal Containerlab Vagrantfile is deployed at `~/containerlab-vagrant/Vagrantfile`.
+
+Note: The `vagrant-libvirt` plugin compiles native extensions on first install and can take 2–5 minutes. The role handles this with an async install and retry loop.
+
 ## Troubleshooting
 
 ### "Timed out waiting for become success or become password prompt" (Ubuntu 26.04)
