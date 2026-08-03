@@ -68,6 +68,10 @@
   register: vagrant_libvirt_check
   changed_when: false
   failed_when: false
+  become: false
+  vars:
+    ansible_become: false
+    ansible_user: "{{ lookup('env', 'USER') }}"
 
 - name: Install vagrant-libvirt plugin
   ansible.builtin.shell: vagrant plugin install "{{ vagrant_plugin_libvirt }}"
@@ -79,6 +83,10 @@
   poll: 0
   register: vagrant_plugin_install
   failed_when: false
+  become: false
+  vars:
+    ansible_become: false
+    ansible_user: "{{ lookup('env', 'USER') }}"
 
 - name: Wait for vagrant-libvirt plugin install to complete
   ansible.builtin.async_status:
@@ -88,6 +96,10 @@
   until: plugin_job_result.finished
   retries: 120
   delay: 5
+  become: false
+  vars:
+    ansible_become: false
+    ansible_user: "{{ lookup('env', 'USER') }}"
 
 - name: Create Vagrant boxes storage directory on /storage
   ansible.builtin.file:
@@ -101,18 +113,23 @@
 - name: Move Vagrant boxes to /storage
   ansible.builtin.shell: |
     set -e
+    user_home=$(eval echo ~{{ ansible_user }})
     mkdir -p "{{ storage_vagrant_boxes | dirname }}"
-    if [ -d ~/.vagrant.d/boxes ] && [ ! -L ~/.vagrant.d/boxes ]; then
-      cp -a ~/.vagrant.d/boxes/* "{{ storage_vagrant_boxes }}" 2>/dev/null || true
+    if [ -d "$user_home/.vagrant.d/boxes" ] && [ ! -L "$user_home/.vagrant.d/boxes" ]; then
+      cp -a "$user_home/.vagrant.d/boxes/"* "{{ storage_vagrant_boxes }}/" 2>/dev/null || true
     fi
-    rm -rf ~/.vagrant.d/boxes
-    ln -s "{{ storage_vagrant_boxes }}" ~/.vagrant.d/boxes
+    rm -rf "$user_home/.vagrant.d/boxes"
+    ln -s "{{ storage_vagrant_boxes }}" "$user_home/.vagrant.d/boxes"
   args:
     executable: /bin/bash
   when: storage_vagrant_boxes is defined
   register: vagrant_storage_link
-  changed_when: "'boxes' in vagrant_storage_link.stdout or 'Symbolic link' in vagrant_storage_link.stdout or vagrant_storage_link.rc == 0"
+  changed_when: "'Symbolic link' in vagrant_storage_link.stdout or vagrant_storage_link.rc == 0"
   failed_when: vagrant_storage_link.rc != 0
+  become: false
+  vars:
+    ansible_become: false
+    ansible_user: "{{ lookup('env', 'USER') }}"
 
 - name: Ensure libvirt images directory on /storage exists
   ansible.builtin.file:
