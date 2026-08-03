@@ -14,3 +14,6 @@ docker_engine_packages:
   - containerd.io
   - docker-buildx-plugin
   - docker-compose-plugin
+docker_data_root: /storage/docker
+docker_daemon_json_path: /etc/docker/daemon.json
+docker_systemd_override_dir: /etc/systemd/system/docker.service.d

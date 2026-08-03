@@ -9,6 +9,7 @@ base_packages:
   - fzf
   - starship
   - gnome-tweaks
+  - git
 # Python development
 python_packages:
   - python3-pip
@@ -20,10 +21,6 @@ virtualization_packages:
   - cloud-utils
   - genisoimage
   - libguestfs-tools
-  - libvirt-clients
-  - libvirt-daemon-system
   - libvirt-dev
-  - qemu-system-x86
   - qemu-utils
-  - virtinst
   - virt-manager

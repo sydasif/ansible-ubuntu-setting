@@ -5,16 +5,21 @@ Automate an Ubuntu desktop setup using Ansible. This repository provides role-ba
 ## Quick facts
 
 - Target: Ubuntu 24.04+ (desktop)
-- Control machine: Any system with `Git` and `Ansible`
+- Control machine: Any system with `Git`, `Python`, and `Ansible`
 
 ## Repository layout
 
 - `local.yml` — main playbook (roles are tagged so you can run subsets)
 - `ansible.cfg` — project Ansible configuration
 - `group_vars/` — `example.yml` provided; copy to `Ubuntu.yml` and customize
-- `roles/` — role implementations (packages, dotfiles, docker, fonts, gnome)
+- `roles/` — role implementations (packages, dotfiles, docker, containerlab, vagrant, fonts, gnome)
 - `scripts/inventory.py` — optional dynamic inventory
 - `requirements.txt` — Python dependencies
+
+## Prerequisites
+
+- Git
+- Python 3 and `venv` module
 
 ## Quick start
 
@@ -60,6 +65,9 @@ ansible-playbook local.yml --tags "fonts,docker"
 
 # run only the dotfiles role
 ansible-playbook local.yml --tags dotfiles
+
+# run only the vagrant role
+ansible-playbook local.yml --tags vagrant
 ```
 
 ## Customize

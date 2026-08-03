@@ -1,0 +1,26 @@
+---
+# tasks file for setup_containerlab
+- name: Install containerlab dependencies
+  ansible.builtin.apt:
+    name: "{{ containerlab_dependencies }}"
+    state: present
+    update_cache: yes
+
+- name: Check if containerlab is already installed
+  ansible.builtin.command:
+    cmd: containerlab version
+  register: containerlab_version_check
+  changed_when: false
+  failed_when: false
+
+- name: Install containerlab
+  ansible.builtin.shell:
+    cmd: 'bash -c "$(curl -sL {{ containerlab_install_script }})"'
+  when: containerlab_version_check.rc != 0
+  register: containerlab_installation
+
+- name: Verify containerlab installation
+  ansible.builtin.command:
+    cmd: containerlab version
+  when: containerlab_version_check.rc != 0 and containerlab_installation is succeeded
+  changed_when: false

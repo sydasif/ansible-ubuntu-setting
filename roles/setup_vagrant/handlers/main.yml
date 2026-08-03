@@ -1,0 +1,11 @@
+---
+# handlers file for setup_vagrant
+- name: Start libvirtd
+  ansible.builtin.service:
+    name: libvirtd
+    enabled: true
+    state: started
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes

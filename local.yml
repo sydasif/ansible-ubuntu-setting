@@ -17,4 +17,6 @@
     - { role: setup_dotfiles, tags: ["dotfiles"] }
     - { role: setup_fonts, tags: ["fonts"] }
     - { role: setup_docker, tags: ["docker"] }
+    - { role: setup_containerlab, tags: ["containerlab"] }
+    - { role: setup_vagrant, tags: ["vagrant"] }
     - { role: setup_gnome, tags: ["gnome"] }

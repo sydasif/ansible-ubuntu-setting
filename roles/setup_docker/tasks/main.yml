@@ -44,7 +44,47 @@
   when: ansible_user is defined and ansible_user != 'root'
   notify: Start and enable docker
 
-- name: Install containerlab
-  ansible.builtin.shell:
-    cmd: 'bash -c "$(curl -sL https://get.containerlab.dev)"'
-  when: docker_installation is changed
+- name: Create Docker data directory on /storage
+  ansible.builtin.file:
+    path: "{{ docker_data_root }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0711"
+
+- name: Create Docker systemd override directory
+  ansible.builtin.file:
+    path: "{{ docker_systemd_override_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure Docker data-root to /storage
+  ansible.builtin.copy:
+    dest: "{{ docker_daemon_json_path }}"
+    content: |
+      {
+        "data-root": "{{ docker_data_root }}"
+      }
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart docker for data-root change
+
+- name: Migrate existing Docker data to /storage
+  ansible.builtin.shell: |
+    set -e
+    if [ -d /var/lib/docker ] && [ ! -L /var/lib/docker ]; then
+      mkdir -p "{{ docker_data_root }}"
+      systemctl stop docker 2>/dev/null || true
+      cp -a /var/lib/docker/* "{{ docker_data_root }}/" 2>/dev/null || true
+      rm -rf /var/lib/docker
+      ln -s "{{ docker_data_root }}" /var/lib/docker
+    fi
+  args:
+    executable: /bin/bash
+  register: docker_data_migrate
+  changed_when: "'Symbolic link' in docker_data_migrate.stdout or docker_data_migrate.rc == 0"
+  failed_when: docker_data_migrate.rc != 0
+  notify: Restart docker for data-root change

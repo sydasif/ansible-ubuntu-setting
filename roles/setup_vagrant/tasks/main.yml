@@ -1,0 +1,174 @@
+---
+# tasks file for setup_vagrant
+- name: Update APT cache
+  ansible.builtin.apt:
+    update_cache: yes
+  changed_when: false
+
+- name: Install vagrant prerequisites
+  ansible.builtin.apt:
+    name: "{{ vagrant_prerequisites }}"
+    state: present
+
+- name: Ensure apt keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Add HashiCorp apt key
+  ansible.builtin.get_url:
+    url: "{{ vagrant_apt_key_url }}"
+    dest: /etc/apt/keyrings/hashicorp.asc
+    mode: "0644"
+  notify: Update apt cache
+
+- name: De-armor HashiCorp apt key
+  ansible.builtin.command:
+    cmd: gpg --batch --yes --dearmor -o /etc/apt/keyrings/hashicorp.gpg /etc/apt/keyrings/hashicorp.asc
+    removes: /etc/apt/keyrings/hashicorp.asc
+  changed_when: false
+  notify: Update apt cache
+
+- name: Add HashiCorp apt repository
+  ansible.builtin.apt_repository:
+    filename: hashicorp
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp.gpg] {{ vagrant_apt_repo_url }} {{ ansible_facts['lsb']['codename'] | default('noble') }} main"
+    state: present
+  notify: Update apt cache
+
+- name: Install Vagrant
+  ansible.builtin.apt:
+    name: "{{ vagrant_packages }}"
+    state: present
+    update_cache: yes
+
+- name: Install libvirt and KVM packages
+  ansible.builtin.apt:
+    name: "{{ libvirt_packages }}"
+    state: present
+  notify: Start libvirtd
+
+- name: Add current user to kvm group
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: kvm
+    append: true
+  when: ansible_user is defined and ansible_user != 'root'
+
+- name: Add current user to libvirt group
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: libvirt
+    append: true
+  when: ansible_user is defined and ansible_user != 'root'
+
+- name: Check if vagrant-libvirt plugin is installed
+  ansible.builtin.shell: vagrant plugin list | grep -q "{{ vagrant_plugin_libvirt }}"
+  register: vagrant_libvirt_check
+  changed_when: false
+  failed_when: false
+
+- name: Install vagrant-libvirt plugin
+  ansible.builtin.shell: vagrant plugin install "{{ vagrant_plugin_libvirt }}"
+  when: vagrant_libvirt_check.rc != 0
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') | default(omit, true) }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') | default(omit, true) }}"
+  async: 600
+  poll: 0
+  register: vagrant_plugin_install
+  failed_when: false
+
+- name: Wait for vagrant-libvirt plugin install to complete
+  ansible.builtin.async_status:
+    jid: "{{ vagrant_plugin_install.ansible_job_id }}"
+  when: vagrant_plugin_install is defined and vagrant_plugin_install.ansible_job_id is defined
+  register: plugin_job_result
+  until: plugin_job_result.finished
+  retries: 120
+  delay: 5
+
+- name: Create Vagrant boxes storage directory on /storage
+  ansible.builtin.file:
+    path: "{{ storage_vagrant_boxes | dirname }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+  when: storage_vagrant_boxes is defined
+
+- name: Move Vagrant boxes to /storage
+  ansible.builtin.shell: |
+    set -e
+    mkdir -p "{{ storage_vagrant_boxes | dirname }}"
+    if [ -d ~/.vagrant.d/boxes ] && [ ! -L ~/.vagrant.d/boxes ]; then
+      cp -a ~/.vagrant.d/boxes/* "{{ storage_vagrant_boxes }}" 2>/dev/null || true
+    fi
+    rm -rf ~/.vagrant.d/boxes
+    ln -s "{{ storage_vagrant_boxes }}" ~/.vagrant.d/boxes
+  args:
+    executable: /bin/bash
+  when: storage_vagrant_boxes is defined
+  register: vagrant_storage_link
+  changed_when: "'boxes' in vagrant_storage_link.stdout or 'Symbolic link' in vagrant_storage_link.stdout or vagrant_storage_link.rc == 0"
+  failed_when: vagrant_storage_link.rc != 0
+
+- name: Ensure libvirt images directory on /storage exists
+  ansible.builtin.file:
+    path: "{{ storage_libvirt_images }}"
+    state: directory
+    owner: libvirt-qemu
+    group: kvm
+    mode: "0755"
+  when: storage_libvirt_images is defined
+  notify: Start libvirtd
+
+- name: Check default libvirt pool path
+  ansible.builtin.shell: |
+    virsh pool-dumpxml default 2>/dev/null | grep -oP '(?<=<path>)[^<]+'
+  register: libvirt_default_pool_path
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Reconfigure default libvirt pool to /storage
+  ansible.builtin.shell: |
+    set -e
+    virsh pool-destroy default 2>/dev/null || true
+    virsh pool-undefine default 2>/dev/null || true
+    virsh pool-define-as default dir - - - - "{{ storage_libvirt_images }}"
+    virsh pool-build default
+    virsh pool-start default
+    virsh pool-autostart default
+  when:
+    - storage_libvirt_images is defined
+    - libvirt_default_pool_path.stdout is defined
+    - libvirt_default_pool_path.stdout != storage_libvirt_images
+  register: libvirt_pool_reconfigure
+  changed_when: libvirt_pool_reconfigure is succeeded
+  failed_when: libvirt_pool_reconfigure is failed
+
+- name: Create Containerlab Vagrant directory
+  ansible.builtin.file:
+    path: "{{ vagrantfile_path }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+
+- name: Deploy Containerlab Vagrantfile
+  ansible.builtin.copy:
+    dest: "{{ vagrantfile_path }}/Vagrantfile"
+    content: |
+      Vagrant.configure("2") do |config|
+        config.vm.box = "generic/ubuntu2204"
+        config.vm.provider :libvirt do |lv|
+          lv.memory = {{ vagrant_vm_memory }}
+          lv.cpus = {{ vagrant_vm_cpus }}
+          lv.driver = "kvm"
+        end
+      end
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0644"

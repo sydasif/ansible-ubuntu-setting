@@ -1,0 +1,5 @@
+---
+# vars file for setup_containerlab
+containerlab_dependencies:
+  - curl
+containerlab_install_script: https://get.containerlab.dev

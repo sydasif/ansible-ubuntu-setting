@@ -1,0 +1,20 @@
+---
+# vars file for setup_vagrant
+vagrant_prerequisites:
+  - gnupg
+  - lsb-release
+vagrant_apt_key_url: https://apt.releases.hashicorp.com/gpg
+vagrant_apt_repo_url: https://apt.releases.hashicorp.com
+vagrant_packages:
+  - vagrant
+libvirt_packages:
+  - libvirt-daemon-system
+  - libvirt-clients
+  - virtinst
+  - qemu-system-x86
+vagrant_plugin_libvirt: vagrant-libvirt
+storage_vagrant_boxes: /storage/vagrant/boxes
+storage_libvirt_images: /storage/libvirt/images
+vagrantfile_path: /home/{{ ansible_user }}/containerlab-vagrant
+vagrant_vm_memory: 2048
+vagrant_vm_cpus: 2

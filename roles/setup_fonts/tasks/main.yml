@@ -17,16 +17,3 @@
     dest: "{{ fonts_base_dir }}/"
     remote_src: yes
   notify: Refresh font cache
-
-- name: Check if Meslo is installed
-  ansible.builtin.stat:
-    path: "{{ fonts_base_dir }}/{{ meslo_font_name }}"
-  register: meslo_stat
-
-- name: Download Meslo
-  when: not meslo_stat.stat.exists
-  ansible.builtin.unarchive:
-    src: "{{ meslo_download_url }}"
-    dest: "{{ fonts_base_dir }}/"
-    remote_src: yes
-  notify: Refresh font cache
