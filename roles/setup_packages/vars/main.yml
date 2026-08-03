@@ -6,6 +6,8 @@ base_packages:
   - tree
   - curl
   - lsd
+  - fzf
+  - starship
   - gnome-tweaks
 # Python development
 python_packages:
