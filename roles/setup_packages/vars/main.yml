@@ -31,7 +31,7 @@ virtualization_packages:
   - libvirt-clients
   - libvirt-daemon-system
   - libvirt-dev
-  - qemu-kvm
+  - qemu-system-x86
   - qemu-utils
   - virtinst
   - virt-manager
