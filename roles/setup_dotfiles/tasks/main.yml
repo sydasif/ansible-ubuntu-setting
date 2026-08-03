@@ -34,3 +34,8 @@
     group: "{{ ansible_user }}"
     mode: "0600"
   loop: "{{ dotfiles_items }}"
+
+- name: Set default shell to zsh
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    shell: /usr/bin/zsh
