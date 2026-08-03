@@ -1,12 +1,31 @@
 ---
+- name: Check if Ghostty is already installed
+  ansible.builtin.command: ghostty --version
+  register: ghostty_check
+  changed_when: false
+  failed_when: false
+
+- name: Skip Ghostty installation on Ubuntu 26.04
+  ansible.builtin.debug:
+    msg: >
+      Ghostty PPA does not support Ubuntu 26.04 (resolute) yet.
+      Install Ghostty manually when the PPA adds resolute support.
+  when:
+    - ghostty_check.rc != 0
+    - ansible_facts['distribution'] == 'Ubuntu'
+    - ansible_facts['lsb']['codename'] == 'resolute'
+  changed_when: false
+
 - name: Add Ghostty PPA
   ansible.builtin.apt_repository:
     repo: "ppa:{{ ghostty_ppa }}"
     state: present
   notify: Update apt cache
+  when: ansible_facts['lsb']['codename'] != 'resolute'
 
 - name: Install Ghostty
   ansible.builtin.apt:
     name: ghostty
     state: present
     update_cache: yes
+  when: ansible_facts['lsb']['codename'] != 'resolute'
