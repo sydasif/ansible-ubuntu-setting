@@ -67,6 +67,33 @@ ansible-playbook local.yml --tags dotfiles
 - Edit `group_vars/Ubuntu.yml` to change package lists, dotfiles repository URL, or GNOME preferences.
 - Keep secrets out of the repository; use Ansible Vault or an external secret store.
 
+## Troubleshooting
+
+### "Timed out waiting for become success or become password prompt" (Ubuntu 26.04)
+
+Ubuntu 26.04 ships `sudo-rs` (a Rust reimplementation of sudo) as the default `sudo` binary. Sudo-rs handles the password prompt/response cycle differently than traditional sudo, which causes Ansible's `become` to hang and fail with an error like:
+
+```text
+[ERROR]: Task failed: Timed out waiting for become success or become password prompt.
+```
+
+This happens even when the password is correct and `sudo` works normally in a terminal.
+
+Fix — switch the `sudo` alternative back to classic sudo:
+
+```bash
+sudo update-alternatives --set sudo /usr/bin/sudo.ws
+```
+
+Verify the fix:
+
+```bash
+update-alternatives --display sudo   # should point to /usr/bin/sudo.ws
+ansible localhost -b -m command -a whoami --ask-become-pass   # should print: root
+```
+
+Note: system updates may reset `update-alternatives` back to `sudo-rs`. If the error resurfaces after an update, run the `update-alternatives` command above again.
+
 ## Idempotency
 
 Roles are written to be idempotent. Re-running the playbook should converge the system to the desired state without repeating already-applied changes.
