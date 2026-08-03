@@ -5,6 +5,19 @@
     state: present
     update_cache: yes
 
+- name: Check if uv is installed
+  ansible.builtin.command: uv --version
+  register: uv_check
+  changed_when: false
+  failed_when: false
+
+- name: Install uv
+  ansible.builtin.shell: >
+    curl -LsSf {{ uv_install_script }} | sh
+  when: uv_check.rc != 0
+  args:
+    executable: /bin/bash
+
 - name: Install Python development packages
   ansible.builtin.apt:
     name: "{{ python_packages }}"
@@ -15,3 +28,49 @@
     name: "{{ virtualization_packages }}"
     state: present
   when: ansible_facts['distribution'] == 'Ubuntu'
+
+- name: Ensure VS Code apt keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Add VS Code apt key
+  ansible.builtin.get_url:
+    url: "{{ vscode_apt_key_url }}"
+    dest: /etc/apt/keyrings/packages.microsoft.asc
+    mode: "0644"
+  notify: Update apt cache
+
+- name: De-armor VS Code apt key
+  ansible.builtin.command:
+    cmd: gpg --batch --yes --dearmor -o /etc/apt/keyrings/packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.asc
+    removes: /etc/apt/keyrings/packages.microsoft.asc
+  changed_when: false
+  notify: Update apt cache
+
+- name: Add VS Code repository
+  ansible.builtin.apt_repository:
+    filename: vscode
+    repo: "{{ vscode_apt_repo }}"
+    state: present
+    keyring: /etc/apt/keyrings/packages.microsoft.gpg
+  notify: Update apt cache
+
+- name: Install VS Code
+  ansible.builtin.apt:
+    name: code
+    state: present
+    update_cache: yes
+
+- name: Add Ghostty PPA
+  ansible.builtin.apt_repository:
+    repo: "ppa:{{ ghostty_ppa }}"
+    state: present
+  notify: Update apt cache
+
+- name: Install Ghostty
+  ansible.builtin.apt:
+    name: ghostty
+    state: present
+    update_cache: yes

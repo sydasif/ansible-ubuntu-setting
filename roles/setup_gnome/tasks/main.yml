@@ -58,3 +58,15 @@
     owner: root
     group: root
   become: true
+
+- name: Set Ghostty as default terminal
+  ansible.builtin.shell: |
+    set -e
+    if command -v xdg-settings >/dev/null 2>&1; then
+      xdg-settings set default-terminal ghostty.desktop || true
+    fi
+    gsettings set org.gnome.desktop.default-applications.terminal exec 'ghostty' || true
+    gsettings set org.gnome.desktop.default-applications.terminal exec-arg '-x' || true
+  become: false
+  register: default_terminal
+  changed_when: default_terminal.rc == 0
