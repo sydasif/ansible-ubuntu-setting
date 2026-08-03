@@ -12,7 +12,7 @@ Automate an Ubuntu desktop setup using Ansible. This repository provides role-ba
 - `local.yml` — main playbook (roles are tagged so you can run subsets)
 - `ansible.cfg` — project Ansible configuration
 - `group_vars/` — `example.yml` provided; copy to `Ubuntu.yml` and customize
-- `roles/` — role implementations (packages, dotfiles, docker, containerlab, vagrant, fonts, gnome)
+- `roles/` — role implementations (packages, vscode, ghostty, dotfiles, docker, containerlab, vagrant, fonts, gnome)
 - `scripts/inventory.py` — optional dynamic inventory
 - `requirements.txt` — Python dependencies
 
@@ -79,6 +79,12 @@ ansible-playbook local.yml --tags vagrant
 
 ### packages
 Installs base utilities, Python development tools, and virtualization packages.
+
+### vscode
+Installs Visual Studio Code from Microsoft’s official APT repository.
+
+### ghostty
+Installs Ghostty terminal emulator from its official PPA.
 
 ### dotfiles
 Clones your dotfiles repository and creates symlinks into your home directory. Also sets the default shell.

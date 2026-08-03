@@ -1,0 +1,12 @@
+---
+- name: Add Ghostty PPA
+  ansible.builtin.apt_repository:
+    repo: "ppa:{{ ghostty_ppa }}"
+    state: present
+  notify: Update apt cache
+
+- name: Install Ghostty
+  ansible.builtin.apt:
+    name: ghostty
+    state: present
+    update_cache: yes
