@@ -84,7 +84,7 @@ Installs base utilities, Python development tools, and virtualization packages.
 Installs Visual Studio Code from Microsoft’s official APT repository.
 
 ### ghostty
-Installs Ghostty terminal emulator from its official PPA. Note: the Ghostty PPA may not yet support every Ubuntu release. If installation is skipped, install Ghostty manually from [ghostty.org](https://ghostty.org) and rerun the playbook.
+Installs Ghostty terminal emulator. On supported Ubuntu releases, it uses the official PPA. On newer releases like Ubuntu 26.04 where the PPA is not yet available, it falls back to `snap install ghostty --classic`.
 
 ### dotfiles
 Clones your dotfiles repository and creates symlinks into your home directory. Also sets the default shell.
