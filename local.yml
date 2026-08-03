@@ -15,7 +15,6 @@
   roles:
     - { role: setup_packages, tags: ["packages"] }
     - { role: setup_vscode, tags: ["vscode"] }
-    - { role: setup_ghostty, tags: ["ghostty"] }
     - { role: setup_dotfiles, tags: ["dotfiles"] }
     - { role: setup_fonts, tags: ["fonts"] }
     - { role: setup_docker, tags: ["docker"] }
