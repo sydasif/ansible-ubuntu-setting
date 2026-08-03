@@ -1,6 +1,6 @@
 # Ansible Ubuntu Setting
 
-Automate an Ubuntu desktop setup using Ansible. This repository provides role-based playbooks that install packages, deploy dotfiles, configure Docker, install developer fonts, and apply GNOME preferences so your desktop configuration is version-controlled and repeatable.
+Automate an Ubuntu desktop setup using Ansible. This repository provides role-based playbooks that install packages, deploy dotfiles, configure Docker, install developer fonts, apply GNOME preferences, install Containerlab, and set up Vagrant with libvirt/KVM so your desktop configuration is version-controlled and repeatable.
 
 ## Quick facts
 
@@ -72,16 +72,33 @@ ansible-playbook local.yml --tags vagrant
 
 ## Customize
 
-- Edit `group_vars/Ubuntu.yml` to change package lists, dotfiles repository URL, or GNOME preferences.
+- Edit `group_vars/Ubuntu.yml` to change package lists, dotfiles repository URL, GNOME preferences, or VM defaults.
 - Keep secrets out of the repository; use Ansible Vault or an external secret store.
 
-## Vagrant role
+## Roles
 
-The `vagrant` role installs Vagrant, libvirt/KVM, and the `vagrant-libvirt` plugin. It also moves Vagrant box storage to `/storage/vagrant/boxes` and reconfigures the libvirt default pool to `/storage/libvirt/images` if needed.
+### packages
+Installs base utilities, Python development tools, and virtualization packages.
 
-A minimal Containerlab Vagrantfile is deployed at `~/containerlab-vagrant/Vagrantfile`.
+### dotfiles
+Clones your dotfiles repository and creates symlinks into your home directory. Also sets the default shell.
+
+### fonts
+Installs developer fonts, currently JetBrainsMono Nerd Font, into `~/.fonts` and refreshes the font cache.
+
+### docker
+Installs Docker Engine from Docker's official APT repository, adds your user to the `docker` group, and configures Docker to use `/storage/docker` for images and containers.
+
+### containerlab
+Installs Containerlab for network lab automation. Skips installation if `containerlab` is already present.
+
+### vagrant
+Installs Vagrant, libvirt/KVM, and the `vagrant-libvirt` plugin. Moves Vagrant box storage to `/storage/vagrant/boxes` and reconfigures the libvirt default pool to `/storage/libvirt/images` if needed.
 
 Note: The `vagrant-libvirt` plugin compiles native extensions on first install and can take 2–5 minutes. The role handles this with an async install and retry loop.
+
+### gnome
+Applies GNOME desktop preferences via dconf, including fonts, theme, and shell settings.
 
 ## Troubleshooting
 
@@ -124,5 +141,4 @@ MIT License - see the `LICENSE` file for details.
 
 ## References
 
-- Dotfiles example: [sydasif/dotfiles](https://github.com/sydasif/dotfiles)
 - Inspiration: LearnLinuxTV Ansible tutorials
