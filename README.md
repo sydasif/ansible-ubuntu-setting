@@ -43,8 +43,8 @@ Note: The inventory script requires the 'distro' package which is included in th
 1. Copy the example group variables and edit them for your environment:
 
 ```bash
-cp group_vars/example.yml group_vars/Ubuntu.yml
 # edit group_vars/Ubuntu.yml (ansible_user, package lists, dotfiles_repo, etc.)
+cp group_vars/example.yml group_vars/Ubuntu.yml
 ```
 
 1. Run the full playbook (example using the included dynamic inventory):
@@ -78,29 +78,37 @@ ansible-playbook local.yml --tags vagrant
 ## Roles
 
 ### packages
+
 Installs base utilities, Python development tools, and virtualization packages.
 
 ### vscode
+
 Installs Visual Studio Code from Microsoft’s official APT repository.
 
 ### dotfiles
+
 Clones your dotfiles repository and creates symlinks into your home directory. Also sets the default shell.
 
 ### fonts
+
 Installs developer fonts, currently JetBrainsMono Nerd Font, into `~/.fonts` and refreshes the font cache.
 
 ### docker
+
 Installs Docker Engine from Docker's official APT repository, adds your user to the `docker` group, and configures Docker to use `/storage/docker` for images and containers.
 
 ### containerlab
+
 Installs Containerlab for network lab automation. Skips installation if `containerlab` is already present.
 
 ### vagrant
+
 Installs Vagrant, libvirt/KVM, and the `vagrant-libvirt` plugin. Sets Vagrant’s home to `/storage/vagrant` so boxes and related data live on `/storage`. Reconfigures the libvirt default pool to `/storage/libvirt/images` if needed.
 
 Note: The `vagrant-libvirt` plugin compiles native extensions on first install and can take 2–5 minutes. The role handles this with an async install and retry loop.
 
 ### gnome
+
 Applies GNOME desktop preferences via dconf, including fonts, theme, and shell settings.
 
 ## Troubleshooting
