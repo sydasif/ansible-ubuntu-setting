@@ -63,8 +63,16 @@
     append: true
   when: ansible_user is defined and ansible_user != 'root'
 
+- name: Create Vagrant home directory on /storage
+  ansible.builtin.file:
+    path: "{{ vagrant_home }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+
 - name: Check if vagrant-libvirt plugin is installed
-  ansible.builtin.shell: vagrant plugin list | grep -q "{{ vagrant_plugin_libvirt }}"
+  ansible.builtin.shell: VAGRANT_HOME="{{ vagrant_home }}" vagrant plugin list | grep -q "{{ vagrant_plugin_libvirt }}"
   register: vagrant_libvirt_check
   changed_when: false
   failed_when: false
@@ -74,9 +82,10 @@
     ansible_user: "{{ lookup('env', 'USER') }}"
 
 - name: Install vagrant-libvirt plugin
-  ansible.builtin.shell: vagrant plugin install "{{ vagrant_plugin_libvirt }}"
+  ansible.builtin.shell: VAGRANT_HOME="{{ vagrant_home }}" vagrant plugin install "{{ vagrant_plugin_libvirt }}"
   when: vagrant_libvirt_check.rc != 0
   environment:
+    VAGRANT_HOME: "{{ vagrant_home }}"
     http_proxy: "{{ lookup('env', 'http_proxy') | default(omit, true) }}"
     https_proxy: "{{ lookup('env', 'https_proxy') | default(omit, true) }}"
   async: 600
@@ -96,36 +105,6 @@
   until: plugin_job_result.finished
   retries: 120
   delay: 5
-  become: false
-  vars:
-    ansible_become: false
-    ansible_user: "{{ lookup('env', 'USER') }}"
-
-- name: Create Vagrant boxes storage directory on /storage
-  ansible.builtin.file:
-    path: "{{ storage_vagrant_boxes | dirname }}"
-    state: directory
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    mode: "0755"
-  when: storage_vagrant_boxes is defined
-
-- name: Move Vagrant boxes to /storage
-  ansible.builtin.shell: |
-    set -e
-    user_home=$(eval echo ~{{ ansible_user }})
-    mkdir -p "{{ storage_vagrant_boxes | dirname }}"
-    if [ -d "$user_home/.vagrant.d/boxes" ] && [ ! -L "$user_home/.vagrant.d/boxes" ]; then
-      cp -a "$user_home/.vagrant.d/boxes/"* "{{ storage_vagrant_boxes }}/" 2>/dev/null || true
-    fi
-    rm -rf "$user_home/.vagrant.d/boxes"
-    ln -s "{{ storage_vagrant_boxes }}" "$user_home/.vagrant.d/boxes"
-  args:
-    executable: /bin/bash
-  when: storage_vagrant_boxes is defined
-  register: vagrant_storage_link
-  changed_when: "'Symbolic link' in vagrant_storage_link.stdout or vagrant_storage_link.rc == 0"
-  failed_when: vagrant_storage_link.rc != 0
   become: false
   vars:
     ansible_become: false

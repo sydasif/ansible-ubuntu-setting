@@ -13,7 +13,8 @@ libvirt_packages:
   - virtinst
   - qemu-system-x86
 vagrant_plugin_libvirt: vagrant-libvirt
-storage_vagrant_boxes: /storage/vagrant/boxes
+vagrant_home: /storage/vagrant
+storage_vagrant_boxes: "{{ vagrant_home }}/boxes"
 storage_libvirt_images: /storage/libvirt/images
 vagrantfile_path: /home/{{ ansible_user }}/containerlab-vagrant
 vagrant_vm_memory: 2048
