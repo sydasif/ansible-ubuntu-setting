@@ -10,21 +10,18 @@
     url: "{{ vscode_apt_key_url }}"
     dest: /etc/apt/keyrings/packages.microsoft.asc
     mode: "0644"
-  notify: Update apt cache
 
 - name: De-armor VS Code apt key
   ansible.builtin.command:
     cmd: gpg --batch --yes --dearmor -o /etc/apt/keyrings/packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.asc
     removes: /etc/apt/keyrings/packages.microsoft.asc
   changed_when: false
-  notify: Update apt cache
 
 - name: Add VS Code repository
   ansible.builtin.apt_repository:
     filename: vscode
     repo: "{{ vscode_apt_repo }}"
     state: present
-  notify: Update apt cache
 
 - name: Install VS Code
   ansible.builtin.apt:

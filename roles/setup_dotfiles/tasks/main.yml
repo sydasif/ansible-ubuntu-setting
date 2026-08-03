@@ -6,6 +6,7 @@
     update: no
     accept_hostkey: yes
   become_user: "{{ ansible_user }}"
+  become: false
   register: git_clone
 
 - name: Ensure required directories exist
@@ -21,6 +22,7 @@
     - "{{ dotfiles_base_dest }}/.config/zed"
     - "{{ dotfiles_base_dest }}/.ssh"
     - "{{ dotfiles_base_dest }}/.config"
+  become: false
 
 - name: Create symlinks for dotfiles
   ansible.builtin.file:
@@ -33,6 +35,7 @@
     group: "{{ ansible_user }}"
     mode: "0600"
   loop: "{{ dotfiles_items }}"
+  become: false
 
 - name: Set default shell to zsh
   ansible.builtin.user:

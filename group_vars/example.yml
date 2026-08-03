@@ -16,4 +16,4 @@ python_packages:
   - python3-venv
 
 # Example dotfiles repository (override to your dotfiles)
-dotfiles_repo: "https://github.com/sydasif/dotfiles.git"
+dotfiles_repo: "https://github.com/your-username/dotfiles.git"

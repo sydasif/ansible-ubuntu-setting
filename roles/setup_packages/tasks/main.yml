@@ -17,6 +17,10 @@
   when: uv_check.rc != 0
   args:
     executable: /bin/bash
+  become: false
+  vars:
+    ansible_become: false
+    ansible_user: "{{ lookup('env', 'USER') }}"
 
 - name: Install Python development packages
   ansible.builtin.apt:
