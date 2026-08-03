@@ -93,7 +93,7 @@ Installs Docker Engine from Docker's official APT repository, adds your user to 
 Installs Containerlab for network lab automation. Skips installation if `containerlab` is already present.
 
 ### vagrant
-Installs Vagrant, libvirt/KVM, and the `vagrant-libvirt` plugin. Moves Vagrant box storage to `/storage/vagrant/boxes` and reconfigures the libvirt default pool to `/storage/libvirt/images` if needed.
+Installs Vagrant, libvirt/KVM, and the `vagrant-libvirt` plugin. Sets Vagrant’s home to `/storage/vagrant` so boxes and related data live on `/storage`. Reconfigures the libvirt default pool to `/storage/libvirt/images` if needed.
 
 Note: The `vagrant-libvirt` plugin compiles native extensions on first install and can take 2–5 minutes. The role handles this with an async install and retry loop.
 
