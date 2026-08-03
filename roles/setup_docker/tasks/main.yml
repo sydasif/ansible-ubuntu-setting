@@ -12,10 +12,16 @@
     mode: "0755"
 
 - name: Add docker gpg key
-  ansible.builtin.apt_key:
+  ansible.builtin.get_url:
     url: "{{ docker_gpg_key_url }}"
-    state: present
-    keyring: /etc/apt/keyrings/docker.gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: "0644"
+
+- name: De-armor docker gpg key
+  ansible.builtin.command:
+    cmd: gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg /etc/apt/keyrings/docker.asc
+    removes: /etc/apt/keyrings/docker.asc
+  changed_when: false
 
 - name: Add docker repository
   ansible.builtin.apt_repository:
