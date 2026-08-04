@@ -1,21 +1,12 @@
 ---
-- name: Copy GNOME wallpapers
+- name: Copy GNOME wallpaper
   copy:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
+    src: "default_wallpaper.jpg"
+    dest: "/usr/share/backgrounds/default_wallpaper.jpg"
     mode: "0644"
     owner: root
     group: root
   become: true
-  loop:
-    - {
-        src: "ubuntu_wallpaper.jpg",
-        dest: "/usr/share/backgrounds/ubuntu_wallpaper.jpg",
-      }
-    - {
-        src: "ubuntu_wallpaper.jpg",
-        dest: "/usr/share/backgrounds/default_wallpaper.jpg",
-      }
 
 - name: Ensure dconf directories exist
   file:
@@ -59,14 +50,14 @@
     group: root
   become: true
 
-- name: Set default terminal
-  ansible.builtin.shell: |
+- name: Apply current terminal config
+  ansible.builtin.shell: |-
     set -e
     if command -v xdg-settings >/dev/null 2>&1; then
       xdg-settings set default-terminal org.gnome.Terminal.desktop || true
     fi
-    gsettings set org.gnome.desktop.default-applications.terminal exec 'gnome-terminal' || true
-    gsettings set org.gnome.desktop.default-applications.terminal exec-arg '-x' || true
+    gsettings set org.gnome.desktop.applications.terminal exec 'gnome-terminal' || true
+    gsettings set org.gnome.desktop.applications.terminal exec-arg '-x' || true
   become: false
   register: default_terminal
   changed_when: default_terminal.rc == 0
