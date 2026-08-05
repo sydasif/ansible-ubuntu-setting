@@ -1,0 +1,11 @@
+---
+exclude_paths:
+  - .venv/
+  - .git/
+
+skip_list:
+  # Repo convention: role vars use the tool prefix (docker_, vagrant_, vscode_…),
+  # not the full setup_*_ role prefix. Renaming ~45 vars would be churn.
+  - var-naming[no-role-prefix]
+  # dotfiles clone intentionally pins update: no for idempotent convergence.
+  - latest[git]

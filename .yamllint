@@ -1,0 +1,38 @@
+---
+extends: default
+
+ignore: |
+  .venv/
+  .git/
+  roles/*/files/*
+
+rules:
+  # Repo style uses "{ role: name }" flow mappings (one space inside),
+  # but zero spaces inside list brackets.
+  braces:
+    min-spaces-inside: 1
+    max-spaces-inside: 1
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 0
+
+  # Long URLs and generated config lines exceed 80 chars by design.
+  line-length:
+    max: 160
+
+  # Playbooks/roles do not consistently use a leading document marker.
+  document-start: disable
+
+  # The repo uses Ansible's native yes/no booleans in several places.
+  truthy:
+    check-keys: false
+    allowed-values:
+      - "true"
+      - "false"
+      - "yes"
+      - "no"
+      - "on"
+      - "off"
+
+  comments:
+    require-starting-space: true

@@ -1,8 +1,8 @@
 ---
 galaxy_info:
-  role_name: setup_packages
+  role_name: setup_dotfiles
   author: sydasif
-  description: Installs and configures common packages on Ubuntu
+  description: Clones a dotfiles repository and creates symlinks into the user's home directory
   license: MIT
   min_ansible_version: "2.13"
   platforms:
@@ -10,11 +10,9 @@ galaxy_info:
       versions:
         - jammy
         - noble
-
   galaxy_tags:
     - ubuntu
     - desktop
-    - system
-    - packages
-
+    - dotfiles
+    - shell
 dependencies: []
