@@ -25,7 +25,7 @@ var/
 *.retry
 ansible_fact_cache/
 .hosts
- inventory
+inventory
 *.inventory
 .secrets
 .vault_pass
