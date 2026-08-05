@@ -11,8 +11,9 @@
   changed_when: false
   failed_when: false
 
-- name: Install uv
-  ansible.builtin.shell: >
+- name: Install uv  # noqa: command-instead-of-module no-changed-when
+  ansible.builtin.shell: |
+    set -o pipefail
     curl -LsSf {{ uv_install_script }} | sh
   when: uv_check.rc != 0
   args:

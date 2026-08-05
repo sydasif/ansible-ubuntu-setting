@@ -1,4 +1,6 @@
 ---
 - name: Update dconf
-  shell: dconf update
+  ansible.builtin.command:
+    cmd: dconf update
   become: true
+  changed_when: false
