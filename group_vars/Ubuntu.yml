@@ -1,2 +1,5 @@
 ---
 ansible_user: zulu
+
+# Root of the persistent data partition (used for docker, vagrant, libvirt)
+storage_root: /storage

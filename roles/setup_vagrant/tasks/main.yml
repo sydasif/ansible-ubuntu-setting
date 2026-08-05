@@ -72,7 +72,9 @@
     mode: "0755"
 
 - name: Check if vagrant-libvirt plugin is installed
-  ansible.builtin.shell: VAGRANT_HOME="{{ vagrant_home }}" vagrant plugin list | grep -q "{{ vagrant_plugin_libvirt }}"
+  ansible.builtin.shell: |
+    set -o pipefail
+    VAGRANT_HOME="{{ vagrant_home }}" vagrant plugin list | grep -q "{{ vagrant_plugin_libvirt }}"
   register: vagrant_libvirt_check
   changed_when: false
   failed_when: false
@@ -81,7 +83,7 @@
     ansible_become: false
     ansible_user: "{{ lookup('env', 'USER') }}"
 
-- name: Install vagrant-libvirt plugin
+- name: Install vagrant-libvirt plugin  # noqa: command-instead-of-shell no-changed-when
   ansible.builtin.shell: VAGRANT_HOME="{{ vagrant_home }}" vagrant plugin install "{{ vagrant_plugin_libvirt }}"
   when: vagrant_libvirt_check.rc != 0
   environment:
@@ -122,6 +124,7 @@
 
 - name: Check default libvirt pool path
   ansible.builtin.shell: |
+    set -o pipefail
     virsh pool-dumpxml default 2>/dev/null | grep -oP '(?<=<path>)[^<]+'
   register: libvirt_default_pool_path
   changed_when: false
@@ -144,27 +147,3 @@
   register: libvirt_pool_reconfigure
   changed_when: libvirt_pool_reconfigure is succeeded
   failed_when: libvirt_pool_reconfigure is failed
-
-- name: Create Containerlab Vagrant directory
-  ansible.builtin.file:
-    path: "{{ vagrantfile_path }}"
-    state: directory
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    mode: "0755"
-
-- name: Deploy Containerlab Vagrantfile
-  ansible.builtin.copy:
-    dest: "{{ vagrantfile_path }}/Vagrantfile"
-    content: |
-      Vagrant.configure("2") do |config|
-        config.vm.box = "generic/ubuntu2204"
-        config.vm.provider :libvirt do |lv|
-          lv.memory = {{ vagrant_vm_memory }}
-          lv.cpus = {{ vagrant_vm_cpus }}
-          lv.driver = "kvm"
-        end
-      end
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    mode: "0644"

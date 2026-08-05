@@ -2,6 +2,9 @@
 # Example variables for Ubuntu targets
 ansible_user: your_username_here
 
+# Root of the persistent data partition (used for docker, vagrant, libvirt)
+storage_root: /storage
+
 # Example package groups (override in your environment)
 base_packages:
   - git
