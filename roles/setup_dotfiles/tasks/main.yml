@@ -5,7 +5,6 @@
     dest: "{{ dotfiles_dest }}"
     update: no
     accept_hostkey: yes
-  become_user: "{{ ansible_user }}"
   become: false
   register: git_clone
 
