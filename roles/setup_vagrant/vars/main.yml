@@ -13,5 +13,5 @@ libvirt_packages:
   - virtinst
   - qemu-system-x86
 vagrant_plugin_libvirt: vagrant-libvirt
-vagrant_home: "{{ storage_root | default('/storage') }}/vagrant"
-storage_libvirt_images: "{{ storage_root | default('/storage') }}/libvirt/images"
+vagrant_home: "{{ storage_root }}/vagrant"
+storage_libvirt_images: "{{ storage_root }}/libvirt/images"
