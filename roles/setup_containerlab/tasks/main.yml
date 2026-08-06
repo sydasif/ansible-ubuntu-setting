@@ -4,7 +4,7 @@
   ansible.builtin.apt:
     name: "{{ containerlab_dependencies }}"
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Check if containerlab is already installed
   ansible.builtin.command:

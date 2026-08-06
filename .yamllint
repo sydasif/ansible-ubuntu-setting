@@ -30,8 +30,6 @@ rules:
       - "false"
       - "yes"
       - "no"
-      - "on"
-      - "off"
 
   # Comments must have a space after the marker (ansible-lint requirement).
   comments:

@@ -4,7 +4,7 @@
   ansible.builtin.apt:
     name: "{{ pipx_packages }}"
     state: present
-    update_cache: yes
+    update_cache: true
   become: true
 
 # pipx/uv operate on the invoking user's ~/.local. With a local connection and

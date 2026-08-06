@@ -3,7 +3,7 @@
   ansible.builtin.apt:
     name: "{{ base_packages }}"
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Check if uv is installed
   ansible.builtin.command: uv --version

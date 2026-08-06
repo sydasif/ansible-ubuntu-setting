@@ -27,4 +27,4 @@
   ansible.builtin.apt:
     name: code
     state: present
-    update_cache: yes
+    update_cache: true

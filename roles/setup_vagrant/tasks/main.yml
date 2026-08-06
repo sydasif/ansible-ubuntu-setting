@@ -2,7 +2,7 @@
 # tasks file for setup_vagrant
 - name: Update APT cache
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
   changed_when: false
 
 - name: Install vagrant prerequisites
@@ -41,7 +41,7 @@
   ansible.builtin.apt:
     name: "{{ vagrant_packages }}"
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Install libvirt and KVM packages
   ansible.builtin.apt:
