@@ -5,29 +5,16 @@
     name: "{{ docker_dependencies }}"
     update_cache: true
 
-- name: Create directory for apt keyrings
-  ansible.builtin.file:
-    path: /etc/apt/keyrings
-    state: directory
-    mode: "0755"
-
-- name: Add docker gpg key
-  ansible.builtin.get_url:
-    url: "{{ docker_gpg_key_url }}"
-    dest: /etc/apt/keyrings/docker.asc
-    mode: "0644"
-
-- name: De-armor docker gpg key
-  ansible.builtin.command:
-    cmd: gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg /etc/apt/keyrings/docker.asc
-    removes: /etc/apt/keyrings/docker.asc
-  changed_when: false
-
-- name: Add docker repository
-  ansible.builtin.apt_repository:
-    filename: docker
-    repo: "{{ docker_repository_repo }}"
-    state: present
+- name: Set up Docker APT repository
+  ansible.builtin.include_tasks:
+    file: ../../common/tasks/apt_keyring.yml
+  vars:
+    apt_keyring_name: "docker"
+    apt_keyring_url: "{{ docker_gpg_key_url }}"
+    apt_keyring_repo: "{{ docker_repository_repo }}"
+    apt_keyring_key_dest: "/etc/apt/keyrings/docker.asc"
+    apt_keyring_gpg_dest: "/etc/apt/keyrings/docker.gpg"
+    apt_repository_filename: "docker"
 
 - name: Install docker engine
   ansible.builtin.apt:
