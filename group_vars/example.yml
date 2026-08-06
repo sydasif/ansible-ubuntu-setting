@@ -1,22 +1,12 @@
 ---
-# Example variables for Ubuntu targets
-ansible_user: your_username_here
+# Host-level overrides for Ubuntu targets.
+# Role-specific values (package lists, repo URLs, dotfiles, etc.) are owned by
+# each role's own `role/vars/main.yml`. Only override them here if you need to
+# customize a specific play run via inventory-level precedence.
 
-# Root of the persistent data partition (used for docker, vagrant, libvirt)
+# The account Ansible manages and that becomes the docker/uv/vagrant user.
+ansible_user: zulu
+
+# Root of the persistent data partition (used for docker, vagrant, libvirt).
+# Required: docker/vagrant roles derive their data dirs from this value.
 storage_root: /storage
-
-# Example package groups (override in your environment)
-base_packages:
-  - git
-  - curl
-  - vim
-network_packages:
-  - net-tools
-  - traceroute
-  - nmap
-python_packages:
-  - python3-pip
-  - python3-venv
-
-# Example dotfiles repository (override to your dotfiles)
-dotfiles_repo: "https://github.com/your-username/dotfiles.git"
