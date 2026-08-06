@@ -44,13 +44,15 @@
   when: ansible_user is defined and ansible_user != 'root'
   notify: Start and enable docker
 
+# Use 0710 explicitly: docker re-chmods its data-root to 0710 at startup, so a
+# different value here (e.g. 0711) made this task report changed on every run.
 - name: Create Docker data directory on /storage
   ansible.builtin.file:
     path: "{{ docker_data_root }}"
     state: directory
     owner: root
     group: root
-    mode: "0711"
+    mode: "0710"
 
 - name: Create Docker systemd override directory
   ansible.builtin.file:
@@ -81,10 +83,11 @@
       cp -a /var/lib/docker/* "{{ docker_data_root }}/" 2>/dev/null || true
       rm -rf /var/lib/docker
       ln -s "{{ docker_data_root }}" /var/lib/docker
+      echo "docker data migrated to {{ docker_data_root }}"
     fi
   args:
     executable: /bin/bash
   register: docker_data_migrate
-  changed_when: "'Symbolic link' in docker_data_migrate.stdout or docker_data_migrate.rc == 0"
+  changed_when: docker_data_migrate.stdout | length > 0
   failed_when: docker_data_migrate.rc != 0
   notify: Restart docker for data-root change
