@@ -15,3 +15,11 @@ libvirt_packages:
 vagrant_plugin_libvirt: vagrant-libvirt
 vagrant_home: "{{ storage_root }}/vagrant"
 storage_libvirt_images: "{{ storage_root }}/libvirt/images"
+
+# Environment for vagrant commands (runs as non-root user)
+vagrant_user_env:
+  VAGRANT_HOME: "{{ vagrant_home }}"
+  http_proxy: "{{ lookup('env', 'http_proxy') | default(omit, true) }}"
+  https_proxy: "{{ lookup('env', 'https_proxy') | default(omit, true) }}"
+  PATH: "/home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin"
+  HOME: "/home/{{ ansible_user }}"

@@ -10,32 +10,19 @@
     name: "{{ vagrant_prerequisites }}"
     state: present
 
-- name: Ensure apt keyrings directory exists
-  ansible.builtin.file:
-    path: /etc/apt/keyrings
-    state: directory
-    mode: "0755"
-
-- name: Add HashiCorp apt key
-  ansible.builtin.get_url:
-    url: "{{ vagrant_apt_key_url }}"
-    dest: /etc/apt/keyrings/hashicorp.asc
-    mode: "0644"
-  notify: Update apt cache
-
-- name: De-armor HashiCorp apt key
-  ansible.builtin.command:
-    cmd: gpg --batch --yes --dearmor -o /etc/apt/keyrings/hashicorp.gpg /etc/apt/keyrings/hashicorp.asc
-    removes: /etc/apt/keyrings/hashicorp.asc
-  changed_when: false
-  notify: Update apt cache
-
-- name: Add HashiCorp apt repository
-  ansible.builtin.apt_repository:
-    filename: hashicorp
-    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp.gpg] {{ vagrant_apt_repo_url }} {{ ansible_facts['lsb']['codename'] | default('noble') }} main"
-    state: present
-  notify: Update apt cache
+- name: Set up HashiCorp APT repository
+  ansible.builtin.include_tasks:
+    file: ../../common/tasks/apt_keyring.yml
+  vars:
+    apt_keyring_name: "hashicorp"
+    apt_keyring_url: "{{ vagrant_apt_key_url }}"
+    apt_keyring_repo: >-
+      deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp.gpg]
+      {{ vagrant_apt_repo_url }}
+      {{ ansible_facts['lsb']['codename'] | default('noble') }} main
+    apt_keyring_key_dest: "/etc/apt/keyrings/hashicorp.asc"
+    apt_keyring_gpg_dest: "/etc/apt/keyrings/hashicorp.gpg"
+    apt_repository_filename: "hashicorp"
 
 - name: Install Vagrant
   ansible.builtin.apt:
@@ -79,23 +66,17 @@
   changed_when: false
   failed_when: false
   become: false
-  vars:
-    ansible_user: "{{ lookup('env', 'USER') }}"
+  environment: "{{ vagrant_user_env }}"
 
 - name: Install vagrant-libvirt plugin  # noqa: command-instead-of-shell no-changed-when
   ansible.builtin.shell: VAGRANT_HOME="{{ vagrant_home }}" vagrant plugin install "{{ vagrant_plugin_libvirt }}"
   when: vagrant_libvirt_check.rc != 0
-  environment:
-    VAGRANT_HOME: "{{ vagrant_home }}"
-    http_proxy: "{{ lookup('env', 'http_proxy') | default(omit, true) }}"
-    https_proxy: "{{ lookup('env', 'https_proxy') | default(omit, true) }}"
+  environment: "{{ vagrant_user_env }}"
   async: 600
   poll: 0
   register: vagrant_plugin_install
   failed_when: false
   become: false
-  vars:
-    ansible_user: "{{ lookup('env', 'USER') }}"
 
 - name: Wait for vagrant-libvirt plugin install to complete
   ansible.builtin.async_status:
@@ -106,8 +87,7 @@
   retries: 120
   delay: 5
   become: false
-  vars:
-    ansible_user: "{{ lookup('env', 'USER') }}"
+  environment: "{{ vagrant_user_env }}"
 
 - name: Ensure libvirt images directory on /storage exists
   ansible.builtin.file:
