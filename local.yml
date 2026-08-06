@@ -20,5 +20,7 @@
     - { role: setup_docker, tags: ["docker"] }
     - { role: setup_containerlab, tags: ["containerlab"] }
     - { role: setup_vagrant, tags: ["vagrant"] }
-    - { role: setup_gnome, tags: ["gnome"] }
+    - role: setup_gnome
+      tags: ["gnome"]
+      when: ansible_facts['distribution'] == 'Ubuntu'
     - { role: setup_netlab, tags: ["netlab"] }
