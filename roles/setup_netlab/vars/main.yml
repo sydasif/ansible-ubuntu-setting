@@ -16,3 +16,8 @@ networklab_python_version: "3.11"
 networklab_injected_packages:
   - "ansible-core<2.19"
   - "paramiko<4"
+
+# Environment for uv/pipx commands (runs as non-root user)
+netlab_user_env:
+  PATH: "/home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin"
+  HOME: "/home/{{ ansible_user }}"

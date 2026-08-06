@@ -7,18 +7,23 @@
     update_cache: true
   become: true
 
-# pipx/uv operate on the invoking user's ~/.local. With a local connection and
-# become: true globally, these must run as the real user (not root), with that
-# user's HOME/PATH and an esolvable uv (role-installed ~/.local/bin or snap).
-- name: Ensure networklab Python version is installed via uv  # noqa: command-instead-of-module
+- name: Check if networklab Python version is already installed via uv
+  ansible.builtin.command:
+    cmd: uv python find {{ networklab_python_version }}
+  become: false
+  environment: "{{ netlab_user_env }}"
+  register: uv_find_result
+  changed_when: false
+  failed_when: false
+
+- name: Install networklab Python version via uv  # noqa: command-instead-of-module
   ansible.builtin.command:
     cmd: uv python install {{ networklab_python_version }}
   become: false
-  environment:
-    PATH: /home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
-    HOME: /home/{{ ansible_user }}
+  environment: "{{ netlab_user_env }}"
+  when: uv_find_result.rc != 0
   register: uv_install_result
-  changed_when: "'already installed' not in uv_install_result.stderr"
+  changed_when: uv_install_result.rc == 0
 
 - name: Find networklab Python path  # noqa: risky-shell-pipe
   ansible.builtin.shell:
@@ -26,9 +31,7 @@
   become: false
   args:
     executable: /bin/bash
-  environment:
-    PATH: /home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
-    HOME: /home/{{ ansible_user }}
+  environment: "{{ netlab_user_env }}"
   register: python_path
   changed_when: false
   failed_when: python_path.rc != 0 or not python_path.stdout.strip()
@@ -37,9 +40,7 @@
   ansible.builtin.command:
     cmd: netlab version
   become: false
-  environment:
-    PATH: /home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
-    HOME: /home/{{ ansible_user }}
+  environment: "{{ netlab_user_env }}"
   register: networklab_version_check
   changed_when: false
   failed_when: false
@@ -53,9 +54,7 @@
   become: false
   args:
     executable: /bin/bash
-  environment:
-    PATH: /home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
-    HOME: /home/{{ ansible_user }}
+  environment: "{{ netlab_user_env }}"
   changed_when: false
   failed_when: false
   register: installed_ansible_core
@@ -73,9 +72,7 @@
   ansible.builtin.command:
     cmd: "pipx uninstall {{ networklab_pipx_package }}"
   become: false
-  environment:
-    PATH: /home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
-    HOME: /home/{{ ansible_user }}
+  environment: "{{ netlab_user_env }}"
   when:
     - netlab_needs_install
     - networklab_version_check.rc == 0
@@ -85,9 +82,7 @@
   ansible.builtin.command:
     cmd: "pipx install --python {{ python_path.stdout.strip() }} {{ networklab_pipx_package }}"
   become: false
-  environment:
-    PATH: /home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
-    HOME: /home/{{ ansible_user }}
+  environment: "{{ netlab_user_env }}"
   when: netlab_needs_install
   register: install_result
   changed_when: install_result.rc == 0
@@ -97,9 +92,7 @@
     cmd: "pipx inject {{ networklab_pipx_package }} {{ item }}"
   loop: "{{ networklab_injected_packages }}"
   become: false
-  environment:
-    PATH: /home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
-    HOME: /home/{{ ansible_user }}
+  environment: "{{ netlab_user_env }}"
   when: netlab_needs_install
   changed_when: true
 
@@ -107,8 +100,6 @@
   ansible.builtin.command:
     cmd: netlab version
   become: false
-  environment:
-    PATH: /home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
-    HOME: /home/{{ ansible_user }}
+  environment: "{{ netlab_user_env }}"
   changed_when: false
   when: netlab_needs_install
