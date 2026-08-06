@@ -1,0 +1,41 @@
+---
+# Shared APT keyring and repository setup
+# Usage: include_tasks with vars:
+#   apt_keyring_name: "docker"
+#   apt_keyring_url: "https://download.docker.com/linux/ubuntu/gpg"
+#   apt_keyring_repo: >
+#       deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg]
+#       https://download.docker.com/linux/ubuntu
+#       {{ ansible_facts['lsb']['codename'] | lower }} stable
+#   apt_keyring_key_dest: "/etc/apt/keyrings/docker.asc"
+#   apt_keyring_gpg_dest: "/etc/apt/keyrings/docker.gpg"
+#   apt_repository_filename: "docker"
+
+- name: Ensure apt keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Download GPG key for {{ apt_keyring_name }}
+  ansible.builtin.get_url:
+    url: "{{ apt_keyring_url }}"
+    dest: "{{ apt_keyring_key_dest }}"
+    mode: "0644"
+  become: true
+
+- name: De-armor GPG key for {{ apt_keyring_name }}
+  ansible.builtin.command:
+    cmd: "gpg --batch --yes --dearmor -o {{ apt_keyring_gpg_dest }} {{ apt_keyring_key_dest }}"
+    removes: "{{ apt_keyring_key_dest }}"
+  become: true
+  changed_when: false
+
+- name: Add repository for {{ apt_keyring_name }}
+  ansible.builtin.apt_repository:
+    filename: "{{ apt_repository_filename }}"
+    repo: "{{ apt_keyring_repo }}"
+    state: present
+  become: true
+  notify: Update apt cache
