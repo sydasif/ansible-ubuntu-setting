@@ -1,27 +1,14 @@
 ---
-- name: Ensure VS Code apt keyrings directory exists
-  ansible.builtin.file:
-    path: /etc/apt/keyrings
-    state: directory
-    mode: "0755"
-
-- name: Add VS Code apt key
-  ansible.builtin.get_url:
-    url: "{{ vscode_apt_key_url }}"
-    dest: /etc/apt/keyrings/packages.microsoft.asc
-    mode: "0644"
-
-- name: De-armor VS Code apt key
-  ansible.builtin.command:
-    cmd: gpg --batch --yes --dearmor -o /etc/apt/keyrings/packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.asc
-    removes: /etc/apt/keyrings/packages.microsoft.asc
-  changed_when: false
-
-- name: Add VS Code repository
-  ansible.builtin.apt_repository:
-    filename: vscode
-    repo: "{{ vscode_apt_repo }}"
-    state: present
+- name: Set up VS Code APT repository
+  ansible.builtin.include_tasks:
+    file: ../../common/tasks/apt_keyring.yml
+  vars:
+    apt_keyring_name: "vscode"
+    apt_keyring_url: "{{ vscode_apt_key_url }}"
+    apt_keyring_repo: "{{ vscode_apt_repo }}"
+    apt_keyring_key_dest: "/etc/apt/keyrings/packages.microsoft.asc"
+    apt_keyring_gpg_dest: "/etc/apt/keyrings/packages.microsoft.gpg"
+    apt_repository_filename: "vscode"
 
 - name: Install VS Code
   ansible.builtin.apt:
