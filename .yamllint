@@ -7,10 +7,9 @@ ignore: |
   roles/*/files/*
 
 rules:
-  # Repo style uses "{ role: name }" flow mappings (one space inside),
-  # but zero spaces inside list brackets.
+  # Flow mappings/jinja braces: allow 0 (flow map) or 1 (jinja {{ var }}).
   braces:
-    min-spaces-inside: 1
+    min-spaces-inside: 0
     max-spaces-inside: 1
   brackets:
     min-spaces-inside: 0
@@ -34,5 +33,15 @@ rules:
       - "on"
       - "off"
 
+  # Comments must have a space after the marker (ansible-lint requirement).
   comments:
     require-starting-space: true
+    min-spaces-from-content: 1
+
+  # Indented nested comments are allowed (ansible-lint requirement).
+  comments-indentation: false
+
+  # Octal values must be explicit (ansible-lint requirement).
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true

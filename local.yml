@@ -13,14 +13,22 @@
       when: ansible_facts['distribution'] == 'Ubuntu'
 
   roles:
-    - { role: setup_packages, tags: ["packages"] }
-    - { role: setup_vscode, tags: ["vscode"] }
-    - { role: setup_dotfiles, tags: ["dotfiles"] }
-    - { role: setup_fonts, tags: ["fonts"] }
-    - { role: setup_docker, tags: ["docker"] }
-    - { role: setup_containerlab, tags: ["containerlab"] }
-    - { role: setup_vagrant, tags: ["vagrant"] }
+    - role: setup_packages
+      tags: ["packages"]
+    - role: setup_vscode
+      tags: ["vscode"]
+    - role: setup_dotfiles
+      tags: ["dotfiles"]
+    - role: setup_fonts
+      tags: ["fonts"]
+    - role: setup_docker
+      tags: ["docker"]
+    - role: setup_containerlab
+      tags: ["containerlab"]
+    - role: setup_vagrant
+      tags: ["vagrant"]
     - role: setup_gnome
       tags: ["gnome"]
       when: ansible_facts['distribution'] == 'Ubuntu'
-    - { role: setup_netlab, tags: ["netlab"] }
+    - role: setup_netlab
+      tags: ["netlab"]
