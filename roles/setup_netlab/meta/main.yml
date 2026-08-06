@@ -1,8 +1,8 @@
 ---
 galaxy_info:
-  role_name: setup_gnome
+  role_name: setup_netlab
   author: sydasif
-  description: Applies GNOME desktop preferences via dconf, including fonts, theme, and shell settings
+  description: Installs NetworkLab via pipx with Ansible dependency injection
   license: MIT
   min_ansible_version: "2.13"
   platforms:
@@ -14,6 +14,7 @@ galaxy_info:
   galaxy_tags:
     - ubuntu
     - desktop
-    - gnome
-    - dconf
+    - networklab
+    - network
+    - pipx
 dependencies: []

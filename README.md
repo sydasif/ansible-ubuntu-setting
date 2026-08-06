@@ -4,7 +4,7 @@ Automate an Ubuntu desktop setup using Ansible. This repository provides role-ba
 
 ## Quick facts
 
-- Target: Ubuntu 24.04+ (desktop)
+- Target: Ubuntu 26.04 LTS (desktop); also supports 22.04 and 24.04
 - Control machine: Any system with `Git`, `Python`, and `Ansible`
 
 ## Repository layout
@@ -12,7 +12,7 @@ Automate an Ubuntu desktop setup using Ansible. This repository provides role-ba
 - `local.yml` — main playbook (roles are tagged so you can run subsets)
 - `ansible.cfg` — project Ansible configuration
 - `group_vars/` — `example.yml` provided; copy to `Ubuntu.yml` and customize
-- `roles/` — role implementations (packages, vscode, dotfiles, docker, containerlab, vagrant, fonts, gnome)
+- `roles/` — role implementations (packages, vscode, dotfiles, docker, containerlab, vagrant, fonts, gnome, netlab)
 - `scripts/inventory.py` — optional dynamic inventory
 - `requirements.txt` — Python dependencies
 
@@ -68,6 +68,9 @@ ansible-playbook local.yml --tags dotfiles
 
 # run only the vagrant role
 ansible-playbook local.yml --tags vagrant
+
+# run only the netlab role
+ansible-playbook local.yml --tags netlab
 ```
 
 ## Customize
@@ -100,6 +103,29 @@ Installs Docker Engine from Docker's official APT repository, adds your user to 
 ### containerlab
 
 Installs Containerlab for network lab automation. Skips installation if `containerlab` is already present.
+
+### netlab
+
+Installs NetworkLab ([`networklab`](https://pypi.org/project/networklab/) on PyPI, `netlab` on the CLI) via `pipx`, with the pinned Ansible and Paramiko versions that netlab actually works with.
+
+**Why the pins matter** — netlab's playbooks use the `paramiko` SSH connection plugin, which requires:
+- **`ansible-core < 2.19`** — ansible-core 2.19+ renamed the `paramiko` connection plugin to `paramiko_ssh`, so any playbook using `connection: paramiko` fails with `the connection plugin 'paramiko' was not found`.
+- **`paramiko < 4`** — Paramiko 5.0 removed SHA-1 key exchange and SHA-1 RSA signing; Paramiko 4.0 dropped DSA. Paramiko 3.x is the last line that keeps full legacy-SSH support for older network devices.
+- A **Python 3.11–3.13** interpreter, since ansible-core 2.18 only supports that range (not the system default Python 3.14 on newer Ubuntu).
+
+The role provides the interpreter via `uv` (already installed by the `packages` role): it runs `uv python install 3.11` and `uv python find 3.11` to get a standalone CPython, then installs into it.
+
+**What it does:**
+
+1. Installs `pipx` via APT.
+2. Ensures Python 3.11 is available via `uv`.
+3. Resolves the Python 3.11 path.
+4. Installs `networklab` through `pipx` into that interpreter.
+5. Injects the pinned dependencies: `ansible-core<2.19` and `paramiko<4`.
+
+It is idempotent and self-repairs: on each run it reads the installed `ansible-core` version from the networklab venv. If netlab is absent, or the venv has an incompatible `ansible-core >= 2.19` (e.g. from an older bare-`ansible` injection), it uninstalls and reinstalls cleanly. A healthy installation is a full no-op.
+
+Tune it via `roles/setup_netlab/vars/main.yml` — `networklab_python_version`, `networklab_pipx_package`, and `networklab_injected_packages`.
 
 ### vagrant
 

@@ -1,0 +1,114 @@
+---
+# tasks file for setup_netlab
+- name: Install pipx
+  ansible.builtin.apt:
+    name: "{{ pipx_packages }}"
+    state: present
+    update_cache: yes
+  become: true
+
+# pipx/uv operate on the invoking user's ~/.local. With a local connection and
+# become: true globally, these must run as the real user (not root), with that
+# user's HOME/PATH and an esolvable uv (role-installed ~/.local/bin or snap).
+- name: Ensure networklab Python version is installed via uv  # noqa: command-instead-of-module
+  ansible.builtin.command:
+    cmd: uv python install {{ networklab_python_version }}
+  become: false
+  environment:
+    PATH: /home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
+    HOME: /home/{{ ansible_user }}
+  register: uv_install_result
+  changed_when: "'already installed' not in uv_install_result.stderr"
+
+- name: Find networklab Python path  # noqa: risky-shell-pipe
+  ansible.builtin.shell:
+    cmd: set -o pipefail && uv python find {{ networklab_python_version }} | tail -1
+  become: false
+  args:
+    executable: /bin/bash
+  environment:
+    PATH: /home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
+    HOME: /home/{{ ansible_user }}
+  register: python_path
+  changed_when: false
+  failed_when: python_path.rc != 0 or not python_path.stdout.strip()
+
+- name: Check if networklab is already installed
+  ansible.builtin.command:
+    cmd: netlab version
+  become: false
+  environment:
+    PATH: /home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
+    HOME: /home/{{ ansible_user }}
+  register: networklab_version_check
+  changed_when: false
+  failed_when: false
+
+# pipx inject cannot downgrade a package already in the venv. netlab was
+# previously installed with a bare `ansible` (ansible-core 2.21) which lacks the
+# paramiko connection plugin. Detect that stale/wrong state and reinstall clean.
+- name: Read installed ansible-core version in networklab venv  # noqa: risky-shell-pipe
+  ansible.builtin.shell:
+    cmd: "set -o pipefail && pipx runpip {{ networklab_pipx_package }} show ansible-core | sed -n 's/^Version: //p'"
+  become: false
+  args:
+    executable: /bin/bash
+  environment:
+    PATH: /home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
+    HOME: /home/{{ ansible_user }}
+  changed_when: false
+  failed_when: false
+  register: installed_ansible_core
+
+- name: Determine whether networklab needs (re)install
+  ansible.builtin.set_fact:
+    netlab_needs_install: >-
+      {{
+        networklab_version_check.rc != 0
+        or not installed_ansible_core.stdout
+        or (installed_ansible_core.stdout is version('2.19', '>='))
+      }}
+
+- name: Remove stale networklab install
+  ansible.builtin.command:
+    cmd: "pipx uninstall {{ networklab_pipx_package }}"
+  become: false
+  environment:
+    PATH: /home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
+    HOME: /home/{{ ansible_user }}
+  when:
+    - netlab_needs_install
+    - networklab_version_check.rc == 0
+  changed_when: true
+
+- name: Install networklab via pipx  # noqa: no-changed-when
+  ansible.builtin.command:
+    cmd: "pipx install --python {{ python_path.stdout.strip() }} {{ networklab_pipx_package }}"
+  become: false
+  environment:
+    PATH: /home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
+    HOME: /home/{{ ansible_user }}
+  when: netlab_needs_install
+  register: install_result
+  changed_when: install_result.rc == 0
+
+- name: Inject pinned dependencies into networklab pipx venv
+  ansible.builtin.command:
+    cmd: "pipx inject {{ networklab_pipx_package }} {{ item }}"
+  loop: "{{ networklab_injected_packages }}"
+  become: false
+  environment:
+    PATH: /home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
+    HOME: /home/{{ ansible_user }}
+  when: netlab_needs_install
+  changed_when: true
+
+- name: Verify networklab installation
+  ansible.builtin.command:
+    cmd: netlab version
+  become: false
+  environment:
+    PATH: /home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
+    HOME: /home/{{ ansible_user }}
+  changed_when: false
+  when: netlab_needs_install
