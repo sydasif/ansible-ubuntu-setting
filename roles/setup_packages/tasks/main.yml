@@ -22,6 +22,42 @@
   vars:
     ansible_user: "{{ lookup('env', 'USER') }}"
 
+- name: Check if nvim is installed  # noqa: risky-shell-pipe
+  ansible.builtin.shell:
+    cmd: set -o pipefail && snap info nvim 2>/dev/null | grep -q "^  installed:"
+  args:
+    executable: /bin/bash
+  become: false
+  register: nvim_check
+  changed_when: false
+  failed_when: false
+
+- name: Install nvim via snap  # noqa: command-instead-of-module no-changed-when
+  ansible.builtin.command: snap install nvim --classic
+  become: true
+  register: nvim_install
+  changed_when: "'installed' in nvim_install.stderr"
+  environment:
+    PATH: /snap/bin:/usr/local/bin:/usr/bin:/bin
+
+- name: Check if ruff is installed  # noqa: risky-shell-pipe
+  ansible.builtin.shell:
+    cmd: set -o pipefail && snap info ruff 2>/dev/null | grep -q "^  installed:"
+  args:
+    executable: /bin/bash
+  become: false
+  register: ruff_check
+  changed_when: false
+  failed_when: false
+
+- name: Install ruff via snap  # noqa: command-instead-of-module no-changed-when
+  ansible.builtin.command: snap install ruff
+  become: true
+  register: ruff_install
+  changed_when: "'installed' in ruff_install.stderr"
+  environment:
+    PATH: /snap/bin:/usr/local/bin:/usr/bin:/bin
+
 - name: Install Python development packages
   ansible.builtin.apt:
     name: "{{ python_packages }}"
