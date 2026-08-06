@@ -25,3 +25,8 @@ virtualization_packages:
   - libvirt-dev
   - qemu-utils
   - virt-manager
+
+# Environment for uv/snap commands (runs as non-root user)
+packages_user_env:
+  PATH: "/home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin"
+  HOME: "/home/{{ ansible_user }}"
