@@ -25,3 +25,6 @@ jobs:
 
       - name: Lint Ansible
         run: ansible-lint
+
+      - name: Syntax-check playbook
+        run: ansible-playbook local.yml --syntax-check
