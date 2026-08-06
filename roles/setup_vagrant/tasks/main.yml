@@ -80,7 +80,6 @@
   failed_when: false
   become: false
   vars:
-    ansible_become: false
     ansible_user: "{{ lookup('env', 'USER') }}"
 
 - name: Install vagrant-libvirt plugin  # noqa: command-instead-of-shell no-changed-when
@@ -96,7 +95,6 @@
   failed_when: false
   become: false
   vars:
-    ansible_become: false
     ansible_user: "{{ lookup('env', 'USER') }}"
 
 - name: Wait for vagrant-libvirt plugin install to complete
@@ -109,7 +107,6 @@
   delay: 5
   become: false
   vars:
-    ansible_become: false
     ansible_user: "{{ lookup('env', 'USER') }}"
 
 - name: Ensure libvirt images directory on /storage exists
