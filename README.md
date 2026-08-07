@@ -19,7 +19,7 @@ Automate an Ubuntu desktop setup with Ansible. This repository provides role-bas
 - **Docker** — Docker Engine from the official APT repo, `docker` group membership, and a configurable data root
 - **Containerlab** — network lab automation with an optional Vagrant/Libvirt VM profile
 - **Vagrant + libvirt/KVM** — Vagrant, `vagrant-libvirt`, and a reconfigured libvirt storage pool
-- **GNOME preferences** — dconf-driven desktop settings
+- **GNOME preferences** — dconf-driven desktop settings, with Ptyxis registered as the xdg default terminal
 - **netlab** — NetworkLab CLI (`netlab`) via pipx, pinned to the `ansible-core`/`paramiko` versions that actually work with it
 - **Shared APT keyring** — one common task for GPG keyring + repository setup reused by docker/vscode/vagrant
 - **Idempotent** — re-running the playbook converges to the desired state without reapplying unchanged work
@@ -97,7 +97,7 @@ Each `setup_*` role installs and configures one tool:
 - **`setup_docker`** — Docker Engine, `docker` group, `daemon.json` data root, and a systemd override
 - **`setup_containerlab`** — Containerlab, plus an optional Vagrant/Libvirt VM profile
 - **`setup_vagrant`** — Vagrant, libvirt/KVM, and the `vagrant-libvirt` plugin
-- **`setup_gnome`** — GNOME desktop preferences via dconf
+- **`setup_gnome`** — GNOME desktop preferences via dconf, and registers Ptyxis as the default/xdg terminal (Ubuntu 26 dropped `gnome-terminal`)
 - **`setup_netlab`** — NetworkLab CLI via pip, pinned to compatible Ansible/Paramiko versions
 - **`common`** — shared APT keyring tasks reused by other roles
 
