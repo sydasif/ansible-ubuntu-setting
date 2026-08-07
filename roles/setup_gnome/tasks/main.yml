@@ -54,9 +54,9 @@
   ansible.builtin.shell: |-
     set -e
     if command -v xdg-settings >/dev/null 2>&1; then
-      xdg-settings set default-terminal org.gnome.Terminal.desktop || true
+      xdg-settings set default-terminal org.gnome.Ptyxis.desktop || true
     fi
-    gsettings set org.gnome.desktop.applications.terminal exec 'gnome-terminal' || true
-    gsettings set org.gnome.desktop.applications.terminal exec-arg '-x' || true
+    gsettings set org.gnome.desktop.default-applications.terminal exec 'ptyxis' || true
+    gsettings set org.gnome.desktop.default-applications.terminal exec-arg '' || true
   become: false
   changed_when: false
