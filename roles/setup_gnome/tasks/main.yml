@@ -63,6 +63,6 @@
 - name: Register ptyxis as new-window terminal for xdg
   ansible.builtin.copy:
     content: "org.gnome.Ptyxis.desktop:new-window\n"
-    dest: "{{ ansible_env.HOME }}/.config/ubuntu-xdg-terminals.list"
+    dest: "/home/{{ ansible_user }}/.config/ubuntu-xdg-terminals.list"
     mode: "0644"
   become: false
