@@ -27,7 +27,7 @@
 
 - name: Create Containerlab Vagrant directory
   ansible.builtin.file:
-    path: "{{ vagrantfile_path }}"
+    path: "{{ containerlab_vagrantfile_path }}"
     state: directory
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
@@ -35,13 +35,13 @@
 
 - name: Deploy Containerlab Vagrantfile
   ansible.builtin.copy:
-    dest: "{{ vagrantfile_path }}/Vagrantfile"
+    dest: "{{ containerlab_vagrantfile_path }}/Vagrantfile"
     content: |
       Vagrant.configure("2") do |config|
-        config.vm.box = "generic/ubuntu2204"
+        config.vm.box = "bento/ubuntu-24.04"
         config.vm.provider :libvirt do |lv|
-          lv.memory = {{ vagrant_vm_memory }}
-          lv.cpus = {{ vagrant_vm_cpus }}
+          lv.memory = {{ containerlab_vagrant_vm_memory }}
+          lv.cpus = {{ containerlab_vagrant_vm_cpus }}
           lv.driver = "kvm"
         end
       end
