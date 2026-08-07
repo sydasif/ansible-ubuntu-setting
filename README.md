@@ -129,4 +129,4 @@ MIT License — see the [LICENSE](LICENSE) file for details.
 
 ## References
 
-- Inspiration: LearnLinuxTV Ansible tutorials
+- Inspiration: [LearnLinuxTV Ansible tutorials](https://youtube.com/playlist?list=PLT98CRl2KxKEUHie1m24-wkyHpEsa4Y70&si=xyQjsGnligtKQFk1)
