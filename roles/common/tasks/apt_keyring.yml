@@ -6,7 +6,7 @@
 #   apt_keyring_repo: >
 #       deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg]
 #       https://download.docker.com/linux/ubuntu
-#       {{ ansible_facts['lsb']['codename'] | lower }} stable
+#       {{ ansible_facts['distribution_release'] | lower }} stable
 #   apt_keyring_key_dest: "/etc/apt/keyrings/docker.asc"
 #   apt_keyring_gpg_dest: "/etc/apt/keyrings/docker.gpg"
 #   apt_repository_filename: "docker"
@@ -24,12 +24,14 @@
     dest: "{{ apt_keyring_key_dest }}"
     mode: "0644"
   become: true
+  register: apt_key_download
 
 - name: De-armor GPG key for {{ apt_keyring_name }}
   ansible.builtin.command:
     cmd: "gpg --batch --yes --dearmor -o {{ apt_keyring_gpg_dest }} {{ apt_keyring_key_dest }}"
-    removes: "{{ apt_keyring_key_dest }}"
+    creates: "{{ apt_keyring_gpg_dest }}"
   become: true
+  when: apt_key_download.changed or ansible_check_mode
   changed_when: false
 
 - name: Add repository for {{ apt_keyring_name }}

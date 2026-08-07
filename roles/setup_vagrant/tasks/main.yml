@@ -19,7 +19,7 @@
     apt_keyring_repo: >-
       deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp.gpg]
       {{ vagrant_apt_repo_url }}
-      {{ ansible_facts['lsb']['codename'] | default('noble') }} main
+      {{ ansible_facts['distribution_release'] }} main
     apt_keyring_key_dest: "/etc/apt/keyrings/hashicorp.asc"
     apt_keyring_gpg_dest: "/etc/apt/keyrings/hashicorp.gpg"
     apt_repository_filename: "hashicorp"
@@ -73,21 +73,8 @@
   when: vagrant_libvirt_check.rc != 0
   environment: "{{ vagrant_user_env }}"
   async: 600
-  poll: 0
-  register: vagrant_plugin_install
-  failed_when: false
+  poll: 5
   become: false
-
-- name: Wait for vagrant-libvirt plugin install to complete
-  ansible.builtin.async_status:
-    jid: "{{ vagrant_plugin_install.ansible_job_id }}"
-  when: vagrant_plugin_install is defined and vagrant_plugin_install.ansible_job_id is defined
-  register: plugin_job_result
-  until: plugin_job_result.finished
-  retries: 120
-  delay: 5
-  become: false
-  environment: "{{ vagrant_user_env }}"
 
 - name: Ensure libvirt images directory on /storage exists
   ansible.builtin.file:

@@ -16,11 +16,11 @@
     group: "{{ ansible_user }}"
     mode: "0700"
   loop:
+    - "{{ dotfiles_base_dest }}/.config"
     - "{{ dotfiles_base_dest }}/.config/ruff"
     - "{{ dotfiles_base_dest }}/.config/Code/User"
     - "{{ dotfiles_base_dest }}/.config/zed"
     - "{{ dotfiles_base_dest }}/.ssh"
-    - "{{ dotfiles_base_dest }}/.config"
   become: false
 
 - name: Create symlinks for dotfiles

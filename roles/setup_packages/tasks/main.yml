@@ -13,6 +13,8 @@
 
 - name: Check if uv is installed
   ansible.builtin.command: uv --version
+  become: false
+  environment: "{{ packages_user_env }}"
   register: uv_check
   changed_when: false
   failed_when: false
@@ -25,8 +27,6 @@
   args:
     executable: /bin/bash
   become: false
-  vars:
-    ansible_user: "{{ lookup('env', 'USER') }}"
   environment: "{{ packages_user_env }}"
 
 - name: Install nvim via snap

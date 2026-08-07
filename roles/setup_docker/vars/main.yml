@@ -10,7 +10,7 @@ docker_gpg_key_url: https://download.docker.com/linux/ubuntu/gpg
 docker_repository_repo: >-
   deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg]
   https://download.docker.com/linux/ubuntu
-  {{ ansible_facts['lsb']['codename'] | default('noble') | lower }} stable
+  {{ ansible_facts['distribution_release'] | lower }} stable
 docker_engine_packages:
   - docker-ce
   - docker-ce-cli

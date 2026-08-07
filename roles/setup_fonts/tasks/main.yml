@@ -17,4 +17,6 @@
     src: "{{ jetbrains_mono_download_url }}"
     dest: "{{ fonts_base_dir }}/"
     remote_src: yes
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
   notify: Refresh font cache
