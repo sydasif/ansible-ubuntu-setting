@@ -1,6 +1,6 @@
 ---
-# Base system utilities
-base_packages:
+# CLI / shell utilities
+cli_packages:
   - bat
   - zsh
   - tree
@@ -8,8 +8,11 @@ base_packages:
   - lsd
   - fzf
   - starship
-  - gnome-tweaks
   - git
+
+# Desktop packages
+desktop_packages:
+  - gnome-tweaks
 uv_install_script: https://astral.sh/uv/install.sh
 # Python development
 python_packages:
