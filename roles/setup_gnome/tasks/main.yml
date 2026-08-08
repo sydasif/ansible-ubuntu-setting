@@ -50,7 +50,7 @@
     group: root
   become: true
 
-- name: Apply current terminal config
+- name: Apply current terminal config # noqa: no-changed-when
   ansible.builtin.shell: |-
     set -e
     if command -v xdg-settings >/dev/null 2>&1; then

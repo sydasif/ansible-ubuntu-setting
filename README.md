@@ -11,13 +11,12 @@ Automate an Ubuntu desktop setup with Ansible. This repository provides role-bas
 ## Features
 
 - **Package installs** — base utilities (bat, zsh, fzf, starship, …), Python dev tooling, and virtualization packages, all in one role
-- **`uv`** — installs Astral's `uv` and uses it to provide standalone Python interpreters where needed
-- **Snap apps** — `nvim` and `ruff` via the `community.general.snap` module
+- **Snap apps** — `astral-uv`, `nvim`, and `ruff` via the `community.general.snap` module
 - **VS Code** — installs from Microsoft's official APT repository
 - **Dotfiles** — clones your dotfiles repo and symlinks shell configs, editors, SSH, and theme files into `~`
 - **Developer fonts** — JetBrainsMono Nerd Font, with font-cache refresh
 - **Docker** — Docker Engine from the official APT repo, `docker` group membership, and a configurable data root
-- **Containerlab** — network lab automation with an optional Vagrant/Libvirt VM profile
+- **Containerlab** — network lab automation
 - **Vagrant + libvirt/KVM** — Vagrant, `vagrant-libvirt`, and a reconfigured libvirt storage pool
 - **GNOME preferences** — dconf-driven desktop settings, with Ptyxis registered as the xdg default terminal
 - **netlab** — NetworkLab CLI (`netlab`) via pipx, pinned to the `ansible-core`/`paramiko` versions that actually work with it
@@ -90,12 +89,12 @@ Keep secrets out of the repository; use Ansible Vault or an external secret stor
 
 Each `setup_*` role installs and configures one tool:
 
-- **`setup_packages`** — base utilities, `uv`, Python and virtualization apt packages, and `nvim` + `ruff` via snap
+- **`setup_packages`** — base utilities, Python and virtualization apt packages, and snap packages (`astral-uv`, `nvim`, `ruff`)
 - **`setup_vscode`** — VS Code from Microsoft's apt repo (uses the shared keyring task)
 - **`setup_dotfiles`** — clones dotfiles into `~/.dotfiles` and symlinks them into `~`
 - **`setup_fonts`** — installs JetBrainsMono Nerd Font and refreshes the font cache
 - **`setup_docker`** — Docker Engine, `docker` group, `daemon.json` data root, and a systemd override
-- **`setup_containerlab`** — Containerlab, plus an optional Vagrant/Libvirt VM profile
+- **`setup_containerlab`** — Containerlab network lab automation
 - **`setup_vagrant`** — Vagrant, libvirt/KVM, and the `vagrant-libvirt` plugin
 - **`setup_gnome`** — GNOME desktop preferences via dconf, and registers Ptyxis as the default/xdg terminal (Ubuntu 26 dropped `gnome-terminal`)
 - **`setup_netlab`** — NetworkLab CLI via pip, pinned to compatible Ansible/Paramiko versions
