@@ -11,37 +11,6 @@
     state: present
   when: ansible_facts['distribution'] == 'Ubuntu'
 
-- name: Check if uv is installed
-  ansible.builtin.command: uv --version
-  become: false
-  environment: "{{ packages_user_env }}"
-  register: uv_check
-  changed_when: false
-  failed_when: false
-
-- name: Install uv  # noqa: command-instead-of-module no-changed-when
-  ansible.builtin.shell: |
-    set -o pipefail
-    curl -LsSf {{ uv_install_script }} | sh
-  when: uv_check.rc != 0
-  args:
-    executable: /bin/bash
-  become: false
-  environment: "{{ packages_user_env }}"
-
-- name: Install nvim via snap
-  community.general.snap:
-    name: nvim
-    classic: true
-    state: present
-  become: true
-
-- name: Install ruff via snap
-  community.general.snap:
-    name: ruff
-    state: present
-  become: true
-
 - name: Install Python development packages
   ansible.builtin.apt:
     name: "{{ python_packages }}"
@@ -52,3 +21,11 @@
     name: "{{ virtualization_packages }}"
     state: present
   when: ansible_facts['distribution'] == 'Ubuntu'
+
+- name: Install snap packages
+  community.general.snap:
+    name: "{{ item.name }}"
+    classic: "{{ item.classic | default(false) }}"
+    state: present
+  loop: "{{ snap_packages }}"
+  become: true

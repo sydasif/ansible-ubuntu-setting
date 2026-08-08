@@ -15,13 +15,14 @@ cli_packages:
 # Desktop packages
 desktop_packages:
   - gnome-tweaks
-uv_install_script: https://astral.sh/uv/install.sh
+
 # Python development
 python_packages:
   - python3-pip
   - python3-venv
   - python3-psutil
   - pipx
+
 # Virtualization packages
 virtualization_packages:
   - bridge-utils
@@ -32,7 +33,11 @@ virtualization_packages:
   - qemu-utils
   - virt-manager
 
-# Environment for uv/snap commands (runs as non-root user)
-packages_user_env:
-  PATH: "/home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin"
-  HOME: "/home/{{ ansible_user }}"
+# Snap packages
+snap_packages:
+  - name: astral-uv
+    classic: true
+  - name: ruff
+    classic: false
+  - name: nvim
+    classic: true
