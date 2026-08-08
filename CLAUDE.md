@@ -15,7 +15,7 @@ ansible-playbook local.yml --ask-become-pass
 # Single role by tag
 ansible-playbook local.yml --tags docker --ask-become-pass
 
-# Lint / validate (CI runs all three)
+# Lint / validate
 yamllint ./
 ansible-lint
 ansible-playbook local.yml --syntax-check

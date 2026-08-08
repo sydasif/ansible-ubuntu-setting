@@ -120,7 +120,7 @@ ansible-ubuntu-setting/
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. This repository includes GitHub Actions that run `yamllint`, `ansible-lint`, and an `ansible-playbook --syntax-check` on every push and pull request.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. Lint locally with `yamllint ./`, `ansible-lint`, and `ansible-playbook --syntax-check` before committing.
 
 ## License
 
