@@ -14,8 +14,9 @@ networklab_python_version: "3.11"
 # Exact package specs pipx injects into the networklab venv. ansible-core<2.19
 # keeps the 'paramiko' connection plugin that netlab's playbooks require.
 networklab_injected_packages:
-  - "ansible-core<2.19"
-  - "paramiko<4"
+  - "ansible-core<=2.18.18"
+  - "paramiko<=3.5.1"
+  - "ansible-pylibssh<=1.4.0"
 
 # Environment for uv/pipx commands (runs as non-root user)
 netlab_user_env:
