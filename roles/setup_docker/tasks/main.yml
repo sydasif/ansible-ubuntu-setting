@@ -60,21 +60,3 @@
     group: root
     mode: "0644"
   notify: Restart docker for data-root change
-
-- name: Migrate existing Docker data to /storage
-  ansible.builtin.shell: |
-    set -e
-    if [ -d /var/lib/docker ] && [ ! -L /var/lib/docker ]; then
-      mkdir -p "{{ docker_data_root }}"
-      systemctl stop docker 2>/dev/null || true
-      cp -a /var/lib/docker/. "{{ docker_data_root }}/" 2>/dev/null || true
-      rm -rf /var/lib/docker
-      ln -s "{{ docker_data_root }}" /var/lib/docker
-      echo "docker data migrated to {{ docker_data_root }}"
-    fi
-  args:
-    executable: /bin/bash
-  register: docker_data_migrate
-  changed_when: docker_data_migrate.stdout | length > 0
-  failed_when: docker_data_migrate.rc != 0
-  notify: Restart docker for data-root change
