@@ -9,6 +9,8 @@ cli_packages:
   - fzf
   - starship
   - git
+  - sshpass
+  - openvswitch-switch
 
 # Desktop packages
 desktop_packages:
@@ -19,6 +21,7 @@ python_packages:
   - python3-pip
   - python3-venv
   - python3-psutil
+  - pipx
 # Virtualization packages
 virtualization_packages:
   - bridge-utils
