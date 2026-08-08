@@ -13,7 +13,7 @@
   changed_when: false
   failed_when: false
 
-- name: Install containerlab  # noqa: command-instead-of-module no-changed-when
+- name: Install containerlab # noqa: command-instead-of-module no-changed-when
   ansible.builtin.shell:
     cmd: 'bash -c "$(curl -sL {{ containerlab_install_script }})"'
   when: containerlab_version_check.rc != 0
@@ -24,27 +24,3 @@
     cmd: containerlab version
   when: containerlab_version_check.rc != 0 and containerlab_installation is succeeded
   changed_when: false
-
-- name: Create Containerlab Vagrant directory
-  ansible.builtin.file:
-    path: "{{ containerlab_vagrantfile_path }}"
-    state: directory
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    mode: "0755"
-
-- name: Deploy Containerlab Vagrantfile
-  ansible.builtin.copy:
-    dest: "{{ containerlab_vagrantfile_path }}/Vagrantfile"
-    content: |
-      Vagrant.configure("2") do |config|
-        config.vm.box = "bento/ubuntu-24.04"
-        config.vm.provider :libvirt do |lv|
-          lv.memory = {{ containerlab_vagrant_vm_memory }}
-          lv.cpus = {{ containerlab_vagrant_vm_cpus }}
-          lv.driver = "kvm"
-        end
-      end
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    mode: "0644"

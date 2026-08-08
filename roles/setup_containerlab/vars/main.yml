@@ -3,6 +3,3 @@
 containerlab_dependencies:
   - curl
 containerlab_install_script: https://get.containerlab.dev
-containerlab_vagrantfile_path: /home/{{ ansible_user }}/containerlab-vagrant
-containerlab_vagrant_vm_memory: 2048
-containerlab_vagrant_vm_cpus: 2
