@@ -1,98 +1,32 @@
 ---
 # tasks file for setup_netlab
-- name: Check if networklab Python version is already installed via uv
-  ansible.builtin.command:
-    cmd: uv python find {{ networklab_python_version }}
-  become: false
-  environment: "{{ netlab_user_env }}"
-  register: uv_find_result
-  changed_when: false
-  failed_when: false
-
-- name: Install networklab Python version via uv # noqa: command-instead-of-module
-  ansible.builtin.command:
-    cmd: uv python install {{ networklab_python_version }}
-  become: false
-  environment: "{{ netlab_user_env }}"
-  when: uv_find_result.rc != 0
-  register: uv_install_result
-  changed_when: uv_install_result.rc == 0
-
-- name: Find networklab Python path # noqa: risky-shell-pipe
-  ansible.builtin.shell:
-    cmd: set -o pipefail && uv python find {{ networklab_python_version }} | tail -1
-  become: false
-  args:
-    executable: /bin/bash
-  environment: "{{ netlab_user_env }}"
-  register: python_path
-  changed_when: false
-  failed_when: python_path.rc != 0 or not python_path.stdout.strip()
-
 - name: Check if networklab is already installed
   ansible.builtin.command:
     cmd: netlab version
   become: false
-  environment: "{{ netlab_user_env }}"
   register: networklab_version_check
   changed_when: false
   failed_when: false
 
-# pipx inject cannot downgrade a package already in the venv. netlab was
-# previously installed with a bare `ansible` (ansible-core 2.21) which lacks the
-# paramiko connection plugin. Detect that stale/wrong state and reinstall clean.
-- name: Read installed ansible-core version in networklab venv # noqa: risky-shell-pipe
-  ansible.builtin.shell:
-    cmd: "set -o pipefail && pipx runpip {{ networklab_pipx_package }} show ansible-core | sed -n 's/^Version: //p'"
-  become: false
-  args:
-    executable: /bin/bash
-  environment: "{{ netlab_user_env }}"
-  changed_when: false
-  failed_when: false
-  register: installed_ansible_core
-
-- name: Determine whether networklab needs (re)install
-  ansible.builtin.set_fact:
-    netlab_needs_install: >-
-      {{
-        networklab_version_check.rc != 0
-        or not installed_ansible_core.stdout
-        or (installed_ansible_core.stdout is version('2.19', '>='))
-      }}
-
-- name: Remove stale networklab install
+- name: Install networklab via pipx
   ansible.builtin.command:
-    cmd: "pipx uninstall {{ networklab_pipx_package }}"
+    cmd: "pipx install {{ netlab_pipx_package }}"
   become: false
-  environment: "{{ netlab_user_env }}"
-  when:
-    - netlab_needs_install
-    - networklab_version_check.rc == 0
-  changed_when: true
+  when: networklab_version_check.rc != 0
+  register: networklab_install_result
+  changed_when: networklab_install_result.rc == 0
 
-- name: Install networklab via pipx # noqa: no-changed-when
+- name: Inject networklab dependencies
   ansible.builtin.command:
-    cmd: "pipx install --python {{ python_path.stdout.strip() }} {{ networklab_pipx_package }}"
+    cmd: "pipx inject {{ netlab_pipx_package }} {{ item }}"
+  loop: "{{ netlab_injected_packages }}"
   become: false
-  environment: "{{ netlab_user_env }}"
-  when: netlab_needs_install
-  register: install_result
-  changed_when: install_result.rc == 0
-
-- name: Inject pinned dependencies into networklab pipx venv
-  ansible.builtin.command:
-    cmd: "pipx inject {{ networklab_pipx_package }} {{ item }}"
-  loop: "{{ networklab_injected_packages }}"
-  become: false
-  environment: "{{ netlab_user_env }}"
-  when: netlab_needs_install
+  when: networklab_version_check.rc != 0
   changed_when: true
 
 - name: Verify networklab installation
   ansible.builtin.command:
     cmd: netlab version
   become: false
-  environment: "{{ netlab_user_env }}"
+  when: networklab_version_check.rc != 0 and networklab_install_result is succeeded
   changed_when: false
-  when: netlab_needs_install

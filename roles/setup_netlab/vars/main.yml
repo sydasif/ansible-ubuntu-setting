@@ -1,24 +1,10 @@
 ---
-# vars file for setup_netlab
-pipx_packages:
-  - pipx
+netlab_pipx_package: networklab
 
-networklab_pipx_package: networklab
-
-# networklab's ansible must run under a Python that ansible-core 2.18 supports
-# (3.11-3.13). ansible-core >= 2.19 dropped the 'paramiko' connection plugin
-# (renamed to 'paramiko_ssh'), breaking netlab; paramiko >= 4/5 dropped legacy
-# SSH. Provide a standalone interpreter via uv.
-networklab_python_version: "3.11"
-
-# Exact package specs pipx injects into the networklab venv. ansible-core<2.19
-# keeps the 'paramiko' connection plugin that netlab's playbooks require.
-networklab_injected_packages:
+# netlab's ansible must use ansible-core < 2.19 (the 'paramiko' connection
+# plugin was renamed to 'paramiko_ssh' in 2.19, breaking netlab's playbooks).
+# Pin exact versions here so pipx inject does not pull a newer, broken set.
+netlab_injected_packages:
   - "ansible-core<=2.18.18"
   - "paramiko<=3.5.1"
   - "ansible-pylibssh<=1.4.0"
-
-# Environment for uv/pipx commands (runs as non-root user)
-netlab_user_env:
-  PATH: "/home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin"
-  HOME: "/home/{{ ansible_user }}"
