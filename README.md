@@ -10,9 +10,10 @@ Automate an Ubuntu desktop setup with Ansible. This repository provides role-bas
 
 ## Features
 
-- **Package installs** — base utilities (bat, zsh, fzf, starship, …), Python dev tooling, and virtualization packages, all in one role
+- **Base packages** — CLI utilities (bat, zsh, fzf, starship, git, …) and Python system packages (python3-pip, python3-venv, pipx) — runs on headless servers too
+- **Desktop packages** — GUI packages (gnome-tweaks) and editor snap (nvim)
+- **Editors** — VS Code (Microsoft APT repo) and Neovim (snap)
 - **Snap apps** — `astral-uv`, `nvim`, and `ruff` via the `community.general.snap` module
-- **VS Code** — installs from Microsoft's official APT repository
 - **Dotfiles** — clones your dotfiles repo and symlinks shell configs, editors, SSH, and theme files into `~`
 - **Developer fonts** — JetBrainsMono Nerd Font, with font-cache refresh
 - **Docker** — Docker Engine from the official APT repo, `docker` group membership, and a configurable data root
@@ -70,7 +71,10 @@ ansible-playbook local.yml --ask-become-pass
 Roles in `local.yml` are tagged. Use `--tags` to run a subset:
 
 ```bash
-ansible-playbook local.yml --tags "fonts,docker"   # packages + docker only
+ansible-playbook local.yml --tags "base,editors,docker"   # base + editors + docker only
+ansible-playbook local.yml --tags base        # CLI utilities + Python packages (headless-friendly)
+ansible-playbook local.yml --tags desktop     # GUI packages + snaps
+ansible-playbook local.yml --tags editors     # VS Code + Neovim
 ansible-playbook local.yml --tags dotfiles
 ansible-playbook local.yml --tags vagrant
 ansible-playbook local.yml --tags netlab
@@ -89,13 +93,15 @@ Keep secrets out of the repository; use Ansible Vault or an external secret stor
 
 Each `setup_*` role installs and configures one tool:
 
-- **`setup_packages`** — base utilities, Python and virtualization apt packages, and snap packages (`astral-uv`, `nvim`, `ruff`)
-- **`setup_vscode`** — VS Code from Microsoft's apt repo (uses the shared keyring task)
+- **`setup_base`** — CLI utilities (bat, zsh, fzf, starship, git, …) and Python system packages (python3-pip, python3-venv, pipx) — runs on headless servers
+- **`setup_desktop`** — GUI packages (gnome-tweaks) and editor snap (nvim)
+- **`setup_editors`** — VS Code (Microsoft APT repo) and Neovim (snap)
+- **`setup_pipx`** — pipx-managed CLI tools: pipx (with uv backend), uv, ruff
 - **`setup_dotfiles`** — clones dotfiles into `~/.dotfiles` and symlinks them into `~`
 - **`setup_fonts`** — installs JetBrainsMono Nerd Font and refreshes the font cache
 - **`setup_docker`** — Docker Engine, `docker` group, `daemon.json` data root, and a systemd override
 - **`setup_containerlab`** — Containerlab network lab automation
-- **`setup_vagrant`** — Vagrant, libvirt/KVM, and the `vagrant-libvirt` plugin
+- **`setup_vagrant`** — Vagrant, libvirt/KVM (including bridge-utils, qemu, virt-manager, libguestfs-tools), and the `vagrant-libvirt` plugin
 - **`setup_gnome`** — GNOME desktop preferences via dconf, and registers Ptyxis as the default/xdg terminal (Ubuntu 26 dropped `gnome-terminal`)
 - **`setup_netlab`** — NetworkLab CLI via pip, pinned to compatible Ansible/Paramiko versions
 - **`common`** — shared APT keyring tasks reused by other roles
@@ -111,9 +117,17 @@ ansible-ubuntu-setting/
 ├── group_vars/                # per-host overrides (Ubuntu.yml, example.yml)
 ├── roles/                     # role implementations
 │   ├── common/                # shared APT keyring / repo tasks
-│   ├── setup_packages/  setup_vscode/  setup_dotfiles/  setup_fonts/
-│   ├── setup_docker/    setup_containerlab/  setup_vagrant/
-│   └── setup_gnome/     setup_netlab/
+│   ├── setup_base/            # CLI utilities + Python system packages
+│   ├── setup_desktop/         # GUI packages + snaps
+│   ├── setup_editors/         # VS Code + Neovim
+│   ├── setup_pipx/            # pipx-managed tools (pipx, uv, ruff)
+│   ├── setup_dotfiles/        # dotfiles symlinks
+│   ├── setup_fonts/           # JetBrainsMono Nerd Font
+│   ├── setup_docker/          # Docker Engine + config
+│   ├── setup_containerlab/    # Containerlab
+│   ├── setup_vagrant/         # Vagrant + libvirt/KVM
+│   └── setup_gnome/           # GNOME dconf preferences
+│   └── setup_netlab/          # NetworkLab CLI
 └── scripts/
     └── inventory.py           # optional dynamic local inventory
 ```
