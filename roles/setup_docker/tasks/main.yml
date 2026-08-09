@@ -28,7 +28,7 @@
     name: "{{ ansible_user }}"
     groups: docker
     append: true
-  when: ansible_user is defined and ansible_user != 'root'
+  when: ansible_user != 'root'
   notify: Start and enable docker
 
 # Use 0710 explicitly: docker re-chmods its data-root to 0710 at startup, so a

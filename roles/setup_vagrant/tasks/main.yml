@@ -41,14 +41,14 @@
     name: "{{ ansible_user }}"
     groups: kvm
     append: true
-  when: ansible_user is defined and ansible_user != 'root'
+  when: ansible_user != 'root'
 
 - name: Add current user to libvirt group
   ansible.builtin.user:
     name: "{{ ansible_user }}"
     groups: libvirt
     append: true
-  when: ansible_user is defined and ansible_user != 'root'
+  when: ansible_user != 'root'
 
 - name: Create Vagrant home directory on /storage
   ansible.builtin.file:
