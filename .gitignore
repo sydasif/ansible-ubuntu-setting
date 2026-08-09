@@ -48,3 +48,4 @@ Thumbs.db
 group_vars/local.yml
 group_vars/secrets.yml
 hosts
+.claude/
