@@ -1,10 +1,9 @@
 ---
 netlab_pipx_package: networklab
 
-# netlab's ansible must use ansible-core < 2.19 (the 'paramiko' connection
-# plugin was renamed to 'paramiko_ssh' in 2.19, breaking netlab's playbooks).
 # Pin exact versions here so pipx inject does not pull a newer, broken set.
 netlab_injected_packages:
   - "ansible-core<=2.18.18"
   - "paramiko<=3.5.1"
   - "ansible-pylibssh<=1.4.0"
+  - "ruamel.yaml<=0.19.1"
