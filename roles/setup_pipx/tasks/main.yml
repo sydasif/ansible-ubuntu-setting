@@ -58,6 +58,5 @@
 - name: Verify pipx/uv/ruff are pipx-managed
   ansible.builtin.shell:
     cmd: "source ~/.zshrc 2>/dev/null || true; pipx list; echo ---; uv --version; ruff --version"
-  register: verify_result
   changed_when: false
   become: false
