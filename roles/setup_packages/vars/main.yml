@@ -35,9 +35,5 @@ virtualization_packages:
 
 # Snap packages
 snap_packages:
-  - name: astral-uv
-    classic: true
-  - name: ruff
-    classic: false
   - name: nvim
     classic: true
