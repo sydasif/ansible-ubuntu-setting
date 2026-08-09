@@ -25,12 +25,28 @@ ansible-playbook local.yml --syntax-check
 
 - **Entry point:** `local.yml` — single play, `become: true`, hosts `all` (resolved by `scripts/inventory.py` to the local machine as its distro group, e.g. `Ubuntu`)
 - **Roles** under `roles/` — each is self-contained with `tasks/main.yml`, `vars/main.yml`, and optional `handlers/`
-- **Shared include:** `roles/common/tasks/apt_keyring.yml` — GPG keyring + repo setup, included by docker/vscode/vagrant roles via `include_tasks` with role-specific vars
+- **Shared include:** `roles/common/tasks/apt_keyring.yml` — GPG keyring + repo setup, included by docker/editors/vagrant roles via `include_tasks` with role-specific vars
 - **group_vars:** two files serve different purposes:
   - `group_vars/Ubuntu.yml` — **live config** (the file Ansible actually reads; `ansible_user: zulu`, `storage_root: /storage`)
   - `group_vars/example.yml` — documented template for others to copy
   - **Trap:** new vars must be added to **both** files, or the live run fails with undefined variable errors
 - **`/storage` layout** — hardcoded data partition root for Docker data-root, Vagrant home, libvirt images. Single-machine assumption, not portable.
+
+## Role Structure (new)
+
+| Role | Tag | Scope |
+|------|-----|-------|
+| `setup_base` | `base` | CLI utils + Python system packages (headless-compatible) |
+| `setup_pipx` | `pipx` | pipx-managed tools (pipx, uv, ruff) — self-contained with apt prereqs |
+| `setup_editors` | `editors` | VS Code (APT) + Neovim (snap) |
+| `setup_desktop` | `desktop` | GUI packages + snaps (desktop-only) |
+| `setup_dotfiles` | `dotfiles` | Dotfiles symlinks |
+| `setup_fonts` | `fonts` | JetBrainsMono Nerd Font |
+| `setup_docker` | `docker` | Docker Engine + config |
+| `setup_containerlab` | `containerlab` | Containerlab |
+| `setup_vagrant` | `vagrant` | Vagrant + libvirt/KVM (all virtualization packages merged) |
+| `setup_gnome` | `gnome` | GNOME dconf preferences |
+| `setup_netlab` | `netlab` | NetworkLab CLI |
 
 ## Key Conventions
 
