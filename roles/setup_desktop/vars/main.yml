@@ -1,0 +1,9 @@
+---
+# Desktop packages
+desktop_packages:
+  - gnome-tweaks
+
+# Snap packages
+snap_packages:
+  - name: nvim
+    classic: true

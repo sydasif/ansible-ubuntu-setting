@@ -15,3 +15,11 @@
     name: code
     state: present
     update_cache: true
+
+- name: Install editor snap packages
+  community.general.snap:
+    name: "{{ item.name }}"
+    classic: "{{ item.classic | default(false) }}"
+    state: present
+  loop: "{{ editor_snap_packages }}"
+  become: true

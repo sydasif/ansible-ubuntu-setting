@@ -1,0 +1,20 @@
+---
+# CLI / shell utilities
+cli_packages:
+  - bat
+  - zsh
+  - tree
+  - curl
+  - lsd
+  - fzf
+  - starship
+  - git
+  - sshpass
+  - openvswitch-switch
+
+# Python development (system packages)
+python_packages:
+  - python3-pip
+  - python3-venv
+  - python3-psutil
+  - pipx

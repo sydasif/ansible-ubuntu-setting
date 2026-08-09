@@ -32,7 +32,7 @@
 
 - name: Install libvirt and KVM packages
   ansible.builtin.apt:
-    name: "{{ libvirt_packages }}"
+    name: "{{ vagrant_libvirt_packages }}"
     state: present
   notify: Start libvirtd
 

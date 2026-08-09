@@ -1,8 +1,8 @@
 ---
 galaxy_info:
-  role_name: setup_packages
+  role_name: setup_desktop
   author: sydasif
-  description: Installs and configures common packages on Ubuntu
+  description: Installs desktop GUI packages and snap applications on Ubuntu
   license: MIT
   min_ansible_version: "2.13"
   platforms:
@@ -15,7 +15,7 @@ galaxy_info:
   galaxy_tags:
     - ubuntu
     - desktop
-    - system
+    - gui
     - packages
 
 dependencies: []

@@ -1,8 +1,8 @@
 ---
 galaxy_info:
-  role_name: setup_vscode
+  role_name: setup_base
   author: sydasif
-  description: Installs Visual Studio Code from Microsoft's official APT repository
+  description: Installs base CLI utilities and Python system packages on Ubuntu (runs on both headless and desktop)
   license: MIT
   min_ansible_version: "2.13"
   platforms:
@@ -11,9 +11,11 @@ galaxy_info:
         - jammy
         - noble
         - resolute
+
   galaxy_tags:
     - ubuntu
-    - desktop
-    - editor
-    - vscode
+    - base
+    - system
+    - packages
+
 dependencies: []

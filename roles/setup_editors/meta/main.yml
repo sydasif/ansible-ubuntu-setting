@@ -1,0 +1,22 @@
+---
+galaxy_info:
+  role_name: setup_editors
+  author: sydasif
+  description: Installs VS Code and Neovim editors on Ubuntu
+  license: MIT
+  min_ansible_version: "2.13"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+        - resolute
+
+  galaxy_tags:
+    - ubuntu
+    - desktop
+    - editors
+    - vscode
+    - neovim
+
+dependencies: []

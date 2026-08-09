@@ -1,14 +1,24 @@
 ---
 # Managed installs for CLI Python tooling via pipx.
 #
-# apt provides pipx (setup_packages) as the system fallback; this role layers a
-# user-owned pipx on top via "pipx install 'pipx[uv]'" so the default pipx is
+# This role is now self-contained: it installs apt prerequisites (pipx, python3-pip, python3-venv)
+# and then layers a user-owned pipx on top via "pipx install 'pipx[uv]'" so the default pipx is
 # pipx-managed and bundles the uv backend.
 #
 # All tasks run become: false — pipx/uv/ruff write under $HOME/.local and the
 # connecting user owns them. A login shell is required: $HOME/.local/bin is on
 # PATH only via ~/.zshrc, so the non-interactive default shell would resolve
 # apt's /usr/bin/pipx (1.8.0) instead of the user's ~/.local/bin/pipx.
+
+- name: Install pipx prerequisites (apt)
+  ansible.builtin.apt:
+    name:
+      - pipx
+      - python3-pip
+      - python3-venv
+    state: present
+    update_cache: true
+  become: true
 
 - name: List current pipx-managed packages
   ansible.builtin.shell:

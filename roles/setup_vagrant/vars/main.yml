@@ -7,11 +7,21 @@ vagrant_apt_key_url: https://apt.releases.hashicorp.com/gpg
 vagrant_apt_repo_url: https://apt.releases.hashicorp.com
 vagrant_packages:
   - vagrant
-libvirt_packages:
+
+# Virtualization and libvirt packages (merged from setup_packages virtualization_packages + libvirt_packages)
+vagrant_libvirt_packages:
+  - bridge-utils
+  - cloud-utils
+  - genisoimage
+  - libguestfs-tools
+  - libvirt-dev
+  - qemu-utils
+  - virt-manager
   - libvirt-daemon-system
   - libvirt-clients
   - virtinst
   - qemu-system-x86
+
 vagrant_plugin_libvirt: vagrant-libvirt
 vagrant_home: "{{ storage_root }}/vagrant"
 storage_libvirt_images: "{{ storage_root }}/libvirt/images"

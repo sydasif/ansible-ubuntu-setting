@@ -13,12 +13,14 @@
       when: ansible_facts['distribution'] == 'Ubuntu'
 
   roles:
-    - role: setup_packages
-      tags: ["packages"]
+    - role: setup_base
+      tags: ["base"]
     - role: setup_pipx
       tags: ["pipx"]
-    - role: setup_vscode
-      tags: ["vscode"]
+    - role: setup_editors
+      tags: ["editors"]
+    - role: setup_desktop
+      tags: ["desktop"]
     - role: setup_dotfiles
       tags: ["dotfiles"]
     - role: setup_fonts
