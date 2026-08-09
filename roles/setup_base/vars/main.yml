@@ -4,7 +4,6 @@ cli_packages:
   - bat
   - zsh
   - tree
-  - curl
   - lsd
   - fzf
   - sshpass
