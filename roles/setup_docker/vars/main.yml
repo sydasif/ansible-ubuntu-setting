@@ -19,4 +19,3 @@ docker_engine_packages:
   - docker-compose-plugin
 docker_data_root: "{{ storage_root }}/docker"
 docker_daemon_json_path: /etc/docker/daemon.json
-docker_systemd_override_dir: /etc/systemd/system/docker.service.d

@@ -41,14 +41,6 @@
     group: root
     mode: "0710"
 
-- name: Create Docker systemd override directory
-  ansible.builtin.file:
-    path: "{{ docker_systemd_override_dir }}"
-    state: directory
-    owner: root
-    group: root
-    mode: "0755"
-
 - name: Configure Docker data-root to /storage
   ansible.builtin.copy:
     dest: "{{ docker_daemon_json_path }}"
