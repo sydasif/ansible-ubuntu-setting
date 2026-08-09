@@ -8,7 +8,7 @@
     - name: Update APT package cache
       ansible.builtin.apt:
         update_cache: true
-        cache_valid_time: 3600  # Update only if cache is older than 1 hour
+        cache_valid_time: 3600 # Update only if cache is older than 1 hour
       changed_when: false
       when: ansible_facts['distribution'] == 'Ubuntu'
 
@@ -28,7 +28,7 @@
     - role: setup_docker
       tags: ["docker"]
     - role: setup_containerlab
-      tags: ["containerlab"]
+      tags: ["clab"]
     - role: setup_vagrant
       tags: ["vagrant"]
     - role: setup_gnome
