@@ -25,7 +25,7 @@ ansible-playbook local.yml --syntax-check
 
 - **Entry point:** `local.yml` — single play, `become: true`, hosts `all` (resolved by `scripts/inventory.py` to the local machine as its distro group, e.g. `Ubuntu`)
 - **Roles** under `roles/` — each is self-contained with `tasks/main.yml`, `vars/main.yml`, and optional `handlers/`
-- **Shared include:** `roles/common/tasks/apt_keyring.yml` — GPG keyring + repo setup, included by docker/editors/vagrant roles via `include_tasks` with role-specific vars
+- **Shared tasks:** Each role that requires an APT repository (docker, editors, vagrant) handles its own keyring download and repository setup.
 - **group_vars:** two files serve different purposes:
   - `group_vars/Ubuntu.yml` — **live config** (the file Ansible actually reads; `ansible_user: zulu`, `storage_root: /storage`)
   - `group_vars/example.yml` — documented template for others to copy

@@ -21,7 +21,6 @@ Automate an Ubuntu desktop setup with Ansible. This repository provides role-bas
 - **Vagrant + libvirt/KVM** — Vagrant, `vagrant-libvirt`, and a reconfigured libvirt storage pool
 - **GNOME preferences** — dconf-driven desktop settings, with Ptyxis registered as the xdg default terminal
 - **netlab** — NetworkLab CLI (`netlab`) via pipx, pinned to the `ansible-core`/`paramiko` versions that actually work with it
-- **Shared APT keyring** — one common task for GPG keyring + repository setup reused by docker/vscode/vagrant
 - **Idempotent** — re-running the playbook converges to the desired state without reapplying unchanged work
 
 ## Prerequisites
@@ -104,7 +103,6 @@ Each `setup_*` role installs and configures one tool:
 - **`setup_vagrant`** — Vagrant, libvirt/KVM (including bridge-utils, qemu, virt-manager, libguestfs-tools), and the `vagrant-libvirt` plugin
 - **`setup_gnome`** — GNOME desktop preferences via dconf, and registers Ptyxis as the default/xdg terminal (Ubuntu 26 dropped `gnome-terminal`)
 - **`setup_netlab`** — NetworkLab CLI via pipx, pinned to compatible Ansible/Paramiko versions
-- **`common`** — shared APT keyring tasks reused by other roles
 
 ## Project Structure
 
@@ -116,7 +114,6 @@ ansible-ubuntu-setting/
 ├── .ansible-lint / .yamllint  # linter configuration
 ├── group_vars/                # per-host overrides (Ubuntu.yml, example.yml)
 ├── roles/                     # role implementations
-│   ├── common/                # shared APT keyring / repo tasks
 │   ├── setup_base/            # CLI utilities + Python system packages
 │   ├── setup_desktop/         # GUI packages + snaps
 │   ├── setup_editors/         # VS Code + Neovim

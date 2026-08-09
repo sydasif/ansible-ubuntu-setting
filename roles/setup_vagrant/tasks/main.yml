@@ -10,19 +10,35 @@
     name: "{{ vagrant_prerequisites }}"
     state: present
 
-- name: Set up HashiCorp APT repository
-  ansible.builtin.include_tasks:
-    file: ../../common/tasks/apt_keyring.yml
-  vars:
-    apt_keyring_name: "hashicorp"
-    apt_keyring_url: "{{ vagrant_apt_key_url }}"
-    apt_keyring_repo: >-
+- name: Ensure apt keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Download GPG key for hashicorp
+  ansible.builtin.get_url:
+    url: "{{ vagrant_apt_key_url }}"
+    dest: /etc/apt/keyrings/hashicorp.asc
+    mode: "0644"
+  register: apt_key_download
+
+- name: De-armor GPG key for hashicorp
+  ansible.builtin.command:
+    cmd: "gpg --batch --yes --dearmor -o /etc/apt/keyrings/hashicorp.gpg /etc/apt/keyrings/hashicorp.asc"
+    creates: /etc/apt/keyrings/hashicorp.gpg
+  when: apt_key_download.changed or ansible_check_mode
+  changed_when: false
+
+- name: Add repository for hashicorp
+  ansible.builtin.apt_repository:
+    filename: hashicorp
+    repo: >-
       deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp.gpg]
       {{ vagrant_apt_repo_url }}
       {{ ansible_facts['distribution_release'] }} main
-    apt_keyring_key_dest: "/etc/apt/keyrings/hashicorp.asc"
-    apt_keyring_gpg_dest: "/etc/apt/keyrings/hashicorp.gpg"
-    apt_repository_filename: "hashicorp"
+    state: present
+  notify: Update apt cache
 
 - name: Install Vagrant
   ansible.builtin.apt:
