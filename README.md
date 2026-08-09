@@ -11,7 +11,7 @@ Automate an Ubuntu desktop setup with Ansible. This repository provides role-bas
 ## Features
 
 - **Base packages** — CLI utilities (bat, zsh, fzf, starship, git, …) and Python system packages (python3-pip, python3-venv, pipx) — runs on headless servers too
-- **Desktop packages** — GUI packages (gnome-tweaks) and editor snap (nvim)
+- **Desktop packages** — GUI packages (gnome-tweaks)
 - **Editors** — VS Code (Microsoft APT repo) and Neovim (snap)
 - **Snap apps** — `astral-uv`, `nvim`, and `ruff` via the `community.general.snap` module
 - **Dotfiles** — clones your dotfiles repo and symlinks shell configs, editors, SSH, and theme files into `~`
@@ -32,14 +32,14 @@ Automate an Ubuntu desktop setup with Ansible. This repository provides role-bas
 
 ## Setup
 
-1. Clone the repository and change into it:
+- Clone the repository and change into it:
 
 ```bash
 git clone https://github.com/sydasif/ansible-ubuntu-setting.git
 cd ansible-ubuntu-setting
 ```
 
-2. Create a Python virtual environment and install dependencies:
+- Create a Python virtual environment and install dependencies:
 
 ```bash
 python3 -m venv .venv
@@ -49,11 +49,11 @@ pip install -r requirements.txt
 
 The inventory script requires the `distro` package, which `requirements.txt` includes.
 
-3. Create group variables for your host and edit them:
+- Create group variables for your host and edit them:
 
 ```bash
-cp group_vars/example.yml group_vars/Ubuntu.yml
 # edit group_vars/Ubuntu.yml (ansible_user, storage_root)
+cp group_vars/example.yml group_vars/Ubuntu.yml
 ```
 
 ## Usage
@@ -94,7 +94,7 @@ Keep secrets out of the repository; use Ansible Vault or an external secret stor
 Each `setup_*` role installs and configures one tool:
 
 - **`setup_base`** — CLI utilities (bat, zsh, fzf, starship, git, …) and Python system packages (python3-pip, python3-venv, pipx) — runs on headless servers
-- **`setup_desktop`** — GUI packages (gnome-tweaks) and editor snap (nvim)
+- **`setup_desktop`** — GUI packages (gnome-tweaks)
 - **`setup_editors`** — VS Code (Microsoft APT repo) and Neovim (snap)
 - **`setup_pipx`** — pipx-managed CLI tools: pipx (with uv backend), uv, ruff
 - **`setup_dotfiles`** — clones dotfiles into `~/.dotfiles` and symlinks them into `~`
@@ -103,7 +103,7 @@ Each `setup_*` role installs and configures one tool:
 - **`setup_containerlab`** — Containerlab network lab automation
 - **`setup_vagrant`** — Vagrant, libvirt/KVM (including bridge-utils, qemu, virt-manager, libguestfs-tools), and the `vagrant-libvirt` plugin
 - **`setup_gnome`** — GNOME desktop preferences via dconf, and registers Ptyxis as the default/xdg terminal (Ubuntu 26 dropped `gnome-terminal`)
-- **`setup_netlab`** — NetworkLab CLI via pip, pinned to compatible Ansible/Paramiko versions
+- **`setup_netlab`** — NetworkLab CLI via pipx, pinned to compatible Ansible/Paramiko versions
 - **`common`** — shared APT keyring tasks reused by other roles
 
 ## Project Structure
