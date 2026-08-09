@@ -1,0 +1,63 @@
+---
+# Managed installs for CLI Python tooling via pipx.
+#
+# apt provides pipx (setup_packages) as the system fallback; this role layers a
+# user-owned pipx on top via "pipx install 'pipx[uv]'" so the default pipx is
+# pipx-managed and bundles the uv backend.
+#
+# All tasks run become: false — pipx/uv/ruff write under $HOME/.local and the
+# connecting user owns them. A login shell is required: $HOME/.local/bin is on
+# PATH only via ~/.zshrc, so the non-interactive default shell would resolve
+# apt's /usr/bin/pipx (1.8.0) instead of the user's ~/.local/bin/pipx.
+
+- name: List current pipx-managed packages
+  ansible.builtin.shell:
+    cmd: "source ~/.zshrc 2>/dev/null || true; pipx list"
+  register: pipx_list
+  changed_when: false
+  failed_when: false
+  become: false
+
+- name: Check uv presence
+  ansible.builtin.shell:
+    cmd: "source ~/.zshrc 2>/dev/null || true; uv --version >/dev/null 2>&1 && echo ok"
+  register: uv_check
+  changed_when: false
+  failed_when: false
+  become: false
+
+- name: Check ruff presence
+  ansible.builtin.shell:
+    cmd: "source ~/.zshrc 2>/dev/null || true; ruff --version >/dev/null 2>&1 && echo ok"
+  register: ruff_check
+  changed_when: false
+  failed_when: false
+  become: false
+
+- name: Install pipx itself with the uv backend
+  ansible.builtin.shell:
+    cmd: "source ~/.zshrc 2>/dev/null || true; pipx install 'pipx[uv]'"
+  become: false
+  when: pipx_list.rc != 0
+  changed_when: pipx_list.rc != 0
+
+- name: Install uv via pipx
+  ansible.builtin.shell:
+    cmd: "source ~/.zshrc 2>/dev/null || true; pipx install uv"
+  become: false
+  when: uv_check.rc != 0
+  changed_when: uv_check.rc != 0
+
+- name: Install ruff via pipx
+  ansible.builtin.shell:
+    cmd: "source ~/.zshrc 2>/dev/null || true; pipx install ruff"
+  become: false
+  when: ruff_check.rc != 0
+  changed_when: ruff_check.rc != 0
+
+- name: Verify pipx/uv/ruff are pipx-managed
+  ansible.builtin.shell:
+    cmd: "source ~/.zshrc 2>/dev/null || true; pipx list; echo ---; uv --version; ruff --version"
+  register: verify_result
+  changed_when: false
+  become: false

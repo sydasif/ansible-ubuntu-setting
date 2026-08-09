@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  role_name: setup_pipx
+  author: sydasif
+  description: Manages pipx-bootstrapped CLI tools (pipx with uv backend, uv, ruff)
+  license: MIT
+  min_ansible_version: "2.13"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+        - resolute
+  galaxy_tags:
+    - ubuntu
+    - desktop
+    - pipx
+    - python
+    - devtools
+
+dependencies: []

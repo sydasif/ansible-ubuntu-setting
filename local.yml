@@ -15,6 +15,8 @@
   roles:
     - role: setup_packages
       tags: ["packages"]
+    - role: setup_pipx
+      tags: ["pipx"]
     - role: setup_vscode
       tags: ["vscode"]
     - role: setup_dotfiles
