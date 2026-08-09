@@ -7,11 +7,12 @@ cli_packages:
   - curl
   - lsd
   - fzf
-  - starship
-  - git
   - sshpass
+  - starship
   - openvswitch-switch
 
 # Python development (system packages)
 python_packages:
   - python3-psutil
+  - python3-pip
+  - python3-venv
