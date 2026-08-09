@@ -5,22 +5,19 @@
     name: "{{ containerlab_dependencies }}"
     state: present
     update_cache: true
+  become: true
 
-- name: Check if containerlab is already installed
-  ansible.builtin.command:
-    cmd: containerlab version
-  register: containerlab_version_check
-  changed_when: false
-  failed_when: false
+- name: Add containerlab APT repository
+  ansible.builtin.apt_repository:
+    filename: "netdevops"
+    repo: "{{ containerlab_apt_repo }}"
+    state: present
+  become: true
+  notify: Update containerlab apt cache
 
-- name: Install containerlab # noqa: command-instead-of-module no-changed-when
-  ansible.builtin.shell:
-    cmd: 'bash -c "$(curl -sL {{ containerlab_install_script }})"'
-  when: containerlab_version_check.rc != 0
-  register: containerlab_installation
-
-- name: Verify containerlab installation
-  ansible.builtin.command:
-    cmd: containerlab version
-  when: containerlab_version_check.rc != 0 and containerlab_installation is succeeded
-  changed_when: false
+- name: Install containerlab
+  ansible.builtin.apt:
+    name: containerlab
+    state: present
+    update_cache: true
+  become: true

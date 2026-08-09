@@ -1,0 +1,6 @@
+---
+# handlers file for setup_containerlab
+- name: Update containerlab apt cache
+  ansible.builtin.apt:
+    update_cache: true
+  become: true
