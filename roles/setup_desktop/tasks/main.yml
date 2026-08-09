@@ -4,11 +4,3 @@
     name: "{{ desktop_packages }}"
     state: present
   when: ansible_facts['distribution'] == 'Ubuntu'
-
-- name: Install snap packages
-  community.general.snap:
-    name: "{{ item.name }}"
-    classic: "{{ item.classic | default(false) }}"
-    state: present
-  loop: "{{ snap_packages }}"
-  become: true
