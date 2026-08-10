@@ -2,7 +2,7 @@
 galaxy_info:
   role_name: setup_containerlab
   author: sydasif
-  description: Installs Containerlab and deploys a libvirt Vagrantfile for network labs
+  description: Installs Containerlab network lab automation on Ubuntu
   license: MIT
   min_ansible_version: "2.13"
   platforms:
