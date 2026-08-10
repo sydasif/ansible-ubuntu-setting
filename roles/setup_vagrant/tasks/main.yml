@@ -18,24 +18,20 @@
 - name: Download GPG key for hashicorp
   ansible.builtin.get_url:
     url: "{{ vagrant_apt_key_url }}"
-    dest: /etc/apt/keyrings/hashicorp.asc
+    dest: "{{ vagrant_gpg_key_path }}"
     mode: "0644"
-  register: apt_key_download
 
-- name: De-armor GPG key for hashicorp
-  ansible.builtin.command:
-    cmd: "gpg --batch --yes --dearmor -o /etc/apt/keyrings/hashicorp.gpg /etc/apt/keyrings/hashicorp.asc"
-    creates: /etc/apt/keyrings/hashicorp.gpg
-  when: apt_key_download.changed or ansible_check_mode
-  changed_when: false
+# Older role versions de-armored the key to hashicorp.gpg; remove the stale
+# file now that the repository uses the armored .asc directly.
+- name: Remove stale de-armored hashicorp key
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/hashicorp.gpg
+    state: absent
 
 - name: Add repository for hashicorp
   ansible.builtin.apt_repository:
     filename: hashicorp
-    repo: >-
-      deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp.gpg]
-      {{ vagrant_apt_repo_url }}
-      {{ ansible_facts['distribution_release'] }} main
+    repo: "{{ vagrant_apt_repo }}"
     state: present
   notify: Update apt cache
 

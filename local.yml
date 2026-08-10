@@ -5,6 +5,23 @@
   become: true
 
   pre_tasks:
+    # Hosts migrated from older role versions may still reference the old
+    # de-armored key in sources; a conflicting Signed-By breaks every apt
+    # operation (including the cache update below), so strip those lines first.
+    - name: Strip stale de-armored key references from apt sources
+      ansible.builtin.lineinfile:
+        path: "/etc/apt/sources.list.d/{{ item.file }}"
+        regexp: "{{ item.regexp }}"
+        state: absent
+      loop:
+        - file: docker.list
+          regexp: '.*signed-by=/etc/apt/keyrings/docker\.gpg.*'
+        - file: vscode.list
+          regexp: '.*signed-by=/etc/apt/keyrings/packages\.microsoft\.gpg.*'
+        - file: hashicorp.list
+          regexp: '.*signed-by=/etc/apt/keyrings/hashicorp\.gpg.*'
+      when: ansible_facts['distribution'] == 'Ubuntu'
+
     - name: Update APT package cache
       ansible.builtin.apt:
         update_cache: true

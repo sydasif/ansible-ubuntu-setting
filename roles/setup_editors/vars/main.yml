@@ -1,7 +1,16 @@
 ---
 # VS Code APT repository
+vscode_dependencies:
+  - software-properties-common
+# Ansible reports x86_64/aarch64; the apt repo expects amd64/arm64.
+# Only amd64/arm64 are mapped (this playbook targets x86_64 desktops);
+# anything else falls back to amd64 deliberately.
+vscode_apt_arch: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}.get(ansible_facts['architecture'], 'amd64') }}"
 vscode_apt_key_url: https://packages.microsoft.com/keys/microsoft.asc
-vscode_apt_repo: deb [arch=amd64 signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main
+vscode_gpg_key_path: /etc/apt/keyrings/packages.microsoft.asc
+vscode_apt_repo: >-
+  deb [arch={{ vscode_apt_arch }} signed-by={{ vscode_gpg_key_path }}]
+  https://packages.microsoft.com/repos/code stable main
 
 # Editor snap packages
 editor_snap_packages:

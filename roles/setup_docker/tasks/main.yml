@@ -14,16 +14,15 @@
 - name: Download GPG key for docker
   ansible.builtin.get_url:
     url: "{{ docker_gpg_key_url }}"
-    dest: /etc/apt/keyrings/docker.asc
+    dest: "{{ docker_gpg_key_path }}"
     mode: "0644"
-  register: apt_key_download
 
-- name: De-armor GPG key for docker
-  ansible.builtin.command:
-    cmd: "gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg /etc/apt/keyrings/docker.asc"
-    creates: /etc/apt/keyrings/docker.gpg
-  when: apt_key_download.changed or ansible_check_mode
-  changed_when: false
+# Older role versions de-armored the key to docker.gpg; remove the stale file
+# now that the repository uses the armored docker.asc directly.
+- name: Remove stale de-armored Docker key
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/docker.gpg
+    state: absent
 
 - name: Add repository for docker
   ansible.builtin.apt_repository:
@@ -36,7 +35,6 @@
   ansible.builtin.apt:
     name: "{{ docker_engine_packages }}"
     update_cache: true
-  register: docker_installation
   notify: Start and enable docker
 
 - name: Add current user to docker group
@@ -68,3 +66,9 @@
     group: root
     mode: "0644"
   notify: Restart docker for data-root change
+
+- name: Ensure Docker service is enabled and started
+  ansible.builtin.service:
+    name: docker
+    enabled: true
+    state: started

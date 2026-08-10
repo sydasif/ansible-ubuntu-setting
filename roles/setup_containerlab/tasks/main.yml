@@ -4,14 +4,12 @@
     name: "{{ containerlab_dependencies }}"
     state: present
     update_cache: true
-  become: true
 
 - name: Add containerlab APT repository
   ansible.builtin.apt_repository:
     filename: "netdevops"
     repo: "{{ containerlab_apt_repo }}"
     state: present
-  become: true
   notify: Update containerlab apt cache
 
 - name: Install containerlab
@@ -19,4 +17,3 @@
     name: containerlab
     state: present
     update_cache: true
-  become: true

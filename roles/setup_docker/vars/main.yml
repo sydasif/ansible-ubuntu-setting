@@ -1,13 +1,16 @@
 ---
 docker_dependencies:
-  - apt-transport-https
   - ca-certificates
   - curl
-  - gnupg-agent
   - software-properties-common
+# Ansible reports x86_64/aarch64; the apt repo expects amd64/arm64.
+# Only amd64/arm64 are mapped (this playbook targets x86_64 desktops);
+# anything else falls back to amd64 deliberately.
+docker_apt_arch: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}.get(ansible_facts['architecture'], 'amd64') }}"
 docker_gpg_key_url: https://download.docker.com/linux/ubuntu/gpg
+docker_gpg_key_path: /etc/apt/keyrings/docker.asc
 docker_repository_repo: >-
-  deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg]
+  deb [arch={{ docker_apt_arch }} signed-by={{ docker_gpg_key_path }}]
   https://download.docker.com/linux/ubuntu
   {{ ansible_facts['distribution_release'] | lower }} stable
 docker_engine_packages:

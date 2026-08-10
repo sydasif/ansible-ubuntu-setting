@@ -1,9 +1,17 @@
 ---
 vagrant_prerequisites:
-  - gnupg
-  - lsb-release
+  - software-properties-common
+# Ansible reports x86_64/aarch64; the apt repo expects amd64/arm64.
+# Only amd64/arm64 are mapped (this playbook targets x86_64 desktops);
+# anything else falls back to amd64 deliberately.
+vagrant_apt_arch: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}.get(ansible_facts['architecture'], 'amd64') }}"
 vagrant_apt_key_url: https://apt.releases.hashicorp.com/gpg
+vagrant_gpg_key_path: /etc/apt/keyrings/hashicorp.asc
 vagrant_apt_repo_url: https://apt.releases.hashicorp.com
+vagrant_apt_repo: >-
+  deb [arch={{ vagrant_apt_arch }} signed-by={{ vagrant_gpg_key_path }}]
+  {{ vagrant_apt_repo_url }}
+  {{ ansible_facts['distribution_release'] }} main
 vagrant_packages:
   - vagrant
 

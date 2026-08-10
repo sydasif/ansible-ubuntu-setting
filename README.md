@@ -15,7 +15,7 @@ Automate an Ubuntu desktop setup with Ansible. This repository provides role-bas
 - **Editors** — VS Code (Microsoft APT repo) and Neovim (snap)
 - **Dotfiles** — clones your dotfiles repo and symlinks shell configs, editors, SSH, and theme files into `~`
 - **Developer fonts** — JetBrainsMono Nerd Font, with font-cache refresh
-- **Docker** — Docker Engine from the official APT repo, `docker` group membership, and a configurable data root
+- **Docker** — Docker Engine from the official APT repo, `docker` group membership, and a configurable data root. Log out and back in after provisioning so the `docker` group membership takes effect without `sudo`
 - **Containerlab** — network lab automation
 - **Vagrant + libvirt/KVM** — Vagrant, `vagrant-libvirt`, and a reconfigured libvirt storage pool
 - **GNOME preferences** — dconf-driven desktop settings, with Ptyxis registered as the xdg default terminal
@@ -97,7 +97,7 @@ Each `setup_*` role installs and configures one tool:
 - **`setup_pipx`** — pipx-managed CLI tools: pipx (with uv backend), uv, ruff
 - **`setup_dotfiles`** — clones dotfiles into `~/.dotfiles` and symlinks them into `~`
 - **`setup_fonts`** — installs JetBrainsMono Nerd Font and refreshes the font cache
-- **`setup_docker`** — Docker Engine, `docker` group, `daemon.json` data root, and a systemd override
+- **`setup_docker`** — Docker Engine (official APT repo), `docker` group membership, `daemon.json` data root on `/storage`, and the Docker service enabled/started
 - **`setup_containerlab`** — Containerlab network lab automation
 - **`setup_vagrant`** — Vagrant, libvirt/KVM (including bridge-utils, qemu, virt-manager, libguestfs-tools), and the `vagrant-libvirt` plugin
 - **`setup_gnome`** — GNOME desktop preferences via dconf, and registers Ptyxis as the default/xdg terminal (Ubuntu 26 dropped `gnome-terminal`)
