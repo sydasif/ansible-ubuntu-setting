@@ -1,5 +1,4 @@
 ---
-# tasks file for setup_vagrant
 - name: Update APT cache
   ansible.builtin.apt:
     update_cache: true
@@ -52,17 +51,10 @@
     state: present
   notify: Start libvirtd
 
-- name: Add current user to kvm group
+- name: Add current user to kvm and libvirt groups
   ansible.builtin.user:
     name: "{{ ansible_user }}"
-    groups: kvm
-    append: true
-  when: ansible_user != 'root'
-
-- name: Add current user to libvirt group
-  ansible.builtin.user:
-    name: "{{ ansible_user }}"
-    groups: libvirt
+    groups: kvm,libvirt
     append: true
   when: ansible_user != 'root'
 

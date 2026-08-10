@@ -1,5 +1,4 @@
 ---
-# vars file for setup_vagrant
 vagrant_prerequisites:
   - gnupg
   - lsb-release

@@ -1,5 +1,4 @@
 ---
-# vars file for setup_containerlab
 containerlab_dependencies:
   - apt-transport-https
   - ca-certificates

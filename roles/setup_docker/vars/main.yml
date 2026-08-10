@@ -1,5 +1,4 @@
 ---
-# vars file for setup_docker
 docker_dependencies:
   - apt-transport-https
   - ca-certificates

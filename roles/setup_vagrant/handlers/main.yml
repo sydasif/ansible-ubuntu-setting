@@ -1,5 +1,4 @@
 ---
-# handlers file for setup_vagrant
 - name: Start libvirtd
   ansible.builtin.service:
     name: libvirtd

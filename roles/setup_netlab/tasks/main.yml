@@ -1,5 +1,4 @@
 ---
-# tasks file for setup_netlab
 - name: Check if networklab is already installed
   ansible.builtin.command:
     cmd: netlab version
