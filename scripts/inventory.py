@@ -23,5 +23,8 @@ if __name__ == "__main__":
 
     if flag == "--list":
         print(json.dumps(inventory))
-    else:
+    elif flag == "--host":
+        # Ansible queries per-host vars; none are defined.
         print(json.dumps({}))
+    else:
+        sys.exit(1)
