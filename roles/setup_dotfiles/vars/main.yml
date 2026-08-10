@@ -5,10 +5,7 @@ dotfiles_items:
   - { src: "ruff/ruff.toml", dest_suffix: ".config/ruff/ruff.toml" }
   - { src: "gitconfig", dest_suffix: ".gitconfig" }
   - { src: "gitignore", dest_suffix: ".gitignore" }
-  - {
-      src: "vscode/settings.json",
-      dest_suffix: ".config/Code/User/settings.json",
-    }
+  - { src: "vscode/settings.json", dest_suffix: ".config/Code/User/settings.json" }
   - { src: "zed/settings.json", dest_suffix: ".config/zed/settings.json" }
   - { src: "ssh/config", dest_suffix: ".ssh/config" }
   - { src: "starship/starship.toml", dest_suffix: ".config/starship.toml" }
