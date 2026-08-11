@@ -1,39 +1,61 @@
 ---
+# ---------------------------------------------------------------------------
+# Validation
+# ---------------------------------------------------------------------------
+
+- name: Validate supported architecture
+  ansible.builtin.assert:
+    that:
+      - vagrant_apt_arch | length > 0
+    fail_msg: >-
+      Unsupported architecture '{{ ansible_facts["architecture"] }}'.
+      Supported architectures are x86_64 and aarch64.
+
+# ---------------------------------------------------------------------------
+# APT
+# ---------------------------------------------------------------------------
+
 - name: Update APT cache
   ansible.builtin.apt:
     update_cache: true
+    cache_valid_time: 3600
   changed_when: false
 
-- name: Install vagrant prerequisites
+- name: Install Vagrant prerequisites
   ansible.builtin.apt:
     name: "{{ vagrant_prerequisites }}"
     state: present
 
-- name: Ensure apt keyrings directory exists
+# ---------------------------------------------------------------------------
+# HashiCorp repository
+# ---------------------------------------------------------------------------
+
+- name: Ensure APT keyrings directory exists
   ansible.builtin.file:
     path: /etc/apt/keyrings
     state: directory
+    owner: root
+    group: root
     mode: "0755"
 
-- name: Download GPG key for hashicorp
+- name: Download HashiCorp repository GPG key
   ansible.builtin.get_url:
     url: "{{ vagrant_apt_key_url }}"
     dest: "{{ vagrant_gpg_key_path }}"
+    owner: root
+    group: root
     mode: "0644"
 
-# Older role versions de-armored the key to hashicorp.gpg; remove the stale
-# file now that the repository uses the armored .asc directly.
-- name: Remove stale de-armored hashicorp key
-  ansible.builtin.file:
-    path: /etc/apt/keyrings/hashicorp.gpg
-    state: absent
-
-- name: Add repository for hashicorp
+- name: Configure HashiCorp APT repository
   ansible.builtin.apt_repository:
     filename: hashicorp
     repo: "{{ vagrant_apt_repo }}"
     state: present
   notify: Update apt cache
+
+# ---------------------------------------------------------------------------
+# Vagrant
+# ---------------------------------------------------------------------------
 
 - name: Install Vagrant
   ansible.builtin.apt:
@@ -41,20 +63,30 @@
     state: present
     update_cache: true
 
-- name: Install libvirt and KVM packages
+# ---------------------------------------------------------------------------
+# KVM / Libvirt
+# ---------------------------------------------------------------------------
+
+- name: Install Libvirt and KVM packages
   ansible.builtin.apt:
     name: "{{ vagrant_libvirt_packages }}"
     state: present
   notify: Start libvirtd
 
-- name: Add current user to kvm and libvirt groups
+- name: Add current user to KVM and Libvirt groups
   ansible.builtin.user:
     name: "{{ ansible_user }}"
-    groups: kvm,libvirt
+    groups:
+      - kvm
+      - libvirt
     append: true
   when: ansible_user != 'root'
 
-- name: Create Vagrant home directory on /storage
+# ---------------------------------------------------------------------------
+# Vagrant home
+# ---------------------------------------------------------------------------
+
+- name: Create Vagrant home directory
   ansible.builtin.file:
     path: "{{ vagrant_home }}"
     state: directory
@@ -62,25 +94,35 @@
     group: "{{ ansible_user }}"
     mode: "0755"
 
-- name: Check if vagrant-libvirt plugin is installed
-  ansible.builtin.shell: |
-    set -o pipefail
-    VAGRANT_HOME="{{ vagrant_home }}" vagrant plugin list | grep -q "{{ vagrant_plugin_libvirt }}"
-  register: vagrant_libvirt_check
+# ---------------------------------------------------------------------------
+# Vagrant libvirt plugin
+# ---------------------------------------------------------------------------
+
+- name: Check installed Vagrant plugins
+  ansible.builtin.command:
+    cmd: vagrant plugin list --machine-readable
+  register: vagrant_plugins
   changed_when: false
   failed_when: false
   become: false
   environment: "{{ vagrant_user_env }}"
 
-- name: Install vagrant-libvirt plugin  # noqa: command-instead-of-shell no-changed-when
-  ansible.builtin.shell: VAGRANT_HOME="{{ vagrant_home }}" vagrant plugin install "{{ vagrant_plugin_libvirt }}"
-  when: vagrant_libvirt_check.rc != 0
+- name: Install vagrant-libvirt plugin
+  ansible.builtin.command:
+    cmd: vagrant plugin install "{{ vagrant_plugin_libvirt }}"
+  when:
+    - vagrant_plugins.rc == 0
+    - vagrant_plugin_libvirt not in vagrant_plugins.stdout
+  become: false
   environment: "{{ vagrant_user_env }}"
   async: 600
   poll: 5
-  become: false
 
-- name: Ensure libvirt images directory on /storage exists
+# ---------------------------------------------------------------------------
+# Libvirt storage
+# ---------------------------------------------------------------------------
+
+- name: Ensure Libvirt images directory exists
   ansible.builtin.file:
     path: "{{ storage_libvirt_images }}"
     state: directory
@@ -90,28 +132,27 @@
   when: storage_libvirt_images is defined
   notify: Start libvirtd
 
-- name: Check default libvirt pool path
-  ansible.builtin.shell: |
-    set -o pipefail
-    virsh pool-dumpxml default 2>/dev/null | grep -oP '(?<=<path>)[^<]+'
-  register: libvirt_default_pool_path
-  changed_when: false
-  failed_when: false
-  check_mode: false
+- name: Ensure default Libvirt storage pool exists
+  community.libvirt.virt_pool:
+    name: default
+    state: present
+    xml: |
+      <pool type='dir'>
+        <name>default</name>
+        <target>
+          <path>{{ storage_libvirt_images }}</path>
+        </target>
+      </pool>
+  when: storage_libvirt_images is defined
 
-- name: Reconfigure default libvirt pool to /storage
-  ansible.builtin.shell: |
-    set -e
-    virsh pool-destroy default 2>/dev/null || true
-    virsh pool-undefine default 2>/dev/null || true
-    virsh pool-define-as default dir - - - - "{{ storage_libvirt_images }}"
-    virsh pool-build default
-    virsh pool-start default
-    virsh pool-autostart default
-  when:
-    - storage_libvirt_images is defined
-    - libvirt_default_pool_path.stdout is defined
-    - libvirt_default_pool_path.stdout != storage_libvirt_images
-  register: libvirt_pool_reconfigure
-  changed_when: libvirt_pool_reconfigure is succeeded
-  failed_when: libvirt_pool_reconfigure is failed
+- name: Ensure default Libvirt storage pool is active
+  community.libvirt.virt_pool:
+    name: default
+    state: active
+  when: storage_libvirt_images is defined
+
+- name: Ensure default Libvirt storage pool autostarts
+  community.libvirt.virt_pool:
+    name: default
+    autostart: true
+  when: storage_libvirt_images is defined

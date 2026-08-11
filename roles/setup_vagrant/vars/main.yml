@@ -1,42 +1,73 @@
 ---
+# Force system Python so apt-installed libvirt/lxml bindings are visible.
+ansible_python_interpreter: /usr/bin/python3
+
+# HashiCorp / Vagrant
+
 vagrant_prerequisites:
-  - software-properties-common
-# Ansible reports x86_64/aarch64; the apt repo expects amd64/arm64.
-# Only amd64/arm64 are mapped (this playbook targets x86_64 desktops);
-# anything else falls back to amd64 deliberately.
-vagrant_apt_arch: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}.get(ansible_facts['architecture'], 'amd64') }}"
+  - ca-certificates
+  - curl
+  - gnupg
+
+vagrant_apt_arch_map:
+  x86_64: amd64
+  aarch64: arm64
+
+vagrant_apt_arch: >-
+  {{
+    vagrant_apt_arch_map[ansible_facts['architecture']]
+    | default('')
+  }}
+
 vagrant_apt_key_url: https://apt.releases.hashicorp.com/gpg
+
 vagrant_gpg_key_path: /etc/apt/keyrings/hashicorp.asc
+
 vagrant_apt_repo_url: https://apt.releases.hashicorp.com
+
 vagrant_apt_repo: >-
-  deb [arch={{ vagrant_apt_arch }} signed-by={{ vagrant_gpg_key_path }}]
+  deb [arch={{ vagrant_apt_arch }}
+  signed-by={{ vagrant_gpg_key_path }}]
   {{ vagrant_apt_repo_url }}
   {{ ansible_facts['distribution_release'] }} main
+
 vagrant_packages:
   - vagrant
 
-# Virtualization and libvirt packages (merged from setup_packages virtualization_packages + libvirt_packages)
+# KVM / Libvirt
+
 vagrant_libvirt_packages:
   - bridge-utils
-  - cloud-utils
   - genisoimage
   - libguestfs-tools
-  - libvirt-dev
+  - libvirt-clients
+  - libvirt-daemon-system
+  - python3-libvirt
+  - python3-lxml
+  - qemu-system-x86
   - qemu-utils
   - virt-manager
-  - libvirt-daemon-system
-  - libvirt-clients
   - virtinst
-  - qemu-system-x86
+
+# Vagrant configuration
 
 vagrant_plugin_libvirt: vagrant-libvirt
+
 vagrant_home: "{{ storage_root }}/vagrant"
+
 storage_libvirt_images: "{{ storage_root }}/libvirt/images"
 
-# Environment for vagrant commands (runs as non-root user)
+# Environment used when Vagrant is executed as the normal desktop user.
+
 vagrant_user_env:
   VAGRANT_HOME: "{{ vagrant_home }}"
-  http_proxy: "{{ lookup('env', 'http_proxy') | default(omit, true) }}"
-  https_proxy: "{{ lookup('env', 'https_proxy') | default(omit, true) }}"
-  PATH: "/home/{{ ansible_user }}/.local/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin"
-  HOME: "/home/{{ ansible_user }}"
+  HOME: "{{ ansible_facts['env']['HOME'] }}"
+  PATH: >-
+    {{ ansible_facts['env']['HOME'] }}/.local/bin:
+    /snap/bin:
+    /usr/local/bin:
+    /usr/bin:
+    /bin
+
+  http_proxy: "{{ lookup('ansible.builtin.env', 'http_proxy') | default(omit, true) }}"
+  https_proxy: "{{ lookup('ansible.builtin.env', 'https_proxy') | default(omit, true) }}"

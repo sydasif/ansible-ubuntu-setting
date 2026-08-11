@@ -47,6 +47,14 @@ pip install -r requirements.txt
 
 The inventory script requires the `distro` package, which `requirements.txt` includes.
 
+- Install required Ansible Galaxy collections:
+
+```bash
+ansible-galaxy collection install community.libvirt
+```
+
+> **Note:** This step is required before running the `vagrant` tag.
+
 - Create group variables for your host and edit them:
 
 ```bash
@@ -99,7 +107,7 @@ Each `setup_*` role installs and configures one tool:
 - **`setup_fonts`** — installs JetBrainsMono Nerd Font and refreshes the font cache
 - **`setup_docker`** — Docker Engine (official APT repo), `docker` group membership, `daemon.json` data root on `/storage`, and the Docker service enabled/started
 - **`setup_containerlab`** — Containerlab network lab automation
-- **`setup_vagrant`** — Vagrant, libvirt/KVM (including bridge-utils, qemu, virt-manager, libguestfs-tools), and the `vagrant-libvirt` plugin
+- **`setup_vagrant`** — Vagrant, libvirt/KVM (including bridge-utils, qemu, virt-manager, libguestfs-tools), and the `vagrant-libvirt` plugin. Requires the `community.libvirt` Ansible collection and `python3-libvirt`/`python3-lxml` Python packages (installed automatically)
 - **`setup_gnome`** — GNOME desktop preferences via dconf, and registers Ptyxis as the default/xdg terminal (Ubuntu 26 dropped `gnome-terminal`)
 - **`setup_netlab`** — NetworkLab CLI via pipx, pinned to compatible Ansible/Paramiko versions
 
