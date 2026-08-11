@@ -1,4 +1,4 @@
-dotfiles_base_dest: "/home/{{ ansible_user }}"
+dotfiles_base_dest: "{{ user_home }}"
 dotfiles_items:
   - { src: "bashrc", dest_suffix: ".bashrc" }
   - { src: "zshrc", dest_suffix: ".zshrc" }
@@ -11,4 +11,4 @@ dotfiles_items:
   - { src: "starship/starship.toml", dest_suffix: ".config/starship.toml" }
   - { src: "nvim", dest_suffix: ".config/nvim" }
 dotfiles_repo: "https://github.com/sydasif/dotfiles.git"
-dotfiles_dest: "/home/{{ ansible_user }}/.dotfiles"
+dotfiles_dest: "{{ user_home }}/.dotfiles"

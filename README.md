@@ -58,7 +58,7 @@ ansible-galaxy collection install community.libvirt
 - Create group variables for your host and edit them:
 
 ```bash
-# edit group_vars/Ubuntu.yml (ansible_user, storage_root)
+# edit group_vars/Ubuntu.yml (ansible_user, user_home, storage_root)
 cp group_vars/example.yml group_vars/Ubuntu.yml
 ```
 

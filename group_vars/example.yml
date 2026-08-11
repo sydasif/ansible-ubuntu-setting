@@ -7,6 +7,11 @@
 # The account Ansible manages and that becomes the docker/uv/vagrant user.
 ansible_user: zulu
 
+# Home directory of the managed user (single source of truth for user paths).
+# Required: pipx/dotfiles/fonts/gnome/vagrant roles derive their user paths
+# from this value.
+user_home: /home/{{ ansible_user }}
+
 # Root of the persistent data partition (used for docker, vagrant, libvirt).
 # Required: docker/vagrant roles derive their data dirs from this value.
 storage_root: /storage

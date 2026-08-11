@@ -61,9 +61,9 @@ storage_libvirt_images: "{{ storage_root }}/libvirt/images"
 
 vagrant_user_env:
   VAGRANT_HOME: "{{ vagrant_home }}"
-  HOME: "{{ ansible_facts['env']['HOME'] }}"
+  HOME: "{{ user_home }}"
   PATH: >-
-    {{ ansible_facts['env']['HOME'] }}/.local/bin:
+    {{ user_home }}/.local/bin:
     /snap/bin:
     /usr/local/bin:
     /usr/bin:
