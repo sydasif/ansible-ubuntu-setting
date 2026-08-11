@@ -1,0 +1,20 @@
+---
+# Host-level overrides for a single managed machine.
+#
+# Local single-machine mode: values live in group_vars/<Distro>.yml (e.g.
+# group_vars/Ubuntu.yml) because the inventory groups the local host by
+# distro.
+#
+# Remote/multi-host mode: run the inventory with ANSIBLE_TARGETS=<host1,host2>
+# and copy this file to host_vars/<hostname>.yml for each host. Every remote
+# target needs ansible_user, user_home, and storage_root set here, since
+# group_vars/Ubuntu.yml only applies to the local distro group.
+
+# The account Ansible manages and that becomes the docker/uv/vagrant user.
+ansible_user: zulu
+
+# Home directory of the managed user (single source of truth for user paths).
+user_home: /home/{{ ansible_user }}
+
+# Root of the persistent data partition (used for docker, vagrant, libvirt).
+storage_root: /storage

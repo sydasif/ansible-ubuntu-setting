@@ -90,10 +90,21 @@ Each role runs as the `ansible_user` account unless it needs root.
 
 ## Configuration
 
-- `group_vars/Ubuntu.yml` — per-host overrides (see `group_vars/example.yml` for the canonical example)
+- `group_vars/Ubuntu.yml` — per-host overrides for the local distro group (see `group_vars/example.yml` for the canonical example)
+- `host_vars/example.yml` — per-host overrides for remote/multi-host targets (see below)
 - Role-specific values live in each role's `vars/main.yml`: package lists, repo URLs, dotfiles repo, storage paths, etc.
 
 Keep secrets out of the repository; use Ansible Vault or an external secret store.
+
+## Remote targets
+
+The default inventory auto-detects the local machine only. To point the playbook at remote hosts, set `ANSIBLE_TARGETS` to a comma-separated host list:
+
+```bash
+ANSIBLE_TARGETS=host1,host2 ansible-playbook local.yml --ask-become-pass
+```
+
+Remote hosts connect over SSH and get their `ansible_user`, `user_home`, and `storage_root` from `host_vars/<hostname>.yml` (copy `host_vars/example.yml` and edit). The full role set targets a single Ubuntu desktop; remote use is best limited to the headless-compatible roles (`base`, `pipx`).
 
 ## Usage / Roles
 
