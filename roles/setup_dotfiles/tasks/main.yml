@@ -23,16 +23,34 @@
     - "{{ dotfiles_base_dest }}/.ssh"
   become: false
 
+- name: Stat existing dotfile targets
+  ansible.builtin.stat:
+    path: "{{ dotfiles_base_dest }}/{{ item.dest_suffix }}"
+  loop: "{{ dotfiles_items }}"
+  register: dotfiles_targets
+  become: false
+
+- name: Skip dotfiles blocked by an existing real file
+  ansible.builtin.debug:
+    msg: >-
+      Skipping symlink for {{ item.item.dest_suffix }}: a real file exists at
+      {{ dotfiles_base_dest }}/{{ item.item.dest_suffix }}. Move it into the
+      dotfiles repo and remove the original to link it.
+  loop: "{{ dotfiles_targets.results }}"
+  when: item.stat.exists and not item.stat.islnk
+  become: false
+
 - name: Create symlinks for dotfiles
   ansible.builtin.file:
-    src: "{{ dotfiles_dest }}/{{ item.src }}"
-    dest: "{{ dotfiles_base_dest }}/{{ item.dest_suffix }}"
+    src: "{{ dotfiles_dest }}/{{ item.item.src }}"
+    dest: "{{ dotfiles_base_dest }}/{{ item.item.dest_suffix }}"
     state: link
     force: yes
     follow: no
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
-  loop: "{{ dotfiles_items }}"
+  loop: "{{ dotfiles_targets.results }}"
+  when: not (item.stat.exists and not item.stat.islnk)
   become: false
 
 - name: Set default shell to zsh

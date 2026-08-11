@@ -50,15 +50,50 @@
     group: root
   become: true
 
-- name: Apply current terminal config # noqa: no-changed-when
-  ansible.builtin.shell: |-
-    set -e
-    if command -v xdg-settings >/dev/null 2>&1; then
-      xdg-settings set default-terminal org.gnome.Ptyxis.desktop || true
-    fi
-    gsettings set org.gnome.desktop.default-applications.terminal exec 'ptyxis' || true
-    gsettings set org.gnome.desktop.default-applications.terminal exec-arg '' || true
+- name: Get current default terminal exec
+  ansible.builtin.command: gsettings get org.gnome.desktop.default-applications.terminal exec
   become: false
+  changed_when: false
+  failed_when: false
+  register: terminal_exec_current
+
+- name: Get current default terminal exec-arg
+  ansible.builtin.command: gsettings get org.gnome.desktop.default-applications.terminal exec-arg
+  become: false
+  changed_when: false
+  failed_when: false
+  register: terminal_exec_arg_current
+
+- name: Set default terminal exec
+  ansible.builtin.command: gsettings set org.gnome.desktop.default-applications.terminal exec ptyxis
+  become: false
+  changed_when: true
+  when:
+    - terminal_exec_current.rc == 0
+    - terminal_exec_current.stdout != "'ptyxis'"
+
+- name: Set default terminal exec-arg
+  ansible.builtin.command: gsettings set org.gnome.desktop.default-applications.terminal exec-arg ''
+  become: false
+  changed_when: true
+  when:
+    - terminal_exec_arg_current.rc == 0
+    - terminal_exec_arg_current.stdout != "''"
+
+- name: Get current xdg default terminal
+  ansible.builtin.command: xdg-settings get default-terminal
+  become: false
+  changed_when: false
+  failed_when: false
+  register: xdg_terminal_current
+
+- name: Set xdg default terminal
+  ansible.builtin.command: xdg-settings set default-terminal org.gnome.Ptyxis.desktop
+  become: false
+  changed_when: true
+  when:
+    - xdg_terminal_current.rc == 0
+    - xdg_terminal_current.stdout != 'org.gnome.Ptyxis.desktop'
 
 - name: Register ptyxis as new-window terminal for xdg
   ansible.builtin.copy:

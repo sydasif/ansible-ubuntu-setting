@@ -115,6 +115,7 @@
     - vagrant_plugins.rc == 0
     - vagrant_plugin_libvirt not in vagrant_plugins.stdout
   become: false
+  changed_when: true
   environment: "{{ vagrant_user_env }}"
   async: 600
   poll: 5
