@@ -7,3 +7,8 @@ netlab_injected_packages:
   - "paramiko<=3.5.1"
   - "ansible-pylibssh<=1.4.0"
   - "ruamel.yaml<=0.19.1"
+
+netlab_pipx_executable: "{{ user_home }}/.local/bin/pipx"
+
+netlab_pipx_environment:
+  PATH: "{{ user_home }}/.local/bin:/usr/local/bin:/usr/bin:/bin"

@@ -1,31 +1,41 @@
 ---
-- name: Check if networklab is already installed
-  ansible.builtin.command:
-    cmd: netlab version
+- name: Install networklab via pipx
+  community.general.pipx:
+    name: "{{ netlab_pipx_package }}"
+    state: present
+    executable: "{{ netlab_pipx_executable }}"
   become: false
-  register: networklab_version_check
-  changed_when: false
+  environment: "{{ netlab_pipx_environment }}"
+
+- name: Get networklab injected packages
+  community.general.pipx_info:
+    name: "{{ netlab_pipx_package }}"
+    include_injected: true
+    executable: "{{ netlab_pipx_executable }}"
+  become: false
+  environment: "{{ netlab_pipx_environment }}"
+  register: netlab_pipx_info
   failed_when: false
 
-- name: Install networklab via pipx
-  ansible.builtin.command:
-    cmd: "pipx install {{ netlab_pipx_package }}"
-  become: false
-  when: networklab_version_check.rc != 0
-  register: networklab_install_result
-  changed_when: networklab_install_result.rc == 0
+- name: Collect injected package names
+  ansible.builtin.set_fact:
+    netlab_injected_present: "{{ ((netlab_pipx_info.application | first | default({})).injected | default({})).keys() | list }}"
 
-- name: Inject networklab dependencies
-  ansible.builtin.command:
-    cmd: "pipx inject {{ netlab_pipx_package }} {{ item }}"
-  loop: "{{ netlab_injected_packages }}"
+- name: Inject networklab pinned dependencies
+  community.general.pipx:
+    name: "{{ netlab_pipx_package }}"
+    state: inject
+    inject_packages: ["{{ item }}"]
+    executable: "{{ netlab_pipx_executable }}"
   become: false
-  when: networklab_version_check.rc != 0
-  changed_when: true
+  loop: "{{ netlab_injected_packages }}"
+  when: item | regex_replace('^([^<>=!~]+).*', '\\1') | replace('_', '-') | replace('.', '-') not in netlab_injected_present
+  environment: "{{ netlab_pipx_environment }}"
 
 - name: Verify networklab installation
   ansible.builtin.command:
     cmd: netlab version
   become: false
-  when: networklab_version_check.rc != 0 and networklab_install_result is succeeded
   changed_when: false
+  failed_when: false
+  environment: "{{ netlab_pipx_environment }}"
