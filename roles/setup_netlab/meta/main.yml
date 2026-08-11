@@ -2,9 +2,9 @@
 galaxy_info:
   role_name: setup_netlab
   author: sydasif
-  description: Installs NetworkLab via pipx with Ansible dependency injection
+  description: Installs NetworkLab via the user's pipx (from the setup_pipx role) with pinned Ansible dependency injection
   license: MIT
-  min_ansible_version: "2.13"
+  min_ansible_version: "2.20"
   platforms:
     - name: Ubuntu
       versions:

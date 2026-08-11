@@ -4,7 +4,7 @@ galaxy_info:
   author: sydasif
   description: Clones a dotfiles repository and creates symlinks into the user's home directory
   license: MIT
-  min_ansible_version: "2.13"
+  min_ansible_version: "2.20"
   platforms:
     - name: Ubuntu
       versions:

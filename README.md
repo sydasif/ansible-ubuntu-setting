@@ -50,10 +50,10 @@ The inventory script requires the `distro` package, which `requirements.txt` inc
 - Install required Ansible Galaxy collections:
 
 ```bash
-ansible-galaxy collection install community.libvirt
+ansible-galaxy collection install -r requirements.yml
 ```
 
-> **Note:** This step is required before running the `vagrant` tag.
+> **Note:** This step is required before running the `editors`, `netlab`, or `vagrant` tags (`community.general` and `community.libvirt`).
 
 - Create group variables for your host and edit them:
 

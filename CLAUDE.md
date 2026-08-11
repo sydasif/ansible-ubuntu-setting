@@ -46,7 +46,7 @@ ansible-playbook local.yml --syntax-check
 | `setup_containerlab` | `containerlab` | Containerlab |
 | `setup_vagrant` | `vagrant` | Vagrant + libvirt/KVM (all virtualization packages merged) |
 | `setup_gnome` | `gnome` | GNOME dconf preferences |
-| `setup_netlab` | `netlab` | NetworkLab CLI |
+| `setup_netlab` | `netlab` | NetworkLab CLI (requires `setup_pipx` for the user pipx install) |
 
 ## Key Conventions
 
