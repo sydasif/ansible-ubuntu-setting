@@ -74,7 +74,7 @@ Tasks that run `curl | sh` or similar get inline `# noqa` annotations with a sho
 
 All repo-owning roles follow the same pattern (aligned with vendor docs for Docker, VS Code, HashiCorp):
 
-- **Armored keys, no dearmor:** `get_url` downloads the `.asc` key and `signed-by=` points at the `.asc` directly. Never de-armor to `.gpg` (modern apt accepts armored keys). When migrating hosts from the old `.gpg` layout, add a `Remove stale de-armored <tool> key` cleanup task; the play-level `Strip stale de-armored key references from apt sources` pre_task removes old `signed-by=...gpg` source lines before any apt operation (see Gotchas).
+- **Armored keys, no dearmor:** `get_url` downloads the `.asc` key and `signed-by=` points at the `.asc` directly. Never de-armor to `.gpg` (modern apt accepts armored keys).
 - **Dynamic arch:** the repo line uses `{tool}_apt_arch` — a dict mapping `x86_64`→`amd64`, `aarch64`→`arm64`, with an `amd64` fallback. Never hardcode `arch=amd64`.
 - **Prerequisites:** every repo role declares `software-properties-common` (the `apt_repository` module's requirement) in its own deps list.
 - **Containerlab is the exception:** its repo is unsigned, so `trusted=yes` is the official spec (commented in vars) — there is no key to download or pin.
@@ -84,5 +84,4 @@ All repo-owning roles follow the same pattern (aligned with vendor docs for Dock
 - **Ubuntu 26 + sudo-rs:** Ansible's `become` can hang if the system uses `sudo-rs`. Workaround: `sudo update-alternatives --set sudo /usr/bin/sudo.ws` (documented in README).
 - **Dotfiles clone** pins `update: no` for idempotent convergence — this is intentional, not `latest[git]` debt.
 - **Docker data migration** uses `cp -a /.` (not `/*`) to preserve dotfiles/hidden files during the `/var/lib/docker` → `/storage` move.
-- **APT repo migration (`.gpg` → `.asc`):** a host provisioned with the old dearmored layout has sources lines referencing `.gpg`; once the new `.asc` line is added, apt fails with *Conflicting values set for option Signed-By* and *The list of sources could not be read* — and this breaks the play's own pre-task cache update, so the repair must happen before it. `local.yml` pre_tasks strip the stale `.gpg` lines first; just re-run the playbook to repair a stuck host.
 - **`ansible -e 'key=value with spaces'` truncates at the first space** — pass spaced values as JSON (`-e '{"key": "value with spaces"}'`). Not an issue for vars set in `group_vars`.

@@ -10,6 +10,7 @@
     fail_msg: >-
       Unsupported architecture '{{ ansible_facts["architecture"] }}'.
       Supported architectures are x86_64 and aarch64.
+    quiet: true
 
 # ---------------------------------------------------------------------------
 # APT

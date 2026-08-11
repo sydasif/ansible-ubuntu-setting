@@ -17,13 +17,6 @@
     dest: "{{ docker_gpg_key_path }}"
     mode: "0644"
 
-# Older role versions de-armored the key to docker.gpg; remove the stale file
-# now that the repository uses the armored docker.asc directly.
-- name: Remove stale de-armored Docker key
-  ansible.builtin.file:
-    path: /etc/apt/keyrings/docker.gpg
-    state: absent
-
 - name: Add repository for docker
   ansible.builtin.apt_repository:
     filename: docker

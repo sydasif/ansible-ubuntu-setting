@@ -24,6 +24,7 @@ var/
 # Ansible
 *.retry
 ansible_fact_cache/
+.ansible/
 .hosts
 inventory
 *.inventory
