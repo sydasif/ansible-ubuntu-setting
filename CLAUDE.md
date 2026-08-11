@@ -37,7 +37,7 @@ ansible-playbook local.yml --syntax-check
 | Role | Tag | Scope |
 |------|-----|-------|
 | `setup_base` | `base` | CLI utils + Python system packages (headless-compatible) |
-| `setup_pipx` | `pipx` | pipx-managed tools (pipx, uv, ruff) — self-contained with apt prereqs |
+| `setup_pipx` | `pipx` | pipx-managed tools (uv, ruff) — explicit PATH, no shell sourcing |
 | `setup_editors` | `editors` | VS Code (APT) + Neovim (snap) |
 | `setup_desktop` | `desktop` | GUI packages + snaps (desktop-only) |
 | `setup_dotfiles` | `dotfiles` | Dotfiles symlinks |

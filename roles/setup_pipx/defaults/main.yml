@@ -1,0 +1,9 @@
+---
+# Python CLI applications to manage with pipx.
+#
+# Customize this list from inventory, group_vars, host_vars,
+# or playbook variables without modifying this role.
+
+pipx_packages:
+  - uv
+  - ruff

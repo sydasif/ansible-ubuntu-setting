@@ -1,0 +1,7 @@
+---
+# Internal role paths and environment.
+
+pipx_user_bin: "{{ lookup('env', 'HOME') }}/.local/bin"
+
+pipx_environment:
+  PATH: "{{ pipx_user_bin }}:/usr/local/bin:/usr/bin:/bin"

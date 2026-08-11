@@ -2,7 +2,7 @@
 galaxy_info:
   role_name: setup_pipx
   author: sydasif
-  description: Manages pipx-bootstrapped CLI tools (pipx with uv backend, uv, ruff)
+  description: Installs and manages CLI Python tools (uv, ruff) via pipx with explicit PATH
   license: MIT
   min_ansible_version: "2.13"
   platforms:
