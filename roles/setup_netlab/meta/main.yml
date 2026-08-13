@@ -17,4 +17,5 @@ galaxy_info:
     - networklab
     - network
     - pipx
-dependencies: []
+dependencies:
+  - setup_pipx
