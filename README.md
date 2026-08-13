@@ -72,6 +72,10 @@ ansible-playbook local.yml --ask-become-pass
 
 `scripts/inventory.py` is a dynamic inventory that auto-detects your local Ubuntu system. `local.yml` sets `become: true`, and the `ansible.cfg` enables password-less escalation only when you pass `--ask-become-pass`.
 
+> **Ubuntu 26 sudo-rs hang:** if `become: true` freezes on the first
+> privilege escalation, the system is using sudo-rs. Fix before re-running:
+> `sudo update-alternatives --set sudo /usr/bin/sudo.ws`
+
 ### Run specific roles
 
 Roles in `local.yml` are tagged. Use `--tags` to run a subset:
