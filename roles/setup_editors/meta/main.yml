@@ -2,7 +2,7 @@
 galaxy_info:
   role_name: setup_editors
   author: sydasif
-  description: Installs VS Code and Neovim editors on Ubuntu
+  description: Installs VS Code, Neovim, and GitHub CLI on Ubuntu
   license: MIT
   min_ansible_version: "2.20"
   platforms:

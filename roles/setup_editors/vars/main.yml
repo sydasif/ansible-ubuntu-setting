@@ -16,3 +16,5 @@ vscode_apt_repo: >-
 editor_snap_packages:
   - name: nvim
     classic: true
+  - name: gh
+    classic: true
