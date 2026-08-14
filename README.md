@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/banner.png" alt="Ansible Ubuntu Setting — automated Ubuntu desktop provisioning" width="640">
+</p>
+
 # Ansible Ubuntu Setting
 
 Automate an Ubuntu desktop setup with Ansible. This repository provides role-based playbooks that install packages, deploy dotfiles, configure Docker, install developer fonts, apply GNOME preferences, set up Containerlab, and provision Vagrant with libvirt/KVM — so your desktop configuration is version-controlled and repeatable.
