@@ -18,3 +18,5 @@ editor_snap_packages:
     classic: true
   - name: gh
     classic: true
+  - name: vlc
+    classic: false
