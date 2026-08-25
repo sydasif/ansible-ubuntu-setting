@@ -3,7 +3,6 @@
   ansible.builtin.apt:
     name: "{{ vscode_dependencies }}"
     state: present
-    update_cache: true
 
 - name: Ensure apt keyrings directory exists
   ansible.builtin.file:
@@ -28,7 +27,6 @@
   ansible.builtin.apt:
     name: code
     state: present
-    update_cache: true
 
 - name: Install editor snap packages
   community.general.snap:

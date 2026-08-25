@@ -3,7 +3,6 @@
   ansible.builtin.apt:
     name: "{{ containerlab_dependencies }}"
     state: present
-    update_cache: true
 
 - name: Add containerlab APT repository
   ansible.builtin.apt_repository:
@@ -16,4 +15,3 @@
   ansible.builtin.apt:
     name: containerlab
     state: present
-    update_cache: true

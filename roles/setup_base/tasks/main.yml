@@ -3,7 +3,6 @@
   ansible.builtin.apt:
     name: "{{ cli_packages }}"
     state: present
-    update_cache: true
 
 - name: Install Python development packages
   ansible.builtin.apt:

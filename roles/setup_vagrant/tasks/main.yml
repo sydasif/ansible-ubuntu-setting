@@ -62,7 +62,6 @@
   ansible.builtin.apt:
     name: "{{ vagrant_packages }}"
     state: present
-    update_cache: true
 
 # ---------------------------------------------------------------------------
 # KVM / Libvirt

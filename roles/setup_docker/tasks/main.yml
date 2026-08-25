@@ -3,7 +3,6 @@
 - name: Install docker dependencies
   ansible.builtin.apt:
     name: "{{ docker_dependencies }}"
-    update_cache: true
 
 - name: Ensure apt keyrings directory exists
   ansible.builtin.file:
@@ -27,7 +26,6 @@
 - name: Install docker engine
   ansible.builtin.apt:
     name: "{{ docker_engine_packages }}"
-    update_cache: true
   notify: Start and enable docker
 
 - name: Add current user to docker group

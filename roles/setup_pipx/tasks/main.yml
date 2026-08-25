@@ -15,44 +15,29 @@
   ansible.builtin.apt:
     name: pipx
     state: present
-    update_cache: true
   become: true
 
-- name: Check user-owned pipx
-  ansible.builtin.stat:
-    path: "{{ pipx_user_bin }}/pipx"
-  register: pipx_user_binary
-  become: false
-
 - name: Install user-owned pipx with uv backend
-  ansible.builtin.command:
-    cmd: pipx install "pipx[uv]"
-  changed_when: true
-  when: not pipx_user_binary.stat.exists
-  become: false
-  environment: "{{ pipx_environment }}"
-
-- name: Get installed pipx packages
-  ansible.builtin.command:
-    cmd: pipx list --short
-  register: pipx_list
-  changed_when: false
-  failed_when: false
+  community.general.pipx:
+    name: pipx
+    state: present
+    install_deps: true
+    executable: "{{ pipx_user_bin }}/pipx"
   become: false
   environment: "{{ pipx_environment }}"
 
 - name: Install Python CLI tools
-  ansible.builtin.command:
-    cmd: "pipx install {{ item }}"
-  changed_when: true
+  community.general.pipx:
+    name: "{{ item }}"
+    state: present
+    executable: "{{ pipx_user_bin }}/pipx"
   loop: "{{ pipx_packages }}"
-  when: item not in (pipx_list.stdout_lines | map('split', ' ') | map('first') | list)
   become: false
   environment: "{{ pipx_environment }}"
 
 - name: Verify pipx
   ansible.builtin.command:
-    cmd: pipx --version
+    cmd: "{{ pipx_user_bin }}/pipx --version"
   changed_when: false
   failed_when: false
   become: false
@@ -60,7 +45,7 @@
 
 - name: Verify installed CLI tools
   ansible.builtin.command:
-    cmd: "{{ item }} --version"
+    cmd: "{{ pipx_user_bin }}/{{ item }} --version"
   loop: "{{ pipx_packages }}"
   changed_when: false
   failed_when: false
