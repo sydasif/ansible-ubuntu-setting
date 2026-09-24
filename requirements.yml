@@ -4,3 +4,7 @@ collections:
     version: 13.2.0
   - name: community.libvirt
     version: 2.3.0
+  - name: arista.eos
+    version: 12.3.0
+  - name: cisco.ios
+    version: 11.6.0
