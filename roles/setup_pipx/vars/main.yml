@@ -3,5 +3,9 @@
 
 pipx_user_bin: "{{ user_home }}/.local/bin"
 
+# System pipx (apt) — used only to bootstrap the user-owned pipx below,
+# because ~/.local/bin/pipx does not exist on a fresh system yet.
+pipx_system_bin: /usr/bin/pipx
+
 pipx_environment:
   PATH: "{{ pipx_user_bin }}:/usr/local/bin:/usr/bin:/bin"

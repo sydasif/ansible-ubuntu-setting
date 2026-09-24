@@ -1,4 +1,14 @@
 ---
 fonts_base_dir: "{{ user_home }}/.fonts"
+
+# System fonts requested by other config in this repo: Inter is the GNOME
+# document-font (dconf), JetBrains Mono the GNOME monospace font (dconf) and
+# the VS Code editor.fontFamily (dotfiles). The Nerd Font below additionally
+# provides the glyphs starship/terminal UIs need. Adwaita Sans is NOT
+# packaged for noble, so dconf deliberately does not request it.
+font_packages:
+  - fonts-inter
+  - fonts-jetbrains-mono
+
 jetbrains_mono_font_name: "JetBrainsMonoNerdFont-Regular.ttf"
 jetbrains_mono_download_url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/JetBrainsMono.tar.xz"

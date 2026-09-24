@@ -18,10 +18,10 @@ Automate an Ubuntu desktop setup with Ansible. This repository provides role-bas
 - **Desktop packages** — GUI packages (gnome-tweaks)
 - **Editors** — VS Code (Microsoft APT repo) and Neovim (snap)
 - **Dotfiles** — clones your dotfiles repo and symlinks shell configs, editors, SSH, and theme files into `~`
-- **Developer fonts** — JetBrainsMono Nerd Font, with font-cache refresh
+- **Developer fonts** — Inter, JetBrains Mono, and the JetBrainsMono Nerd Font, with font-cache refresh
 - **Docker** — Docker Engine from the official APT repo, `docker` group membership, and a configurable data root. Log out and back in after provisioning so the `docker` group membership takes effect without `sudo`
 - **Containerlab** — network lab automation
-- **Vagrant + libvirt/KVM** — Vagrant, `vagrant-libvirt`, and a reconfigured libvirt storage pool
+- **Vagrant + libvirt/KVM** — Vagrant, `vagrant-libvirt`, a reconfigured libvirt storage pool, and `kvm`/`libvirt` group membership (log out and back in to activate)
 - **GNOME preferences** — dconf-driven desktop settings, with Ptyxis registered as the xdg default terminal
 - **netlab** — NetworkLab CLI (`netlab`) via pipx, pinned to the `ansible-core`/`paramiko` versions that actually work with it
 - **Idempotent** — re-running the playbook converges to the desired state without reapplying unchanged work
@@ -62,8 +62,8 @@ ansible-galaxy collection install -r requirements.yml
 - Create group variables for your host and edit them:
 
 ```bash
-# edit group_vars/Ubuntu.yml (ansible_user, user_home, storage_root)
-cp group_vars/example.yml group_vars/Ubuntu.yml
+cp group_vars/example.yml group_vars/Ubuntu.yml # only if it does not exist yet — this overwrites
+# then edit group_vars/Ubuntu.yml (ansible_user, user_home, storage_root)
 ```
 
 ## Usage
@@ -79,6 +79,11 @@ ansible-playbook local.yml --ask-become-pass
 > **Ubuntu 26 sudo-rs hang:** if `become: true` freezes on the first
 > privilege escalation, the system is using sudo-rs. Fix before re-running:
 > `sudo update-alternatives --set sudo /usr/bin/sudo.ws`
+
+> **Group memberships:** provisioning adds your user to `docker` (Docker) and
+> to `kvm` + `libvirt` (Vagrant/libvirt). Log out and back in — or reboot —
+> before using them: until then `docker` still needs `sudo`, and
+> Vagrant/libvirt VMs cannot be managed as your own user.
 
 ### Run specific roles
 
@@ -122,11 +127,11 @@ Each `setup_*` role installs and configures one tool:
 - **`setup_desktop`** — GUI packages (gnome-tweaks)
 - **`setup_editors`** — VS Code (Microsoft APT repo) and Neovim (snap)
 - **`setup_pipx`** — pipx-managed CLI tools: pipx (with uv backend), uv, ruff
-- **`setup_dotfiles`** — clones dotfiles into `~/.dotfiles` and symlinks them into `~`
-- **`setup_fonts`** — installs JetBrainsMono Nerd Font and refreshes the font cache
-- **`setup_docker`** — Docker Engine (official APT repo), `docker` group membership, `daemon.json` data root on `/storage`, and the Docker service enabled/started
+- **`setup_dotfiles`** — clones dotfiles into `~/.dotfiles`, symlinks them into `~`, and sets your login shell to zsh (skipped if zsh is not installed yet)
+- **`setup_fonts`** — installs the system fonts other config requests (Inter, JetBrains Mono) plus the JetBrainsMono Nerd Font, and refreshes the font cache
+- **`setup_docker`** — Docker Engine (official APT repo), `docker` group membership, `daemon.json` data root on `storage_root` (default `/home/storage`), and the Docker service enabled/started
 - **`setup_containerlab`** — Containerlab network lab automation
-- **`setup_vagrant`** — Vagrant, libvirt/KVM (including bridge-utils, qemu, virt-manager, libguestfs-tools), and the `vagrant-libvirt` plugin. Requires the `community.libvirt` Ansible collection and `python3-libvirt`/`python3-lxml` Python packages (installed automatically)
+- **`setup_vagrant`** — Vagrant, libvirt/KVM (including bridge-utils, qemu, virt-manager, libguestfs-tools), and the `vagrant-libvirt` plugin; adds your user to the `kvm`/`libvirt` groups (log out/in to activate). Requires the `community.libvirt` Ansible collection and `python3-libvirt`/`python3-lxml` Python packages (installed automatically)
 - **`setup_gnome`** — GNOME desktop preferences via dconf, and registers Ptyxis as the default/xdg terminal (Ubuntu 26 dropped `gnome-terminal`)
 - **`setup_netlab`** — NetworkLab CLI via pipx, pinned to compatible Ansible/Paramiko versions
 

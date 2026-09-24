@@ -27,10 +27,10 @@ ansible-playbook local.yml --syntax-check
 - **Roles** under `roles/` — each is self-contained with `tasks/main.yml`, `vars/main.yml`, and optional `handlers/`
 - **Shared tasks:** Each role that requires an APT repository (docker, editors, vagrant, containerlab) handles its own keyring download and repository setup, following the aligned convention in "APT repository setup" below.
 - **group_vars:** two files serve different purposes:
-  - `group_vars/Ubuntu.yml` — **live config** (the file Ansible actually reads; `ansible_user: zulu`, `storage_root: /storage`)
+  - `group_vars/Ubuntu.yml` — **live config** (the file Ansible actually reads; `ansible_user: zulu`, `storage_root: /home/storage`)
   - `group_vars/example.yml` — documented template for others to copy
   - **Trap:** new vars must be added to **both** files, or the live run fails with undefined variable errors
-- **`/storage` layout** — hardcoded data partition root for Docker data-root, Vagrant home, libvirt images. Single-machine assumption, not portable.
+- **`storage_root` layout** (`group_vars`, currently `/home/storage` on the `/home` partition) — data root for Docker data-root, Vagrant home, libvirt images. Both consumer roles (`setup_docker`, `setup_vagrant`) create it as 0755 root:root first, so libvirt-qemu can traverse to its image paths.
 
 ## Role Structure (new)
 
@@ -83,5 +83,4 @@ All repo-owning roles follow the same pattern (aligned with vendor docs for Dock
 
 - **Ubuntu 26 + sudo-rs:** Ansible's `become` can hang if the system uses `sudo-rs`. Workaround: `sudo update-alternatives --set sudo /usr/bin/sudo.ws` (documented in README).
 - **Dotfiles clone** pins `update: no` for idempotent convergence — this is intentional, not `latest[git]` debt.
-- **Docker data migration** uses `cp -a /.` (not `/*`) to preserve dotfiles/hidden files during the `/var/lib/docker` → `/storage` move.
 - **`ansible -e 'key=value with spaces'` truncates at the first space** — pass spaced values as JSON (`-e '{"key": "value with spaces"}'`). Not an issue for vars set in `group_vars`.

@@ -4,5 +4,6 @@ ansible_user: zulu
 # Home directory of the managed user (single source of truth for user paths)
 user_home: /home/{{ ansible_user }}
 
-# Root of the persistent data partition (used for docker, vagrant, libvirt)
-storage_root: /storage
+# Root for persistent tool data (docker data-root, vagrant home, libvirt
+# images). Lives on the /home partition; created on first run as 0755 root:root.
+storage_root: /home/storage

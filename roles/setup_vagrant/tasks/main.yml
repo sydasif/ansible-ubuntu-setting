@@ -86,6 +86,16 @@
 # Vagrant home
 # ---------------------------------------------------------------------------
 
+# Same 0755 root:root storage root as in setup_docker, so this role also works
+# when run alone via --tags vagrant and libvirt image paths stay traversable.
+- name: Ensure storage root directory exists
+  ansible.builtin.file:
+    path: "{{ storage_root }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
 - name: Create Vagrant home directory
   ansible.builtin.file:
     path: "{{ vagrant_home }}"
@@ -122,6 +132,16 @@
 # ---------------------------------------------------------------------------
 # Libvirt storage
 # ---------------------------------------------------------------------------
+
+# The 'Start libvirtd' handler only flushes at the end of the play — after
+# the pool tasks below, which need a live daemon connection. Start libvirtd
+# explicitly here (idempotent) instead of relying on handler order; this also
+# covers re-runs where packages/dirs are unchanged but the daemon was stopped.
+- name: Ensure libvirtd is running
+  ansible.builtin.systemd:
+    name: libvirtd
+    enabled: true
+    state: started
 
 - name: Ensure Libvirt images directory exists
   ansible.builtin.file:

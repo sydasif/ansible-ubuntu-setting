@@ -12,6 +12,7 @@ ansible_user: zulu
 # from this value.
 user_home: /home/{{ ansible_user }}
 
-# Root of the persistent data partition (used for docker, vagrant, libvirt).
+# Root for persistent tool data (Docker data-root, Vagrant home, libvirt
+# images). Use a dedicated partition or a directory on a large filesystem.
 # Required: docker/vagrant roles derive their data dirs from this value.
-storage_root: /storage
+storage_root: /home/storage

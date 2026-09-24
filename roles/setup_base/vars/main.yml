@@ -6,9 +6,24 @@ cli_packages:
   - tree
   - lsd
   - fzf
+  - git # required by the setup_dotfiles clone; a fresh desktop may not ship it
   - sshpass
-  - starship
   - openvswitch-switch
+
+# starship is not packaged for Ubuntu, so install the official static (musl)
+# release binary, pinned to a version with per-arch sha256 digests (both
+# verified against the release's .sha256 assets on 2026-09-23). The arch dict
+# maps Ansible's x86_64/aarch64 to the release asset names (identical);
+# anything else falls back to x86_64 deliberately (docker_apt_arch-style).
+starship_version: 1.26.0
+starship_arch: "{{ {'x86_64': 'x86_64', 'aarch64': 'aarch64'}.get(ansible_facts['architecture'], 'x86_64') }}"
+starship_download_url: >-
+  https://github.com/starship/starship/releases/download/v{{ starship_version }}/starship-{{ starship_arch }}-unknown-linux-musl.tar.gz
+starship_checksum: >-
+  {{ {'x86_64': 'sha256:b7c232b0e8249d8e55a40beb79c5c43a7d370f3f9408bd215deb0170daeaadf3',
+      'aarch64': 'sha256:dc30189378d2f2e287384e8a692d3f95ad1df64cf0e8c36aa9201516028aed6b'}[starship_arch] }}
+starship_tarball: "/tmp/starship-{{ starship_arch }}-unknown-linux-musl.tar.gz"
+starship_install_path: /usr/local/bin/starship
 
 # Python development (system packages)
 python_packages:

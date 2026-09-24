@@ -1,4 +1,9 @@
 ---
+- name: Install system fonts
+  ansible.builtin.apt:
+    name: "{{ font_packages }}"
+    state: present
+
 - name: Ensure fonts directory
   ansible.builtin.file:
     path: "{{ fonts_base_dir }}"

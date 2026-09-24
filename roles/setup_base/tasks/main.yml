@@ -8,3 +8,34 @@
   ansible.builtin.apt:
     name: "{{ python_packages }}"
     state: present
+
+# starship has no apt package on Ubuntu; ship the official GitHub release,
+# pinned in vars to a version + verified sha256 per arch. The stat gate keeps
+# re-runs fully idempotent (no download, no change).
+- name: Check whether starship is installed
+  ansible.builtin.stat:
+    path: "{{ starship_install_path }}"
+  register: starship_binary
+
+- name: Install starship from the official GitHub release
+  when: not starship_binary.stat.exists
+  block:
+    - name: Download starship release tarball
+      ansible.builtin.get_url:
+        url: "{{ starship_download_url }}"
+        dest: "{{ starship_tarball }}"
+        checksum: "{{ starship_checksum }}"
+        mode: "0644"
+
+    - name: Install starship binary to /usr/local/bin
+      ansible.builtin.unarchive:
+        src: "{{ starship_tarball }}"
+        dest: /usr/local/bin
+        owner: root
+        group: root
+        remote_src: true
+
+    - name: Remove starship release tarball
+      ansible.builtin.file:
+        path: "{{ starship_tarball }}"
+        state: absent

@@ -2,10 +2,10 @@
 # Managed installs for CLI Python tooling via pipx.
 #
 # System bootstrap:
-#   apt -> pipx
+#   apt -> /usr/bin/pipx -> ~/.local/bin/pipx (pipx installing itself)
 #
-# User-level tooling:
-#   ~/.local/bin/pipx
+# User-level tooling (installed via the user-owned pipx; uv on PATH also
+# makes pipx default to its uv backend for later installs):
 #   ~/.local/bin/uv
 #   ~/.local/bin/ruff
 #
@@ -17,14 +17,26 @@
     state: present
   become: true
 
-- name: Install user-owned pipx with uv backend
+# ~/.local/bin/pipx cannot install itself (it does not exist yet), so the
+# apt-installed pipx bootstraps the user-owned copy first. Only do this when
+# needed: the apt pipx (1.4.x) cannot parse the newer venv metadata that
+# newer user-owned pipx versions write (e.g. metadata 0.12), so a re-run
+# against an existing bootstrap fails on its idempotency check.
+- name: Check whether user-owned pipx is installed
+  ansible.builtin.stat:
+    path: "{{ pipx_user_bin }}/pipx"
+  become: false
+  register: pipx_user_installed
+
+- name: Bootstrap user-owned pipx with the system pipx
   community.general.pipx:
     name: pipx
     state: present
     install_deps: true
-    executable: "{{ pipx_user_bin }}/pipx"
+    executable: "{{ pipx_system_bin }}"
   become: false
   environment: "{{ pipx_environment }}"
+  when: not pipx_user_installed.stat.exists
 
 - name: Install Python CLI tools
   community.general.pipx:

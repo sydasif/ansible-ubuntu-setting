@@ -21,6 +21,15 @@
     - /etc/dconf/db/local.d
     - /etc/dconf/db/gdm.d
 
+# Ptyxis is the default terminal only on Ubuntu 25.04+/26.04; 22.04/24.04
+# ship gnome-terminal (default exec: x-terminal-emulator). Every
+# Ptyxis-specific config below is gated on the binary actually existing.
+- name: Check whether Ptyxis is installed
+  ansible.builtin.stat:
+    path: /usr/bin/ptyxis
+  register: ptyxis_binary
+  become: false
+
 - name: Deploy GNOME dconf defaults
   ansible.builtin.copy:
     src: dconf_gnome.ini
@@ -30,6 +39,90 @@
     mode: "0644"
   notify: Update dconf
   become: true
+
+# Ptyxis dconf defaults live in a separate keyfile so machines without
+# Ptyxis (22.04/24.04) never get a default terminal pointing at a missing
+# binary from the system database.
+- name: Deploy Ptyxis dconf defaults
+  ansible.builtin.copy:
+    src: dconf_ptyxis.ini
+    dest: /etc/dconf/db/local.d/10-ptyxis
+    owner: root
+    group: root
+    mode: "0644"
+  when: ptyxis_binary.stat.exists
+  notify: Update dconf
+  become: true
+
+- name: Remove Ptyxis dconf defaults when Ptyxis is absent
+  ansible.builtin.file:
+    path: /etc/dconf/db/local.d/10-ptyxis
+    state: absent
+  when: not ptyxis_binary.stat.exists
+  notify: Update dconf
+  become: true
+
+# The pre-gate playbook additionally wrote Ptyxis into the *user* dconf db
+# and the xdg terminal list even on machines without Ptyxis. Undo exactly
+# those writes (fingerprint: the value is still the one the old playbook
+# set) so a stale override does not survive; anything the user configured
+# themselves is left alone. These only fire on non-Ptyxis systems.
+- name: Get user default terminal exec
+  ansible.builtin.command: gsettings get org.gnome.desktop.default-applications.terminal exec
+  become: false
+  changed_when: false
+  failed_when: false
+  register: stale_terminal_exec
+
+- name: Get user default terminal exec-arg
+  ansible.builtin.command: gsettings get org.gnome.desktop.default-applications.terminal exec-arg
+  become: false
+  changed_when: false
+  failed_when: false
+  register: stale_terminal_exec_arg
+
+- name: Reset stale Ptyxis default-terminal exec when Ptyxis is absent
+  ansible.builtin.command: gsettings reset org.gnome.desktop.default-applications.terminal exec
+  become: false
+  changed_when: true
+  when:
+    - not ptyxis_binary.stat.exists
+    - stale_terminal_exec.rc == 0
+    - stale_terminal_exec.stdout == "'ptyxis'"
+
+- name: Reset stale Ptyxis default-terminal exec-arg when Ptyxis is absent
+  ansible.builtin.command: gsettings reset org.gnome.desktop.default-applications.terminal exec-arg
+  become: false
+  changed_when: true
+  when:
+    - not ptyxis_binary.stat.exists
+    - stale_terminal_exec.rc == 0
+    - stale_terminal_exec.stdout == "'ptyxis'"
+    - stale_terminal_exec_arg.rc == 0
+    - stale_terminal_exec_arg.stdout == "''"
+
+- name: Stat xdg terminal list for a stale Ptyxis entry
+  ansible.builtin.stat:
+    path: "{{ user_home }}/.config/ubuntu-xdg-terminals.list"
+  register: stale_xdg_terminals_list
+  become: false
+
+- name: Read xdg terminal list
+  ansible.builtin.slurp:
+    src: "{{ user_home }}/.config/ubuntu-xdg-terminals.list"
+  register: stale_xdg_terminals_list_content
+  when: stale_xdg_terminals_list.stat.exists
+  become: false
+
+- name: Remove stale xdg terminal list when Ptyxis is absent
+  ansible.builtin.file:
+    path: "{{ user_home }}/.config/ubuntu-xdg-terminals.list"
+    state: absent
+  when:
+    - not ptyxis_binary.stat.exists
+    - stale_xdg_terminals_list.stat.exists
+    - (stale_xdg_terminals_list_content.content | default('') | b64decode) == "org.gnome.Ptyxis.desktop:new-window\n"
+  become: false
 
 - name: Deploy GDM dconf settings defaults
   ansible.builtin.copy:
@@ -50,56 +143,61 @@
     group: root
   become: true
 
-- name: Get current default terminal exec
-  ansible.builtin.command: gsettings get org.gnome.desktop.default-applications.terminal exec
-  become: false
-  changed_when: false
-  failed_when: false
-  register: terminal_exec_current
+# Ptyxis-only: point the default-terminal settings at Ptyxis. On 22.04/24.04
+# the block is skipped, leaving the working x-terminal-emulator default alone.
+- name: Configure Ptyxis as the default terminal
+  when: ptyxis_binary.stat.exists
+  block:
+    - name: Get current default terminal exec
+      ansible.builtin.command: gsettings get org.gnome.desktop.default-applications.terminal exec
+      become: false
+      changed_when: false
+      failed_when: false
+      register: terminal_exec_current
 
-- name: Get current default terminal exec-arg
-  ansible.builtin.command: gsettings get org.gnome.desktop.default-applications.terminal exec-arg
-  become: false
-  changed_when: false
-  failed_when: false
-  register: terminal_exec_arg_current
+    - name: Get current default terminal exec-arg
+      ansible.builtin.command: gsettings get org.gnome.desktop.default-applications.terminal exec-arg
+      become: false
+      changed_when: false
+      failed_when: false
+      register: terminal_exec_arg_current
 
-- name: Set default terminal exec
-  ansible.builtin.command: gsettings set org.gnome.desktop.default-applications.terminal exec ptyxis
-  become: false
-  changed_when: true
-  when:
-    - terminal_exec_current.rc == 0
-    - terminal_exec_current.stdout != "'ptyxis'"
+    - name: Set default terminal exec
+      ansible.builtin.command: gsettings set org.gnome.desktop.default-applications.terminal exec ptyxis
+      become: false
+      changed_when: true
+      when:
+        - terminal_exec_current.rc == 0
+        - terminal_exec_current.stdout != "'ptyxis'"
 
-- name: Set default terminal exec-arg
-  ansible.builtin.command: gsettings set org.gnome.desktop.default-applications.terminal exec-arg ''
-  become: false
-  changed_when: true
-  when:
-    - terminal_exec_arg_current.rc == 0
-    - terminal_exec_arg_current.stdout != "''"
+    - name: Set default terminal exec-arg
+      ansible.builtin.command: gsettings set org.gnome.desktop.default-applications.terminal exec-arg ''
+      become: false
+      changed_when: true
+      when:
+        - terminal_exec_arg_current.rc == 0
+        - terminal_exec_arg_current.stdout != "''"
 
-- name: Get current xdg default terminal
-  ansible.builtin.command: xdg-settings get default-terminal
-  become: false
-  changed_when: false
-  failed_when: false
-  register: xdg_terminal_current
+    - name: Get current xdg default terminal
+      ansible.builtin.command: xdg-settings get default-terminal
+      become: false
+      changed_when: false
+      failed_when: false
+      register: xdg_terminal_current
 
-- name: Set xdg default terminal
-  ansible.builtin.command: xdg-settings set default-terminal org.gnome.Ptyxis.desktop
-  become: false
-  changed_when: true
-  when:
-    - xdg_terminal_current.rc == 0
-    - xdg_terminal_current.stdout != 'org.gnome.Ptyxis.desktop'
+    - name: Set xdg default terminal
+      ansible.builtin.command: xdg-settings set default-terminal org.gnome.Ptyxis.desktop
+      become: false
+      changed_when: true
+      when:
+        - xdg_terminal_current.rc == 0
+        - xdg_terminal_current.stdout != 'org.gnome.Ptyxis.desktop'
 
-- name: Register ptyxis as new-window terminal for xdg
-  ansible.builtin.copy:
-    content: "org.gnome.Ptyxis.desktop:new-window\n"
-    dest: "{{ user_home }}/.config/ubuntu-xdg-terminals.list"
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    mode: "0644"
-  become: false
+    - name: Register ptyxis as new-window terminal for xdg
+      ansible.builtin.copy:
+        content: "org.gnome.Ptyxis.desktop:new-window\n"
+        dest: "{{ user_home }}/.config/ubuntu-xdg-terminals.list"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: "0644"
+      become: false
