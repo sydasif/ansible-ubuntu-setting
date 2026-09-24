@@ -30,30 +30,60 @@
   register: dotfiles_targets
   become: false
 
+- name: Reduce dotfile target stats for lean output
+  ansible.builtin.set_fact:
+    dotfiles_targets_lean: >-
+      {{ dotfiles_targets_lean | default([]) + [{
+        'src': item.item.src,
+        'dest_suffix': item.item.dest_suffix,
+        'exists': item.stat.exists,
+        'islnk': item.stat.islnk
+      }] }}
+  loop: "{{ dotfiles_targets.results }}"
+  become: false
+
 - name: Skip dotfiles blocked by an existing real file
   ansible.builtin.debug:
     msg: >-
-      Skipping symlink for {{ item.item.dest_suffix }}: a real file exists at
-      {{ dotfiles_base_dest }}/{{ item.item.dest_suffix }}. Move it into the
+      Skipping symlink for {{ item.dest_suffix }}: a real file exists at
+      {{ dotfiles_base_dest }}/{{ item.dest_suffix }}. Move it into the
       dotfiles repo and remove the original to link it.
-  loop: "{{ dotfiles_targets.results }}"
-  when: item.stat.exists and not item.stat.islnk
+  loop: "{{ dotfiles_targets_lean }}"
+  when: item.exists and not item.islnk
   become: false
 
 - name: Create symlinks for dotfiles
   ansible.builtin.file:
-    src: "{{ dotfiles_dest }}/{{ item.item.src }}"
-    dest: "{{ dotfiles_base_dest }}/{{ item.item.dest_suffix }}"
+    src: "{{ dotfiles_dest }}/{{ item.src }}"
+    dest: "{{ dotfiles_base_dest }}/{{ item.dest_suffix }}"
     state: link
     force: yes
     follow: no
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
-  loop: "{{ dotfiles_targets.results }}"
-  when: not (item.stat.exists and not item.stat.islnk)
+  loop: "{{ dotfiles_targets_lean }}"
+  when: not (item.exists and not item.islnk)
+  become: false
+
+# The shell is installed by setup_base; a subset run (--tags dotfiles) on a
+# bare system must not write a nonexistent path into /etc/passwd — usermod -s
+# accepts it silently, which would break login shells until zsh is installed.
+- name: Check whether zsh is installed
+  ansible.builtin.stat:
+    path: /usr/bin/zsh
+  register: zsh_binary
+  become: false
+
+- name: Skip default shell change when zsh is missing
+  ansible.builtin.debug:
+    msg: >-
+      Skipping default shell change: /usr/bin/zsh is not installed yet.
+      Run the 'base' role first (the full playbook does this automatically).
+  when: not zsh_binary.stat.exists
   become: false
 
 - name: Set default shell to zsh
   ansible.builtin.user:
     name: "{{ ansible_user }}"
     shell: /usr/bin/zsh
+  when: zsh_binary.stat.exists
