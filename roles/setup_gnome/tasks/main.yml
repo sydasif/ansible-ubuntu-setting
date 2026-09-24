@@ -62,6 +62,19 @@
   notify: Update dconf
   become: true
 
+# Nord gnome-terminal profile with the JetBrainsMono Nerd Font Mono (restored
+# from the repo's old dconf_terminal.ini). The profile's keys are prefixed
+# with a high number so they layer after the Ptyxis defaults.
+- name: Deploy terminal profile dconf defaults
+  ansible.builtin.copy:
+    src: dconf_terminal.ini
+    dest: /etc/dconf/db/local.d/20-terminal
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Update dconf
+  become: true
+
 # The pre-gate playbook additionally wrote Ptyxis into the *user* dconf db
 # and the xdg terminal list even on machines without Ptyxis. Undo exactly
 # those writes (fingerprint: the value is still the one the old playbook
