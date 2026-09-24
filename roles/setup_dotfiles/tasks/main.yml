@@ -30,39 +30,32 @@
   register: dotfiles_targets
   become: false
 
-- name: Reduce dotfile target stats for lean output
-  ansible.builtin.set_fact:
-    dotfiles_targets_lean: >-
-      {{ dotfiles_targets_lean | default([]) + [{
-        'src': item.item.src,
-        'dest_suffix': item.item.dest_suffix,
-        'exists': item.stat.exists,
-        'islnk': item.stat.islnk
-      }] }}
-  loop: "{{ dotfiles_targets.results }}"
-  become: false
-
 - name: Skip dotfiles blocked by an existing real file
   ansible.builtin.debug:
     msg: >-
-      Skipping symlink for {{ item.dest_suffix }}: a real file exists at
-      {{ dotfiles_base_dest }}/{{ item.dest_suffix }}. Move it into the
-      dotfiles repo and remove the original to link it.
-  loop: "{{ dotfiles_targets_lean }}"
-  when: item.exists and not item.islnk
+      Skipping symlink for {{ dotfiles_targets.results[dotfiles_idx].item.dest_suffix }}:
+      a real file exists at
+      {{ dotfiles_base_dest }}/{{ dotfiles_targets.results[dotfiles_idx].item.dest_suffix }}.
+      Move it into the dotfiles repo and remove the original to link it.
+  loop: "{{ dotfiles_items }}"
+  loop_control:
+    index_var: dotfiles_idx
+  when: dotfiles_targets.results[dotfiles_idx].stat.exists and not dotfiles_targets.results[dotfiles_idx].stat.islnk
   become: false
 
 - name: Create symlinks for dotfiles
   ansible.builtin.file:
-    src: "{{ dotfiles_dest }}/{{ item.src }}"
-    dest: "{{ dotfiles_base_dest }}/{{ item.dest_suffix }}"
+    src: "{{ dotfiles_dest }}/{{ dotfiles_targets.results[dotfiles_idx].item.src }}"
+    dest: "{{ dotfiles_base_dest }}/{{ dotfiles_targets.results[dotfiles_idx].item.dest_suffix }}"
     state: link
     force: yes
     follow: no
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
-  loop: "{{ dotfiles_targets_lean }}"
-  when: not (item.exists and not item.islnk)
+  loop: "{{ dotfiles_items }}"
+  loop_control:
+    index_var: dotfiles_idx
+  when: not (dotfiles_targets.results[dotfiles_idx].stat.exists and not dotfiles_targets.results[dotfiles_idx].stat.islnk)
   become: false
 
 # The shell is installed by setup_base; a subset run (--tags dotfiles) on a
