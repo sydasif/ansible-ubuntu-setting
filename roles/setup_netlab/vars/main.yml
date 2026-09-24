@@ -2,11 +2,15 @@
 netlab_pipx_package: networklab
 
 # Pin exact versions here so pipx inject does not pull a newer, broken set.
+# netlab.tools install docs recommend "the latest Ansible 11.x release";
+# the bundled "netlab install ansible" script caps at ansible<=11.10
+# (ansible 11.x pairs with ansible-core 2.18.x, hence the core cap too).
 netlab_injected_packages:
   - "ansible-core<=2.18.18"
   - "paramiko<=3.5.1"
   - "ansible-pylibssh<=1.4.0"
   - "ruamel.yaml<=0.19.1"
+  - "ansible<=11.10"
 
 netlab_pipx_executable: "{{ user_home }}/.local/bin/pipx"
 
