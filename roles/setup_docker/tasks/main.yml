@@ -1,4 +1,3 @@
-# Ref: https://github.com/ChristianLempa/boilerplates/blob/main/ansible/docker/inst-docker-ubuntu.yaml
 ---
 - name: Install docker dependencies
   ansible.builtin.apt:
@@ -21,7 +20,7 @@
     filename: docker
     repo: "{{ docker_repository_repo }}"
     state: present
-  notify: Update apt cache
+    update_cache: true
 
 - name: Install docker engine
   ansible.builtin.apt:
@@ -34,7 +33,6 @@
     groups: docker
     append: true
   when: ansible_user != 'root'
-  notify: Start and enable docker
 
 # storage_root is shared with setup_vagrant: create it explicitly as 0755
 # root:root so it stays traversable for every consumer's data paths, rather
