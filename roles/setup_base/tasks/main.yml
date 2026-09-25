@@ -1,12 +1,7 @@
 ---
-- name: Install CLI packages
+- name: Install base packages
   ansible.builtin.apt:
-    name: "{{ cli_packages }}"
-    state: present
-
-- name: Install Python development packages
-  ansible.builtin.apt:
-    name: "{{ python_packages }}"
+    name: "{{ cli_packages + python_packages }}"
     state: present
 
 # starship has no apt package on Ubuntu; ship the official GitHub release,
