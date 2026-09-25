@@ -14,9 +14,9 @@ Automate an Ubuntu desktop setup with Ansible. This repository provides role-bas
 
 ## Features
 
-- **Base packages** — CLI utilities (bat, zsh, fzf, starship, git, …) and Python system packages (python3-pip, python3-venv) — runs on headless servers too
-- **Desktop packages** — GUI packages (gnome-tweaks)
-- **Editors** — VS Code (Microsoft APT repo) and Neovim (snap)
+- **Base packages** — CLI utilities (bat, zsh, fzf, starship, gh, git, …) and Python system packages (python3-psutil, python3-venv) — runs on headless servers too
+- **Desktop packages** — GNOME GUI tools (gnome-tweaks, gnome-shell-extensions)
+- **Editors** — VS Code (Microsoft APT repo) and Neovim (snap); GitHub CLI installs from its own APT repo via `setup_base`
 - **Dotfiles** — clones your dotfiles repo and symlinks shell configs, editors, SSH, and theme files into `~`
 - **Developer fonts** — Inter, JetBrains Mono, and the JetBrainsMono Nerd Font, with font-cache refresh
 - **Docker** — Docker Engine from the official APT repo, `docker` group membership, and a configurable data root. Log out and back in after provisioning so the `docker` group membership takes effect without `sudo`
@@ -123,9 +123,9 @@ Remote hosts connect over SSH and get their `ansible_user`, `user_home`, and `st
 
 Each `setup_*` role installs and configures one tool:
 
-- **`setup_base`** — CLI utilities (bat, zsh, fzf, starship, git, …) and Python system packages (python3-pip, python3-venv) — runs on headless servers
-- **`setup_desktop`** — GUI packages (gnome-tweaks)
-- **`setup_editors`** — VS Code (Microsoft APT repo) and Neovim (snap)
+- **`setup_base`** — CLI utilities (bat, zsh, fzf, starship, gh, git, …) and Python system packages (python3-psutil, python3-venv) — runs on headless servers
+- **`setup_desktop`** — GNOME GUI tools (gnome-tweaks, gnome-shell-extensions)
+- **`setup_editors`** — VS Code (Microsoft APT repo) and Neovim (snap); GitHub CLI installs from its own APT repo via `setup_base`
 - **`setup_pipx`** — pipx-managed CLI tools: pipx (with uv backend), uv, ruff
 - **`setup_dotfiles`** — clones dotfiles into `~/.dotfiles`, symlinks them into `~`, and sets your login shell to zsh (skipped if zsh is not installed yet)
 - **`setup_fonts`** — installs the system fonts other config requests (Inter, JetBrains Mono) plus the JetBrainsMono Nerd Font, and refreshes the font cache
@@ -146,7 +146,7 @@ ansible-ubuntu-setting/
 ├── group_vars/                # per-host overrides (Ubuntu.yml, example.yml)
 ├── roles/                     # role implementations
 │   ├── setup_base/            # CLI utilities + Python system packages
-│   ├── setup_desktop/         # GUI packages
+│   ├── setup_desktop/         # GNOME GUI tools
 │   ├── setup_editors/         # VS Code + Neovim
 │   ├── setup_pipx/            # pipx-managed tools (pipx, uv, ruff)
 │   ├── setup_dotfiles/        # dotfiles symlinks

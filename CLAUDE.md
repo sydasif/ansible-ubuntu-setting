@@ -39,7 +39,7 @@ ansible-playbook local.yml --syntax-check
 | `setup_base`         | `base`         | CLI utils (incl. gh from GitHub APT) + Python system packages (headless-compatible) |
 | `setup_pipx`         | `pipx`         | pipx-managed tools (uv, ruff) — explicit PATH, no shell sourcing                    |
 | `setup_editors`      | `editors`      | VS Code (APT) + Neovim (snap)                                                       |
-| `setup_desktop`      | `desktop`      | GUI packages + snaps (desktop-only)                                                 |
+| `setup_desktop`      | `desktop`      | GNOME GUI tools (gnome-tweaks, gnome-shell-extensions) — desktop-only               |
 | `setup_dotfiles`     | `dotfiles`     | Dotfiles symlinks                                                                   |
 | `setup_fonts`        | `fonts`        | JetBrainsMono Nerd Font                                                             |
 | `setup_docker`       | `docker`       | Docker Engine + config                                                              |
