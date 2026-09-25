@@ -12,9 +12,8 @@ vscode_apt_repo: >-
   deb [arch={{ vscode_apt_arch }} signed-by={{ vscode_gpg_key_path }}]
   https://packages.microsoft.com/repos/code stable main
 
-# Editor snap packages
+# Editor snap packages; gh was moved to setup_base via GitHub's official APT repo
+# (the vendor explicitly discourages snap — see cli/cli#7).
 editor_snap_packages:
   - name: nvim
-    classic: true
-  - name: gh
     classic: true

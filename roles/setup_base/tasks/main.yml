@@ -4,6 +4,33 @@
     name: "{{ cli_packages + python_packages }}"
     state: present
 
+# gh is installed from GitHub's official APT repo (armored key, signed-by=).
+# The vendor docs explicitly discourage snap; the APT path keeps it consistent
+# with VS Code / Docker conventions used elsewhere in this repo.
+- name: Ensure apt keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Download GitHub CLI GPG key
+  ansible.builtin.get_url:
+    url: "{{ gh_apt_key_url }}"
+    dest: "{{ gh_apt_key_path }}"
+    mode: "0644"
+
+- name: Add GitHub CLI APT repository
+  ansible.builtin.apt_repository:
+    filename: github-cli
+    repo: "{{ gh_apt_repo }}"
+    state: present
+    update_cache: true
+
+- name: Install GitHub CLI
+  ansible.builtin.apt:
+    name: "{{ gh_packages }}"
+    state: present
+
 # starship has no apt package on Ubuntu; ship the official GitHub release,
 # pinned in vars to a version + verified sha256 per arch. The stat gate keeps
 # re-runs fully idempotent (no download, no change).

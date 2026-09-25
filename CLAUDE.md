@@ -25,7 +25,7 @@ ansible-playbook local.yml --syntax-check
 
 - **Entry point:** `local.yml` — single play, `become: true`, hosts `all` (resolved by `scripts/inventory.py` to the local machine as its distro group, e.g. `Ubuntu`)
 - **Roles** under `roles/` — each is self-contained with `tasks/main.yml`, `vars/main.yml`, and optional `handlers/`
-- **Shared tasks:** Each role that requires an APT repository (docker, editors, vagrant, containerlab) handles its own keyring download and repository setup, following the aligned convention in "APT repository setup" below.
+- **Shared tasks:** Each role that requires an APT repository (base for gh, editors for VS Code, docker, vagrant, containerlab) handles its own keyring download and repository setup, following the aligned convention in "APT repository setup" below.
 - **group_vars:** two files serve different purposes:
   - `group_vars/Ubuntu.yml` — **live config** (the file Ansible actually reads; `ansible_user: zulu`, `storage_root: /home/storage`)
   - `group_vars/example.yml` — documented template for others to copy
@@ -34,19 +34,19 @@ ansible-playbook local.yml --syntax-check
 
 ## Role Structure (new)
 
-| Role                 | Tag            | Scope                                                            |
-| -------------------- | -------------- | ---------------------------------------------------------------- |
-| `setup_base`         | `base`         | CLI utils + Python system packages (headless-compatible)         |
-| `setup_pipx`         | `pipx`         | pipx-managed tools (uv, ruff) — explicit PATH, no shell sourcing |
-| `setup_editors`      | `editors`      | VS Code (APT) + Neovim (snap)                                    |
-| `setup_desktop`      | `desktop`      | GUI packages + snaps (desktop-only)                              |
-| `setup_dotfiles`     | `dotfiles`     | Dotfiles symlinks                                                |
-| `setup_fonts`        | `fonts`        | JetBrainsMono Nerd Font                                          |
-| `setup_docker`       | `docker`       | Docker Engine + config                                           |
-| `setup_containerlab` | `containerlab` | Containerlab                                                     |
-| `setup_vagrant`      | `vagrant`      | Vagrant + libvirt/KVM (all virtualization packages merged)       |
-| `setup_gnome`        | `gnome`        | GNOME dconf preferences                                          |
-| `setup_netlab`       | `netlab`       | NetworkLab CLI (requires `setup_pipx` for the user pipx install) |
+| Role                 | Tag            | Scope                                                                               |
+| -------------------- | -------------- | ----------------------------------------------------------------------------------- |
+| `setup_base`         | `base`         | CLI utils (incl. gh from GitHub APT) + Python system packages (headless-compatible) |
+| `setup_pipx`         | `pipx`         | pipx-managed tools (uv, ruff) — explicit PATH, no shell sourcing                    |
+| `setup_editors`      | `editors`      | VS Code (APT) + Neovim (snap)                                                       |
+| `setup_desktop`      | `desktop`      | GUI packages + snaps (desktop-only)                                                 |
+| `setup_dotfiles`     | `dotfiles`     | Dotfiles symlinks                                                                   |
+| `setup_fonts`        | `fonts`        | JetBrainsMono Nerd Font                                                             |
+| `setup_docker`       | `docker`       | Docker Engine + config                                                              |
+| `setup_containerlab` | `containerlab` | Containerlab                                                                        |
+| `setup_vagrant`      | `vagrant`      | Vagrant + libvirt/KVM (all virtualization packages merged)                          |
+| `setup_gnome`        | `gnome`        | GNOME dconf preferences                                                             |
+| `setup_netlab`       | `netlab`       | NetworkLab CLI (requires `setup_pipx` for the user pipx install)                    |
 
 ## Key Conventions
 

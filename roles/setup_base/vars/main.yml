@@ -10,6 +10,18 @@ cli_packages:
   - sshpass
   - openvswitch-switch
 
+# gh is installed from GitHub's official APT repo (armored key + signed-by=)
+# to match the convention used by VS Code and Docker in this repo. Snap install
+# is explicitly discouraged by the gh maintainers (see cli/cli#7).
+gh_apt_arch: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}.get(ansible_facts['architecture'], 'amd64') }}"
+gh_apt_key_url: https://cli.github.com/packages/githubcli-archive-keyring.asc
+gh_apt_key_path: /etc/apt/keyrings/githubcli-archive-keyring.asc
+gh_apt_repo: >-
+  deb [arch={{ gh_apt_arch }} signed-by={{ gh_apt_key_path }}]
+  https://cli.github.com/packages stable main
+gh_packages:
+  - gh
+
 # starship is not packaged for Ubuntu, so install the official static (musl)
 # release binary, pinned to a version with per-arch sha256 digests (both
 # verified against the release's .sha256 assets on 2026-09-23). The arch dict

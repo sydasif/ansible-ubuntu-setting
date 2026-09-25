@@ -2,7 +2,7 @@
 galaxy_info:
   role_name: setup_base
   author: sydasif
-  description: Installs base CLI utilities and Python system packages on Ubuntu (runs on both headless and desktop)
+  description: Installs base CLI utilities (incl. gh) and Python system packages on Ubuntu (runs on both headless and desktop)
   license: MIT
   min_ansible_version: "2.20"
   platforms:
