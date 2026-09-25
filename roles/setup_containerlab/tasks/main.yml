@@ -16,8 +16,8 @@
     mode: "0644"
 
 - name: Verify SHA256 checksum for downloaded deb
-  ansible.builtin.command: >
-    sha256sum -c <(grep "{{ containerlab_version }}_linux_{{ containerlab_arch_map[ansible_facts['architecture']] }}.deb"
+  ansible.builtin.shell: >
+    sha256sum -c <(grep "containerlab_{{ containerlab_version }}_linux_{{ containerlab_arch_map[ansible_facts['architecture']] }}.deb"
     /tmp/containerlab_checksums.txt)
   args:
     chdir: /tmp
