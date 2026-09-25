@@ -46,20 +46,3 @@
   loop: "{{ pipx_packages }}"
   become: false
   environment: "{{ pipx_environment }}"
-
-- name: Verify pipx
-  ansible.builtin.command:
-    cmd: "{{ pipx_user_bin }}/pipx --version"
-  changed_when: false
-  failed_when: false
-  become: false
-  environment: "{{ pipx_environment }}"
-
-- name: Verify installed CLI tools
-  ansible.builtin.command:
-    cmd: "{{ pipx_user_bin }}/{{ item }} --version"
-  loop: "{{ pipx_packages }}"
-  changed_when: false
-  failed_when: false
-  become: false
-  environment: "{{ pipx_environment }}"
