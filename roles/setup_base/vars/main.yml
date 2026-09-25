@@ -1,4 +1,9 @@
 ---
+# Prerequisite for the apt_repository module used by the gh section below
+# (repo convention: every repo-owning role declares this itself).
+base_dependencies:
+  - software-properties-common
+
 # CLI / shell utilities
 cli_packages:
   - bat
@@ -22,18 +27,23 @@ gh_apt_repo: >-
 gh_packages:
   - gh
 
-# starship is not packaged for Ubuntu, so install the official static (musl)
-# release binary, pinned to a version with per-arch sha256 digests (both
-# verified against the release's .sha256 assets on 2026-09-23). The arch dict
-# maps Ansible's x86_64/aarch64 to the release asset names (identical);
-# anything else falls back to x86_64 deliberately (docker_apt_arch-style).
+# starship isn't packaged on Ubuntu 22.04/24.04 (Universe only from 25.04+), so
+# pin the official static (musl) release binary — one mechanism, same result on
+# all supported releases; apt would also drop the version pin. Digests verified
+# against the release's .sha256 assets. The digest map is keyed by release-asset
+# arch; anything else falls back to x86_64 deliberately (docker_apt_arch-style).
+# Not `curl https://starship.rs/install.sh | sh`: that script downloads this
+# same tarball but verifies nothing, leaks its mktemp file in /tmp, runs sudo
+# internally, and reports changed every run — the stat-gated block avoids all four.
 starship_version: 1.26.0
 starship_arch: "{{ {'x86_64': 'x86_64', 'aarch64': 'aarch64'}.get(ansible_facts['architecture'], 'x86_64') }}"
+# Digests keep the sha256:<hex> form get_url expects (algorithm:checksum).
+starship_checksums:
+  x86_64: sha256:b7c232b0e8249d8e55a40beb79c5c43a7d370f3f9408bd215deb0170daeaadf3
+  aarch64: sha256:dc30189378d2f2e287384e8a692d3f95ad1df64cf0e8c36aa9201516028aed6b
+starship_checksum: "{{ starship_checksums[starship_arch] }}"
 starship_download_url: >-
   https://github.com/starship/starship/releases/download/v{{ starship_version }}/starship-{{ starship_arch }}-unknown-linux-musl.tar.gz
-starship_checksum: >-
-  {{ {'x86_64': 'sha256:b7c232b0e8249d8e55a40beb79c5c43a7d370f3f9408bd215deb0170daeaadf3',
-      'aarch64': 'sha256:dc30189378d2f2e287384e8a692d3f95ad1df64cf0e8c36aa9201516028aed6b'}[starship_arch] }}
 starship_tarball: "/tmp/starship-{{ starship_arch }}-unknown-linux-musl.tar.gz"
 starship_install_path: /usr/local/bin/starship
 

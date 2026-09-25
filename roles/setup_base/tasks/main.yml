@@ -1,12 +1,11 @@
 ---
 - name: Install base packages
   ansible.builtin.apt:
-    name: "{{ cli_packages + python_packages }}"
+    name: "{{ base_dependencies + cli_packages + python_packages }}"
     state: present
 
-# gh is installed from GitHub's official APT repo (armored key, signed-by=).
-# The vendor docs explicitly discourage snap; the APT path keeps it consistent
-# with VS Code / Docker conventions used elsewhere in this repo.
+# gh comes from GitHub's official APT repo (armored key, signed-by=) —
+# rationale in vars/main.yml.
 - name: Ensure apt keyrings directory exists
   ansible.builtin.file:
     path: /etc/apt/keyrings
@@ -31,9 +30,8 @@
     name: "{{ gh_packages }}"
     state: present
 
-# starship has no apt package on Ubuntu; ship the official GitHub release,
-# pinned in vars to a version + verified sha256 per arch. The stat gate keeps
-# re-runs fully idempotent (no download, no change).
+# Official GitHub release binary; digest-pinning rationale in vars/main.yml.
+# The stat gate keeps re-runs fully idempotent (no download, no change).
 - name: Check whether starship is installed
   ansible.builtin.stat:
     path: "{{ starship_install_path }}"
@@ -49,10 +47,10 @@
         checksum: "{{ starship_checksum }}"
         mode: "0644"
 
-    - name: Install starship binary to /usr/local/bin
+    - name: Install starship binary
       ansible.builtin.unarchive:
         src: "{{ starship_tarball }}"
-        dest: /usr/local/bin
+        dest: "{{ starship_install_path | dirname }}"
         owner: root
         group: root
         remote_src: true
