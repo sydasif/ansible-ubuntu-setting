@@ -12,6 +12,6 @@ font_packages:
 
 jetbrains_mono_font_name: "JetBrainsMonoNerdFont-Regular.ttf"
 jetbrains_mono_download_url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/JetBrainsMono.tar.xz"
-# --- POINT 2: Added checksum variable ---
-# TODO: Replace this placeholder with the actual SHA256 hash from the v3.4.0 release notes
-jetbrains_mono_checksum: "0000000000000000000000000000000000000000000000000000000000000000"
+# SHA-256 of JetBrainsMono.tar.xz (nerd-fonts v3.4.0), taken from the release's
+# SHA-256.txt. The download task prefixes this with `sha256:`.
+jetbrains_mono_checksum: "ef552a3e638f25125c6ad4c51176a6adcdce295ab1d2ffacf0db060caf8c1582"
