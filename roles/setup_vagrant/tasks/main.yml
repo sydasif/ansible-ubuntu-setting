@@ -52,7 +52,7 @@
     filename: hashicorp
     repo: "{{ vagrant_apt_repo }}"
     state: present
-  notify: Update apt cache
+    update_cache: true
 
 # ---------------------------------------------------------------------------
 # Vagrant
@@ -150,7 +150,6 @@
     owner: libvirt-qemu
     group: kvm
     mode: "0755"
-  when: storage_libvirt_images is defined
   notify: Start libvirtd
 
 - name: Ensure default Libvirt storage pool exists
@@ -164,16 +163,13 @@
           <path>{{ storage_libvirt_images }}</path>
         </target>
       </pool>
-  when: storage_libvirt_images is defined
 
 - name: Ensure default Libvirt storage pool is active
   community.libvirt.virt_pool:
     name: default
     state: active
-  when: storage_libvirt_images is defined
 
 - name: Ensure default Libvirt storage pool autostarts
   community.libvirt.virt_pool:
     name: default
     autostart: true
-  when: storage_libvirt_images is defined

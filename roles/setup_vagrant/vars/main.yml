@@ -47,7 +47,6 @@ vagrant_libvirt_packages:
   - qemu-system-x86
   - qemu-utils
   - virt-manager
-  - virtinst
 
 # Vagrant configuration
 
