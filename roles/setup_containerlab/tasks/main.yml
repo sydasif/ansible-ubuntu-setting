@@ -9,10 +9,34 @@
   retries: 3
   delay: 5
 
+- name: Download checksums file
+  ansible.builtin.get_url:
+    url: "https://github.com/srl-labs/containerlab/releases/download/v{{ containerlab_version }}/checksums.txt"
+    dest: "/tmp/containerlab_checksums.txt"
+    mode: "0644"
+
+- name: Verify SHA256 checksum
+  ansible.builtin.command: sha256sum -c /tmp/containerlab_checksums.txt
+  args:
+    chdir: /tmp
+  register: _clab_checksum
+  changed_when: false
+
 - name: Install containerlab .deb
-  ansible.builtin.apt:
-    name: "/tmp/containerlab.deb"
-    state: present
-    allow_change_held_packages: true
-    allow_downgrade: true
-    update_cache: true
+  ansible.builtin.command: dpkg -i /tmp/containerlab.deb
+  register: _clab_install
+  changed_when: _clab_install.rc == 0
+
+- name: Clean up download artifacts
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/containerlab.deb
+    - /tmp/containerlab_checksums.txt
+
+- name: Verify containerlab installation
+  ansible.builtin.command: containerlab version
+  register: _clab_version
+  changed_when: false
+  failed_when: false
