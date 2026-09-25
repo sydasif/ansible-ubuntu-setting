@@ -1,4 +1,10 @@
 ---
+- name: Install GNOME dconf dependencies
+  ansible.builtin.apt:
+    name: "{{ gnome_dependencies }}"
+    state: present
+  become: true
+
 - name: Copy GNOME wallpaper
   ansible.builtin.copy:
     src: "default_wallpaper.jpg"
@@ -21,9 +27,9 @@
     - /etc/dconf/db/local.d
     - /etc/dconf/db/gdm.d
 
-# Ptyxis is the default terminal only on Ubuntu 25.04+/26.04; 22.04/24.04
-# ship gnome-terminal (default exec: x-terminal-emulator). Every
-# Ptyxis-specific config below is gated on the binary actually existing.
+# Ptyxis is only packaged from Ubuntu 25.10 onward (questing/resolute); 22.04,
+# 24.04 and 25.04 ship gnome-terminal (default exec: x-terminal-emulator).
+# Every Ptyxis-specific config below is gated on the binary actually existing.
 - name: Check whether Ptyxis is installed
   ansible.builtin.stat:
     path: /usr/bin/ptyxis
@@ -80,11 +86,16 @@
 # those writes (fingerprint: the value is still the one the old playbook
 # set) so a stale override does not survive; anything the user configured
 # themselves is left alone. These only fire on non-Ptyxis systems.
+# Only consumed by the stale-value cleanup below, so skip these on Ptyxis
+# systems (where they are dead weight) and never fail the role when dconf or a
+# D-Bus session is unavailable (headless target).
 - name: Get user default terminal exec
   community.general.dconf:
     key: /org/gnome/desktop/default-applications/terminal/exec
     state: read
   become: false
+  when: not ptyxis_binary.stat.exists
+  failed_when: false
   register: stale_terminal_exec
 
 - name: Get user default terminal exec-arg
@@ -92,6 +103,8 @@
     key: /org/gnome/desktop/default-applications/terminal/exec-arg
     state: read
   become: false
+  when: not ptyxis_binary.stat.exists
+  failed_when: false
   register: stale_terminal_exec_arg
 
 - name: Reset stale Ptyxis default-terminal exec when Ptyxis is absent
@@ -101,7 +114,7 @@
   become: false
   when:
     - not ptyxis_binary.stat.exists
-    - stale_terminal_exec.value == "'ptyxis'"
+    - stale_terminal_exec.value | default('') == "'ptyxis'"
 
 - name: Reset stale Ptyxis default-terminal exec-arg when Ptyxis is absent
   community.general.dconf:
@@ -110,8 +123,8 @@
   become: false
   when:
     - not ptyxis_binary.stat.exists
-    - stale_terminal_exec.value == "'ptyxis'"
-    - stale_terminal_exec_arg.value == "''"
+    - stale_terminal_exec.value | default('') == "'ptyxis'"
+    - stale_terminal_exec_arg.value | default('') == "''"
 
 - name: Deploy GDM dconf settings defaults
   ansible.builtin.copy:

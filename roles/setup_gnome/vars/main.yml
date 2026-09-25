@@ -1,0 +1,10 @@
+---
+# Requirements of the community.general.dconf module used by this role: the
+# dconf CLI, a reachable D-Bus session (dbus-send/dbus-run-session, with
+# busctl supplied by systemd) and the psutil Python library. Declared here so
+# `--tags gnome` works on a fresh host without setup_base.
+gnome_dependencies:
+  - dconf-cli
+  - dbus
+  - dbus-user-session
+  - python3-psutil
