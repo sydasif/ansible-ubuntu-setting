@@ -19,6 +19,18 @@ vagrant_apt_arch: >-
     | default('')
   }}
 
+# libvirt boots the guest with the host CPU's emulator, so an aarch64 host
+# needs qemu-system-arm — qemu-system-x86 would be the wrong emulator there.
+vagrant_qemu_package_map:
+  x86_64: qemu-system-x86
+  aarch64: qemu-system-arm
+
+vagrant_qemu_package: >-
+  {{
+    vagrant_qemu_package_map[ansible_facts['architecture']]
+    | default('')
+  }}
+
 vagrant_apt_key_url: https://apt.releases.hashicorp.com/gpg
 
 vagrant_gpg_key_path: /etc/apt/keyrings/hashicorp.asc
@@ -44,7 +56,7 @@ vagrant_libvirt_packages:
   - libvirt-daemon-system
   - python3-libvirt
   - python3-lxml
-  - qemu-system-x86
+  - "{{ vagrant_qemu_package }}"
   - qemu-utils
   - virt-manager
 
