@@ -1,8 +1,13 @@
 ---
 # Pin to the latest release at time of writing; bump when upgrading.
+# Upstream publishes amd64/arm64 assets only (verified against the v0.79.0
+# release assets), hence the architecture assert in tasks/main.yml.
 containerlab_version: "0.79.0"
 # GitHub releases serve stable assets; Fury APT is flaky (intermittent 404s).
 containerlab_arch_map:
   x86_64: amd64
   aarch64: arm64
-containerlab_github_url: "https://github.com/srl-labs/containerlab/releases/download/v{{ containerlab_version }}/containerlab_{{ containerlab_version }}_linux_{{ containerlab_arch_map[ansible_facts['architecture']] }}.deb"
+containerlab_asset_arch: "{{ containerlab_arch_map[ansible_facts['architecture']] }}"
+containerlab_release_url: "https://github.com/srl-labs/containerlab/releases/download/v{{ containerlab_version }}"
+containerlab_deb_name: "containerlab_{{ containerlab_version }}_linux_{{ containerlab_asset_arch }}.deb"
+containerlab_github_url: "{{ containerlab_release_url }}/{{ containerlab_deb_name }}"
