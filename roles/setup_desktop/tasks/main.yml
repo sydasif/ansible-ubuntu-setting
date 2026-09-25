@@ -3,4 +3,3 @@
   ansible.builtin.apt:
     name: "{{ desktop_packages }}"
     state: present
-  when: ansible_facts['distribution'] == 'Ubuntu'
