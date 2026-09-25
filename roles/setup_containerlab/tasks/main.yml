@@ -16,7 +16,7 @@
     mode: "0644"
 
 - name: Extract expected SHA256 from checksums file
-  ansible.builtin.command: >
+  ansible.builtin.shell: >
     grep "containerlab_{{ containerlab_version }}_linux_{{ containerlab_arch_map[ansible_facts['architecture']] }}.deb"
     /tmp/containerlab_checksums.txt | awk '{print $1}'
   register: _clab_expected
