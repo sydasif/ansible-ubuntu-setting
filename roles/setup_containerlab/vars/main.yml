@@ -1,8 +1,8 @@
 ---
-containerlab_dependencies:
-  - ca-certificates
-  - software-properties-common
-# Official containerlab repo (netdevops.fury.site) is unsigned, so the official
-# docs specify `trusted=yes`; there is no signing key to download or pin.
-containerlab_apt_repo: "deb [trusted=yes] https://netdevops.fury.site/apt/ /"
-containerlab_apt_conf_path: /etc/apt/apt.conf.d/99-no-translations
+# Pin to the latest release at time of writing; bump when upgrading.
+containerlab_version: "0.79.0"
+# GitHub releases serve stable assets; Fury APT is flaky (intermittent 404s).
+containerlab_arch_map:
+  x86_64: amd64
+  aarch64: arm64
+containerlab_github_url: "https://github.com/srl-labs/containerlab/releases/download/v{{ containerlab_version }}/containerlab_{{ containerlab_version }}_linux_{{ containerlab_arch_map[ansible_facts['architecture']] }}.deb"

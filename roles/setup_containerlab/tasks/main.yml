@@ -1,29 +1,18 @@
 ---
-- name: Install containerlab dependencies
-  ansible.builtin.apt:
-    name: "{{ containerlab_dependencies }}"
-    state: present
-
-# Flat repos (no dists/ layout) have no Translation-* indexes, so every
-# `apt update` logs a pair of Ign lines per probe (en_US + en). Disabling
-# translation fetches removes that noise; long descriptions fall back to
-# the one-liner already present in the Packages index.
-- name: Disable APT translation index fetches
-  ansible.builtin.copy:
-    dest: "{{ containerlab_apt_conf_path }}"
-    content: 'Acquire::Languages "none";'
-    owner: root
-    group: root
+- name: Download containerlab .deb from GitHub releases
+  ansible.builtin.get_url:
+    url: "{{ containerlab_github_url }}"
+    dest: "/tmp/containerlab.deb"
     mode: "0644"
+  register: _clab_download
+  until: _clab_download is succeeded
+  retries: 3
+  delay: 5
 
-- name: Add containerlab APT repository
-  ansible.builtin.apt_repository:
-    filename: "netdevops"
-    repo: "{{ containerlab_apt_repo }}"
-    state: present
-  notify: Update containerlab apt cache
-
-- name: Install containerlab
+- name: Install containerlab .deb
   ansible.builtin.apt:
-    name: containerlab
+    name: "/tmp/containerlab.deb"
     state: present
+    allow_change_held_packages: true
+    allow_downgrade: true
+    update_cache: true

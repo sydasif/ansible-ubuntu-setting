@@ -1,4 +1,2 @@
 ---
-- name: Update containerlab apt cache
-  ansible.builtin.apt:
-    update_cache: true
+# No apt handler needed — installing directly from a .deb.
