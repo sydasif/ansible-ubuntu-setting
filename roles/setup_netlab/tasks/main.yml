@@ -1,4 +1,10 @@
 ---
+- name: Install Graphviz for netlab topology graphs
+  ansible.builtin.apt:
+    name: graphviz
+    state: present
+  become: true
+
 - name: Install networklab via pipx
   community.general.pipx:
     name: "{{ netlab_pipx_package }}"
