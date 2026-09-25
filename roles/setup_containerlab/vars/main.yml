@@ -5,3 +5,4 @@ containerlab_dependencies:
 # Official containerlab repo (netdevops.fury.site) is unsigned, so the official
 # docs specify `trusted=yes`; there is no signing key to download or pin.
 containerlab_apt_repo: "deb [trusted=yes] https://netdevops.fury.site/apt/ /"
+containerlab_apt_conf_path: /etc/apt/apt.conf.d/99-no-translations

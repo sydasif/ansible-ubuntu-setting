@@ -34,19 +34,19 @@ ansible-playbook local.yml --syntax-check
 
 ## Role Structure (new)
 
-| Role | Tag | Scope |
-|------|-----|-------|
-| `setup_base` | `base` | CLI utils + Python system packages (headless-compatible) |
-| `setup_pipx` | `pipx` | pipx-managed tools (uv, ruff) — explicit PATH, no shell sourcing |
-| `setup_editors` | `editors` | VS Code (APT) + Neovim (snap) |
-| `setup_desktop` | `desktop` | GUI packages + snaps (desktop-only) |
-| `setup_dotfiles` | `dotfiles` | Dotfiles symlinks |
-| `setup_fonts` | `fonts` | JetBrainsMono Nerd Font |
-| `setup_docker` | `docker` | Docker Engine + config |
-| `setup_containerlab` | `containerlab` | Containerlab |
-| `setup_vagrant` | `vagrant` | Vagrant + libvirt/KVM (all virtualization packages merged) |
-| `setup_gnome` | `gnome` | GNOME dconf preferences |
-| `setup_netlab` | `netlab` | NetworkLab CLI (requires `setup_pipx` for the user pipx install) |
+| Role                 | Tag            | Scope                                                            |
+| -------------------- | -------------- | ---------------------------------------------------------------- |
+| `setup_base`         | `base`         | CLI utils + Python system packages (headless-compatible)         |
+| `setup_pipx`         | `pipx`         | pipx-managed tools (uv, ruff) — explicit PATH, no shell sourcing |
+| `setup_editors`      | `editors`      | VS Code (APT) + Neovim (snap)                                    |
+| `setup_desktop`      | `desktop`      | GUI packages + snaps (desktop-only)                              |
+| `setup_dotfiles`     | `dotfiles`     | Dotfiles symlinks                                                |
+| `setup_fonts`        | `fonts`        | JetBrainsMono Nerd Font                                          |
+| `setup_docker`       | `docker`       | Docker Engine + config                                           |
+| `setup_containerlab` | `containerlab` | Containerlab                                                     |
+| `setup_vagrant`      | `vagrant`      | Vagrant + libvirt/KVM (all virtualization packages merged)       |
+| `setup_gnome`        | `gnome`        | GNOME dconf preferences                                          |
+| `setup_netlab`       | `netlab`       | NetworkLab CLI (requires `setup_pipx` for the user pipx install) |
 
 ## Key Conventions
 
@@ -83,4 +83,5 @@ All repo-owning roles follow the same pattern (aligned with vendor docs for Dock
 
 - **Ubuntu 26 + sudo-rs:** Ansible's `become` can hang if the system uses `sudo-rs`. Workaround: `sudo update-alternatives --set sudo /usr/bin/sudo.ws` (documented in README).
 - **Dotfiles clone** pins `update: no` for idempotent convergence — this is intentional, not `latest[git]` debt.
+- **Containerlab repo `Ign` lines in `apt update` are expected:** the netdevops.fury.site repo is flat (no `dists/` layout), so apt always logs a few `Ign … InRelease/Release` probes. Translation-index probes are silenced by `Acquire::Languages "none"` (`roles/setup_containerlab` drops `/etc/apt/apt.conf.d/99-no-translations`); the remaining 2-3 `Ign` lines are harmless.
 - **`ansible -e 'key=value with spaces'` truncates at the first space** — pass spaced values as JSON (`-e '{"key": "value with spaces"}'`). Not an issue for vars set in `group_vars`.

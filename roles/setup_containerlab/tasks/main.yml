@@ -4,6 +4,18 @@
     name: "{{ containerlab_dependencies }}"
     state: present
 
+# Flat repos (no dists/ layout) have no Translation-* indexes, so every
+# `apt update` logs a pair of Ign lines per probe (en_US + en). Disabling
+# translation fetches removes that noise; long descriptions fall back to
+# the one-liner already present in the Packages index.
+- name: Disable APT translation index fetches
+  ansible.builtin.copy:
+    dest: "{{ containerlab_apt_conf_path }}"
+    content: 'Acquire::Languages "none";'
+    owner: root
+    group: root
+    mode: "0644"
+
 - name: Add containerlab APT repository
   ansible.builtin.apt_repository:
     filename: "netdevops"
