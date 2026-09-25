@@ -15,12 +15,23 @@
     dest: "/tmp/containerlab_checksums.txt"
     mode: "0644"
 
-- name: Extract expected SHA256 from checksums file
-  ansible.builtin.shell: >
-    grep "containerlab_{{ containerlab_version }}_linux_{{ containerlab_arch_map[ansible_facts['architecture']] }}.deb"
-    /tmp/containerlab_checksums.txt | awk '{print $1}'
-  register: _clab_expected
+- name: Read checksums file
+  ansible.builtin.command: cat /tmp/containerlab_checksums.txt
+  register: _clab_checksums_content
   changed_when: false
+
+- name: Extract expected SHA256
+  ansible.builtin.set_fact:
+    _clab_expected_hash: >-
+      {{
+        _clab_checksums_content.stdout |
+        regex_search(
+          '([a-f0-9]{64})\s+containerlab_' ~ containerlab_version ~
+          '_linux_' ~ containerlab_arch_map[ansible_facts['architecture']] ~
+          '\.deb', '\1'
+        ) |
+        first
+      }}
 
 - name: Compute actual SHA256 of downloaded deb
   ansible.builtin.command: sha256sum /tmp/containerlab.deb
@@ -29,16 +40,17 @@
 
 - name: Verify SHA256 checksum matches
   ansible.builtin.assert:
-    that: _clab_expected.stdout.strip() == _clab_actual.stdout.split()[0]
+    that: _clab_expected_hash == _clab_actual.stdout.split()[0]
     fail_msg: "SHA256 mismatch for containerlab {{ containerlab_version }}"
 
 - name: Install containerlab .deb
-  ansible.builtin.command: dpkg -i /tmp/containerlab.deb
+  ansible.builtin.apt:
+    deb: /tmp/containerlab.deb
+    state: present
   register: _clab_install
-  until: _clab_install.rc == 0
+  until: _clab_install is succeeded
   retries: 3
   delay: 5
-  changed_when: _clab_install.rc == 0
 
 - name: Verify containerlab installation
   ansible.builtin.command: containerlab version

@@ -21,15 +21,34 @@
   ansible.builtin.set_fact:
     netlab_injected_present: "{{ ((netlab_pipx_info.application | first | default({})).injected | default({})).keys() | list }}"
 
-- name: Inject networklab pinned dependencies
+- name: Calculate missing injected packages
+  vars:
+    _netlab_normalized: >-
+      {{
+        netlab_injected_packages
+        | map('regex_replace', '^([^<>=!~]+).*', '\\1')
+        | map('replace', '_', '-')
+        | map('replace', '.', '-')
+        | list
+      }}
+    _netlab_spec_by_name: "{{ dict(_netlab_normalized | zip(netlab_injected_packages)) }}"
+  ansible.builtin.set_fact:
+    _netlab_missing_packages: >-
+      {{
+        _netlab_normalized
+        | reject('in', netlab_injected_present)
+        | map('extract', _netlab_spec_by_name)
+        | list
+      }}
+
+- name: Inject networklab pinned dependencies in batch
   community.general.pipx:
     name: "{{ netlab_pipx_package }}"
     state: inject
-    inject_packages: ["{{ item }}"]
+    inject_packages: "{{ _netlab_missing_packages }}"
     executable: "{{ netlab_pipx_executable }}"
   become: false
-  loop: "{{ netlab_injected_packages }}"
-  when: item | regex_replace('^([^<>=!~]+).*', '\\1') | replace('_', '-') | replace('.', '-') not in netlab_injected_present
+  when: _netlab_missing_packages | length > 0
   environment: "{{ netlab_pipx_environment }}"
 
 - name: Verify networklab installation

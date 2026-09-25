@@ -17,10 +17,18 @@
     path: "{{ fonts_base_dir }}/{{ jetbrains_mono_font_name }}"
   register: jetbrains_mono_stat
 
-- name: Download JetBrainsMono
+- name: Download JetBrainsMono tarball
+  when: not jetbrains_mono_stat.stat.exists
+  ansible.builtin.get_url:
+    url: "{{ jetbrains_mono_download_url }}"
+    dest: "/tmp/JetBrainsMono.tar.xz"
+    checksum: "sha256:{{ jetbrains_mono_checksum }}"
+    mode: "0644"
+
+- name: Extract JetBrainsMono
   when: not jetbrains_mono_stat.stat.exists
   ansible.builtin.unarchive:
-    src: "{{ jetbrains_mono_download_url }}"
+    src: "/tmp/JetBrainsMono.tar.xz"
     dest: "{{ fonts_base_dir }}/"
     remote_src: yes
     owner: "{{ ansible_user }}"

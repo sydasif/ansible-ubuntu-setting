@@ -55,13 +55,26 @@
     group: root
     mode: "0710"
 
-- name: Configure Docker data-root
+- name: Check if daemon.json exists
+  ansible.builtin.stat:
+    path: "{{ docker_daemon_json_path }}"
+  register: _daemon_json_stat
+
+- name: Read existing daemon.json
+  ansible.builtin.slurp:
+    src: "{{ docker_daemon_json_path }}"
+  register: _daemon_json_raw
+  when: _daemon_json_stat.stat.exists
+
+- name: Merge and write daemon.json
   ansible.builtin.copy:
+    content: >-
+      {{
+        (_daemon_json_raw.content | default('e30=') | b64decode | from_json)
+        | combine({'data-root': docker_data_root})
+        | to_nice_json
+      }}
     dest: "{{ docker_daemon_json_path }}"
-    content: |
-      {
-        "data-root": "{{ docker_data_root }}"
-      }
     owner: root
     group: root
     mode: "0644"
