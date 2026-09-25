@@ -35,15 +35,10 @@
 - name: Install containerlab .deb
   ansible.builtin.command: dpkg -i /tmp/containerlab.deb
   register: _clab_install
+  until: _clab_install.rc == 0
+  retries: 3
+  delay: 5
   changed_when: _clab_install.rc == 0
-
-- name: Clean up download artifacts
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: absent
-  loop:
-    - /tmp/containerlab.deb
-    - /tmp/containerlab_checksums.txt
 
 - name: Verify containerlab installation
   ansible.builtin.command: containerlab version
