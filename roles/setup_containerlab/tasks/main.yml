@@ -10,16 +10,25 @@
       containerlab publishes amd64 (x86_64) and arm64 (aarch64) assets only.
     quiet: true
 
-# The download only happens when the pinned version is not the installed one,
-# which keeps re-runs offline and makes the /tmp cleanup below safe.
+# The download only happens when the pinned version is not installed, which
+# keeps re-runs offline and makes the /tmp cleanup below safe. The binary check
+# covers a package that is registered but broken or partly removed: dpkg would
+# still report the pinned version, so the version test alone would skip repair.
 - name: Check installed containerlab version
   ansible.builtin.command: "dpkg-query -W -f='${Version}' containerlab"
   register: _clab_installed
   changed_when: false
   failed_when: false
 
+- name: Check whether the containerlab binary exists
+  ansible.builtin.stat:
+    path: /usr/bin/containerlab
+  register: _clab_binary
+
 - name: Install containerlab from GitHub releases
-  when: containerlab_version not in (_clab_installed.stdout | default(''))
+  when: >-
+    containerlab_version not in (_clab_installed.stdout | default('')) or
+    not _clab_binary.stat.exists
   block:
     - name: Download containerlab .deb from GitHub releases
       ansible.builtin.get_url:
