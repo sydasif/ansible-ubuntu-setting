@@ -8,6 +8,9 @@ vagrant_prerequisites:
   - ca-certificates
   - curl
   - gnupg
+  # apt_repository module requirement — needed before the HashiCorp repo
+  # can be added. Without it, --tags vagrant fails on a fresh host.
+  - software-properties-common
 
 vagrant_apt_arch_map:
   x86_64: amd64
