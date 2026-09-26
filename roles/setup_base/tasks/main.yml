@@ -4,8 +4,15 @@
     name: "{{ dependencies + cli_packages + python_packages }}"
     state: present
 
+# -y is required: the installer prompts on /dev/tty, which Ansible's shell
+# module cannot provide, so the read fails and the task exits 1. /bin/bash is
+# the executable so `set -o pipefail` works — dash rejects that option, and
+# pipefail is what makes a curl failure fail the task instead of being
+# swallowed by the pipe.
 - name: Install starship via official script
-  ansible.builtin.shell: curl -sS https://starship.rs/install.sh | sh
+  ansible.builtin.shell: |-
+    set -o pipefail
+    curl -sSfL https://starship.rs/install.sh | sh -s -- -y
   args:
     creates: /usr/local/bin/starship
-  become: false
+    executable: /bin/bash

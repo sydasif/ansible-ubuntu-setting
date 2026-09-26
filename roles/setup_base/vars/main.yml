@@ -1,6 +1,9 @@
 ---
+# Prerequisite for the starship installer in tasks/main.yml, which curls the
+# upstream script. editors/docker/vagrant declare their own copy.
 dependencies:
   - software-properties-common
+  - curl
 
 cli_packages:
   - bat
