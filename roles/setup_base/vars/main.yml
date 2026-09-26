@@ -11,6 +11,7 @@ cli_packages:
   - tree
   - lsd
   - fzf
+  - git
   - gh
 
 python_packages:
