@@ -4,7 +4,6 @@
     name: "{{ dependencies + cli_packages + python_packages }}"
     state: present
 
-# Install starship using the official install script - becomes: false for user-owned task
 - name: Install starship via official script
   ansible.builtin.shell: curl -sS https://starship.rs/install.sh | sh
   args:
