@@ -1,61 +1,12 @@
 ---
-- name: Install base packages
+- name: Install packages
   ansible.builtin.apt:
-    name: "{{ base_dependencies + cli_packages + python_packages }}"
+    name: "{{ dependencies + cli_packages + python_packages }}"
     state: present
 
-# gh comes from GitHub's official APT repo (armored key, signed-by=) —
-# rationale in vars/main.yml.
-- name: Ensure apt keyrings directory exists
-  ansible.builtin.file:
-    path: /etc/apt/keyrings
-    state: directory
-    mode: "0755"
-
-- name: Download GitHub CLI GPG key
-  ansible.builtin.get_url:
-    url: "{{ gh_apt_key_url }}"
-    dest: "{{ gh_apt_key_path }}"
-    mode: "0644"
-
-- name: Add GitHub CLI APT repository
-  ansible.builtin.apt_repository:
-    filename: github-cli
-    repo: "{{ gh_apt_repo }}"
-    state: present
-    update_cache: true
-
-- name: Install GitHub CLI
-  ansible.builtin.apt:
-    name: "{{ gh_packages }}"
-    state: present
-
-# Official GitHub release binary; digest-pinning rationale in vars/main.yml.
-# The stat gate keeps re-runs fully idempotent (no download, no change).
-- name: Check whether starship is installed
-  ansible.builtin.stat:
-    path: "{{ starship_install_path }}"
-  register: starship_binary
-
-- name: Install starship from the official GitHub release
-  when: not starship_binary.stat.exists
-  block:
-    - name: Download starship release tarball
-      ansible.builtin.get_url:
-        url: "{{ starship_download_url }}"
-        dest: "{{ starship_tarball }}"
-        checksum: "{{ starship_checksum }}"
-        mode: "0644"
-
-    - name: Install starship binary
-      ansible.builtin.unarchive:
-        src: "{{ starship_tarball }}"
-        dest: "{{ starship_install_path | dirname }}"
-        owner: root
-        group: root
-        remote_src: true
-
-    - name: Remove starship release tarball
-      ansible.builtin.file:
-        path: "{{ starship_tarball }}"
-        state: absent
+# Install starship using the official install script - becomes: false for user-owned task
+- name: Install starship via official script
+  ansible.builtin.shell: curl -sS https://starship.rs/install.sh | sh
+  args:
+    creates: /usr/local/bin/starship
+  become: false
