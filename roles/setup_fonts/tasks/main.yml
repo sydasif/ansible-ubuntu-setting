@@ -36,8 +36,7 @@
         group: "{{ ansible_user }}"
       notify: Refresh font cache
 
-    # Cleanup mirrors setup_base's starship block: the whole block is gated on
-    # the font being absent, so a re-run never re-downloads.
+    # Gate on font absence so a re-run never re-downloads.
     - name: Remove JetBrainsMono tarball
       ansible.builtin.file:
         path: "/tmp/JetBrainsMono.tar.xz"

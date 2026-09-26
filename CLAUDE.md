@@ -25,7 +25,7 @@ ansible-playbook local.yml --syntax-check
 
 - **Entry point:** `local.yml` — single play, `become: true`, hosts `all` (resolved by `scripts/inventory.py` to the local machine as its distro group, e.g. `Ubuntu`)
 - **Roles** under `roles/` — each is self-contained with `tasks/main.yml`, `vars/main.yml`, and optional `handlers/`
-- **Shared tasks:** Each role that requires an APT repository (base for gh, editors for VS Code, docker, vagrant, containerlab) handles its own keyring download and repository setup, following the aligned convention in "APT repository setup" below.
+- **Shared tasks:** Each role that requires an APT repository (editors for VS Code, docker, vagrant) handles its own keyring download and repository setup, following the aligned convention in "APT repository setup" below. base no longer owns an APT repo — `gh` comes from the Ubuntu archive, and containerlab uses the official installer script.
 - **group_vars:** two files serve different purposes:
   - `group_vars/Ubuntu.yml` — **live config** (the file Ansible actually reads; `ansible_user: zulu`, `storage_root: /home/storage`)
   - `group_vars/example.yml` — documented template for others to copy
@@ -34,19 +34,19 @@ ansible-playbook local.yml --syntax-check
 
 ## Role Structure (new)
 
-| Role                 | Tag            | Scope                                                                               |
-| -------------------- | -------------- | ----------------------------------------------------------------------------------- |
-| `setup_base`         | `base`         | CLI utils (incl. gh from GitHub APT) + Python system packages (headless-compatible) |
-| `setup_pipx`         | `pipx`         | pipx-managed tools (uv, ruff) — explicit PATH, no shell sourcing                    |
-| `setup_editors`      | `editors`      | VS Code (APT) + Neovim (snap)                                                       |
-| `setup_desktop`      | `desktop`      | GNOME GUI tools (gnome-tweaks, gnome-shell-extensions) — desktop-only               |
-| `setup_dotfiles`     | `dotfiles`     | Dotfiles symlinks                                                                   |
-| `setup_fonts`        | `fonts`        | JetBrainsMono Nerd Font                                                             |
-| `setup_docker`       | `docker`       | Docker Engine + config                                                              |
-| `setup_containerlab` | `containerlab` | Containerlab                                                                        |
-| `setup_vagrant`      | `vagrant`      | Vagrant + libvirt/KVM (all virtualization packages merged)                          |
-| `setup_gnome`        | `gnome`        | GNOME dconf preferences                                                             |
-| `setup_netlab`       | `netlab`       | NetworkLab CLI (requires `setup_pipx` for the user pipx install)                    |
+| Role                 | Tag            | Scope                                                                                   |
+| -------------------- | -------------- | --------------------------------------------------------------------------------------- |
+| `setup_base`         | `base`         | CLI utils (incl. gh from Ubuntu archive) + Python system packages (headless-compatible) |
+| `setup_pipx`         | `pipx`         | pipx-managed tools (uv, ruff) — explicit PATH, no shell sourcing                        |
+| `setup_editors`      | `editors`      | VS Code (APT) + Neovim (snap)                                                           |
+| `setup_desktop`      | `desktop`      | GNOME GUI tools (gnome-tweaks, gnome-shell-extensions) — desktop-only                   |
+| `setup_dotfiles`     | `dotfiles`     | Dotfiles symlinks                                                                       |
+| `setup_fonts`        | `fonts`        | JetBrainsMono Nerd Font                                                                 |
+| `setup_docker`       | `docker`       | Docker Engine + config                                                                  |
+| `setup_containerlab` | `containerlab` | Containerlab                                                                            |
+| `setup_vagrant`      | `vagrant`      | Vagrant + libvirt/KVM (all virtualization packages merged)                              |
+| `setup_gnome`        | `gnome`        | GNOME dconf preferences                                                                 |
+| `setup_netlab`       | `netlab`       | NetworkLab CLI (requires `setup_pipx` for the user pipx install)                        |
 
 ## Key Conventions
 
@@ -68,7 +68,7 @@ Always access facts via `ansible_facts['...']` (e.g. `ansible_facts['distributio
 
 ### `# noqa` on installer tasks
 
-Tasks that run `curl | sh` or similar get inline `# noqa` annotations with a short rationale — these are conditional fallback installs, not security issues to fix.
+Installer tasks that run `curl | sh` or similar are allowed — see `setup_base` (starship) and `setup_containerlab`. No inline annotations are needed; ansible-lint handles them at the profile level.
 
 ### APT repository setup (aligned convention)
 
@@ -77,12 +77,12 @@ All repo-owning roles follow the same pattern (aligned with vendor docs for Dock
 - **Armored keys, no dearmor:** `get_url` downloads the `.asc` key and `signed-by=` points at the `.asc` directly. Never de-armor to `.gpg` (modern apt accepts armored keys).
 - **Dynamic arch:** the repo line uses `{tool}_apt_arch` — a dict mapping `x86_64`→`amd64`, `aarch64`→`arm64`, with an `amd64` fallback. Never hardcode `arch=amd64`.
 - **Prerequisites:** every repo role declares `software-properties-common` (the `apt_repository` module's requirement) in its own deps list.
-- **Containerlab is the exception:** its repo is unsigned, so `trusted=yes` is the official spec (commented in vars) — there is no key to download or pin.
+- **containerlab** is not an APT-repo role — it uses the official upstream installer script, so there is no repo, keyring, or pin to maintain.
 
 ## Gotchas
 
 - **Ubuntu 26 + sudo-rs:** Ansible's `become` can hang if the system uses `sudo-rs`. Workaround: `sudo update-alternatives --set sudo /usr/bin/sudo.ws` (documented in README).
 - **Dotfiles clone** pins `update: no` for idempotent convergence — this is intentional, not `latest[git]` debt.
-- **Containerlab installs from GitHub releases** (`roles/setup_containerlab` downloads the `.deb` directly from `github.com/srl-labs/containerlab/releases`). Fury APT (netdevops.fury.site) is skipped due to intermittent 404s. Upstream publishes amd64/arm64 assets only, so the role asserts the architecture up front. Bump `containerlab_version` in `roles/setup_containerlab/vars/main.yml` to upgrade — the install block is gated on `dpkg-query` not already reporting that version **or** `/usr/bin/containerlab` being absent, so re-runs skip the download while a removed/broken binary is still repaired; when it does run it verifies the release `checksums.txt` and removes the `/tmp` artifacts afterwards.
+- **Containerlab** uses the official upstream installer (`get.containerlab.dev`); no `.deb`, no checksums, no version pin — `latest` is installed and `creates: /usr/bin/clab` gates future runs.
 - **`ansible -e 'key=value with spaces'` truncates at the first space** — pass spaced values as JSON (`-e '{"key": "value with spaces"}'`). Not an issue for vars set in `group_vars`.
 - **setup_netlab meta dependency** — `roles/setup_netlab/meta/main.yml` declares `dependencies: [setup_pipx]`. This makes pipx tasks appear twice in a full run (once from `local.yml`'s explicit role list, once via netlab's meta dependency). This is intentional: without it, `--tags netlab` fails on a fresh system because pipx isn't installed yet. Do not remove it.
