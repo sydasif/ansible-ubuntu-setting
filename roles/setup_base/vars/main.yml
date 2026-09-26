@@ -1,9 +1,10 @@
 ---
-# Prerequisite for the starship installer in tasks/main.yml, which curls the
-# upstream script. editors/docker/vagrant declare their own copy.
+# Prerequisites for downstream roles: setup_dotfiles clones a git repo, and
+# the starship installer in setup_base curls the upstream script.
 dependencies:
   - software-properties-common
   - curl
+  - git
 
 cli_packages:
   - bat
@@ -11,7 +12,6 @@ cli_packages:
   - tree
   - lsd
   - fzf
-  - git
   - gh
 
 python_packages:
