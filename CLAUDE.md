@@ -1,88 +1,55 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## What This Repo Is
-
-Single-machine Ansible playbook (`local.yml`) that provisions an Ubuntu desktop — packages, dotfiles, Docker, Containerlab, Vagrant/libvirt, GNOME/dconf. Runs against localhost (`--ask-become-pass`), dynamic inventory via `scripts/inventory.py`.
+Guidance for Claude Code working in this repository. This file records **decisions and gotchas** — mechanism detail lives in the code (each role's `tasks/main.yml` and `vars/main.yml`). If the two disagree, the code is right and this file is stale.
 
 ## Commands
 
 ```bash
-# Full provision (prompts for sudo password)
-ansible-playbook local.yml --ask-become-pass
-
-# Single role by tag
-ansible-playbook local.yml --tags docker --ask-become-pass
-
-# Lint / validate
-yamllint ./
-ansible-lint
-ansible-playbook local.yml --syntax-check
+ansible-playbook local.yml --ask-become-pass                  # full provision
+ansible-playbook local.yml --tags docker --ask-become-pass   # single role
+yamllint ./ && ansible-lint && ansible-playbook local.yml --syntax-check
 ```
 
-## Architecture
+## Conventions
 
-- **Entry point:** `local.yml` — single play, `become: true`, hosts `all` (resolved by `scripts/inventory.py` to the local machine as its distro group, e.g. `Ubuntu`)
-- **Roles** under `roles/` — each is self-contained with `tasks/main.yml`, `vars/main.yml`, and optional `handlers/`
-- **Shared tasks:** Each role that requires an APT repository (editors for VS Code, docker, vagrant) handles its own keyring download and repository setup, following the aligned convention in "APT repository setup" below. base no longer owns an APT repo — `gh` comes from the Ubuntu archive, and containerlab uses the official installer script.
-- **group_vars:** two files serve different purposes:
-  - `group_vars/Ubuntu.yml` — **live config** (the file Ansible actually reads; `ansible_user: zulu`, `storage_root: /home/storage`)
-  - `group_vars/example.yml` — documented template for others to copy
-  - **Trap:** new vars must be added to **both** files, or the live run fails with undefined variable errors
-- **`storage_root` layout** (`group_vars`, currently `/home/storage` on the `/home` partition) — data root for Docker data-root, Vagrant home, libvirt images. Both consumer roles (`setup_docker`, `setup_vagrant`) create it as 0755 root:root first, so libvirt-qemu can traverse to its image paths.
+### `become: false` only for user-owned tasks
 
-## Role Structure (new)
+The play-level default is `become: true`. Opt out only for tasks that must run as the connecting user (dotfiles symlinks, uv/pipx installs, vagrant plugin, font cache). Do not use `become_user` without `become: true` — silent no-op, runs as root. System-path writes (`/usr/local/bin`, `/etc`) must stay `true`.
 
-| Role                 | Tag            | Scope                                                                                   |
-| -------------------- | -------------- | --------------------------------------------------------------------------------------- |
-| `setup_base`         | `base`         | CLI utils (incl. gh from Ubuntu archive) + Python system packages (headless-compatible) |
-| `setup_pipx`         | `pipx`         | pipx-managed tools (uv, ruff) — explicit PATH, no shell sourcing                        |
-| `setup_editors`      | `editors`      | VS Code (APT) + Neovim (snap)                                                           |
-| `setup_desktop`      | `desktop`      | GNOME GUI tools (gnome-tweaks, gnome-shell-extensions) — desktop-only                   |
-| `setup_dotfiles`     | `dotfiles`     | Dotfiles symlinks                                                                       |
-| `setup_fonts`        | `fonts`        | JetBrainsMono Nerd Font                                                                 |
-| `setup_docker`       | `docker`       | Docker Engine + config                                                                  |
-| `setup_containerlab` | `containerlab` | Containerlab                                                                            |
-| `setup_vagrant`      | `vagrant`      | Vagrant + libvirt/KVM (all virtualization packages merged)                              |
-| `setup_gnome`        | `gnome`        | GNOME dconf preferences                                                                 |
-| `setup_netlab`       | `netlab`       | NetworkLab CLI (requires `setup_pipx` for the user pipx install)                        |
+### Tool prefix, not role prefix
 
-## Key Conventions
+Vars use short prefixes (`docker_`, `vagrant_`, `vscode_`), not `setup_docker_`. Codified as an `.ansible-lint` skip (`var-naming[no-role-prefix]`) — don't rename to satisfy the linter.
 
-### `become: false` for user-owned tasks
+### `ansible_facts['...']`, never top-level `ansible_*`
 
-The play-level default is `become: true`. Tasks that must run as the connecting user (dotfiles symlinks, uv install, vagrant plugin, font cache) opt out with `become: false`. Do not use `become_user` without `become: true` — it's a silent no-op and tasks will run as root.
-
-### Variable naming: tool prefix, not role prefix
-
-Roles use short prefixes (`docker_`, `vagrant_`, `vscode_`) instead of `setup_docker_`. This is codified as a skip in `.ansible-lint` (`var-naming[no-role-prefix]`) — don't rename to satisfy the linter.
-
-### `ansible_facts['...']` access, never top-level `ansible_*` vars
-
-Always access facts via `ansible_facts['...']` (e.g. `ansible_facts['distribution_release']`, `ansible_facts['architecture']`), never the top-level `ansible_*` vars (`ansible_distribution_release`, `ansible_architecture`). Top-level injection is deprecated (`INJECT_FACTS_AS_VARS`) and will be removed in ansible-core 2.24 — the live run emits a deprecation warning otherwise. Also avoid `ansible_facts['lsb']['codename']`: the `lsb` dict is not reliably populated by fact gathering.
+Always `ansible_facts['architecture']`, never `ansible_architecture`. Top-level injection is deprecated (`INJECT_FACTS_AS_VARS`), removed in ansible-core 2.24, and warns now. Also avoid `ansible_facts['lsb']['codename']` — the `lsb` dict isn't reliably populated.
 
 ### Lint rules are intentional
 
-`.ansible-lint` and `.yamllint` encode repo conventions (short var names, `yes/no` booleans, 160-char lines, flow-mapping braces). When a linter flags something, judge whether it's a convention skip or genuine debt before changing code.
+`.ansible-lint` and `.yamllint` encode conventions. When one flags something, decide whether it's a convention skip or genuine debt before changing code.
 
-### `# noqa` on installer tasks
+### `set -o pipefail` needs `executable: /bin/bash`
 
-Installer tasks that run `curl | sh` or similar are allowed — see `setup_base` (starship) and `setup_containerlab`. No inline annotations are needed; ansible-lint handles them at the profile level.
+Ubuntu's `/bin/sh` is dash, which rejects `set -o pipefail`. A `shell` task with pipefail in the body but no `executable` **passes ansible-lint and then fails at runtime** with `Illegal option -o pipefail`. See `roles/setup_base/tasks/main.yml`.
 
-### APT repository setup (aligned convention)
+### APT repositories
 
-All repo-owning roles follow the same pattern (aligned with vendor docs for Docker, VS Code, HashiCorp):
+`setup_editors` (VS Code), `setup_docker`, `setup_vagrant` own a repo; each handles its own keyring. Aligned with vendor docs:
 
-- **Armored keys, no dearmor:** `get_url` downloads the `.asc` key and `signed-by=` points at the `.asc` directly. Never de-armor to `.gpg` (modern apt accepts armored keys).
-- **Dynamic arch:** the repo line uses `{tool}_apt_arch` — a dict mapping `x86_64`→`amd64`, `aarch64`→`arm64`, with an `amd64` fallback. Never hardcode `arch=amd64`.
-- **Prerequisites:** every repo role declares `software-properties-common` (the `apt_repository` module's requirement) in its own deps list.
-- **containerlab** is not an APT-repo role — it uses the official upstream installer script, so there is no repo, keyring, or pin to maintain.
+- **Armored keys, no dearmor:** `get_url` fetches the `.asc`, `signed-by=` points at it. Never de-armor to `.gpg`.
+- **Dynamic arch:** use `{tool}_apt_arch` — dict mapping `x86_64`→`amd64`, `aarch64`→`arm64`, `amd64` fallback. Never hardcode `arch=amd64`.
+- **Prerequisites:** each repo role declares `software-properties-common` in its own deps list.
+
+`setup_base` and `setup_containerlab` do **not** own a repo — `gh` comes from the Ubuntu archive, containerlab uses `get.containerlab.dev`.
+
+### `group_vars` — add to both files
+
+`Ubuntu.yml` is live config; `example.yml` is the template. **New vars must go in both** or the live run fails on undefined variables.
 
 ## Gotchas
 
-- **Ubuntu 26 + sudo-rs:** Ansible's `become` can hang if the system uses `sudo-rs`. Workaround: `sudo update-alternatives --set sudo /usr/bin/sudo.ws` (documented in README).
-- **Dotfiles clone** pins `update: no` for idempotent convergence — this is intentional, not `latest[git]` debt.
-- **Containerlab** uses the official upstream installer (`get.containerlab.dev`); no `.deb`, no checksums, no version pin — `latest` is installed and `creates: /usr/bin/clab` gates future runs.
-- **`ansible -e 'key=value with spaces'` truncates at the first space** — pass spaced values as JSON (`-e '{"key": "value with spaces"}'`). Not an issue for vars set in `group_vars`.
-- **setup_netlab meta dependency** — `roles/setup_netlab/meta/main.yml` declares `dependencies: [setup_pipx]`. This makes pipx tasks appear twice in a full run (once from `local.yml`'s explicit role list, once via netlab's meta dependency). This is intentional: without it, `--tags netlab` fails on a fresh system because pipx isn't installed yet. Do not remove it.
+- **Ubuntu 26 + sudo-rs:** `become` can hang. Fix: `sudo update-alternatives --set sudo /usr/bin/sudo.ws`.
+- **Dotfiles clone** pins `update: no` for idempotency — intentional, not `latest[git]` debt. Don't "fix" it.
+- **setup_netlab meta dependency** — `meta/main.yml` declares `dependencies: [setup_pipx]`, so pipx tasks run twice in a full pass. Intentional: without it `--tags netlab` fails on a fresh host. **Do not remove it.**
+- **`ansible -e 'key=value with spaces'` truncates at the first space.** Pass JSON: `-e '{"key": "value with spaces"}'`. Only affects CLI extras.
+- **Installer scripts are unverified.** Starship and containerlab install via `curl | sh` with no checksum (upstream default). Accepted tradeoff — don't assume they're pinned.
