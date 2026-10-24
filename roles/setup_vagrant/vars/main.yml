@@ -48,6 +48,7 @@ vagrant_apt_repo: >-
 
 vagrant_packages:
   - vagrant
+  - packer
 
 # KVM / Libvirt
 
