@@ -7,3 +7,4 @@
 pipx_packages:
   - uv
   - ruff
+  - yt-dlp
