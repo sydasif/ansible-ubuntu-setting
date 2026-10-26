@@ -1,0 +1,19 @@
+[Desktop Entry]
+X-SnapInstanceName=ghostty
+Version=1.0
+Name=Ghostty
+Comment=A terminal emulator
+X-SnapAppName=ghostty
+Exec=/snap/bin/ghostty --gtk-single-instance=true
+Icon=/snap/ghostty/current/share/icons/hicolor/512x512/apps/com.mitchellh.ghostty.png
+Categories=System;TerminalEmulator;
+Keywords=terminal;tty;pty;
+StartupNotify=true
+StartupWMClass=com.mitchellh.ghostty
+Terminal=false
+Actions=new-window;
+
+[Desktop Action new-window]
+Name=New Window
+X-SnapAppName=ghostty
+Exec=/snap/bin/ghostty --gtk-single-instance=true

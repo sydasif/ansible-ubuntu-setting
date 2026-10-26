@@ -13,6 +13,12 @@ cli_packages:
   - lsd
   - fzf
   - gh
+  - ffmpeg
+  - sshpass
+  - ibus-table-cangjie3
+  - ibus-table-cangjie5
+  - ibus-table-cangjie-big
+  - libchewing3
 
 python_packages:
   - python3-venv

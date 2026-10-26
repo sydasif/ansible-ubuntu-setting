@@ -8,3 +8,4 @@ gnome_dependencies:
   - dbus
   - dbus-user-session
   - python3-psutil
+  - xdg-terminal-exec

@@ -48,6 +48,7 @@ vagrant_apt_repo: >-
 
 vagrant_packages:
   - vagrant
+  - packer
 
 # KVM / Libvirt
 
@@ -57,6 +58,8 @@ vagrant_libvirt_packages:
   - libguestfs-tools
   - libvirt-clients
   - libvirt-daemon-system
+  - libvirt-dev
+  - openvswitch-switch
   - python3-libvirt
   - python3-lxml
   - "{{ vagrant_qemu_package }}"
