@@ -187,3 +187,54 @@
         group: "{{ ansible_user }}"
         mode: "0644"
       become: false
+
+# Ghostty (Snap) — installed outside apt; gsettings + xdg-terminal-exec only.
+# Skipped entirely when the binary is absent so this role reuses cleanly on
+# machines that use Ptyxis/gnome-terminal instead.
+- name: Check whether Ghostty is installed
+  ansible.builtin.stat:
+    path: /snap/bin/ghostty
+  register: ghostty_binary
+  become: false
+
+- name: Configure Ghostty as the default terminal
+  when: ghostty_binary.stat.exists
+  block:
+    - name: Install xdg-terminal-exec package
+      ansible.builtin.apt:
+        name: xdg-terminal-exec
+        state: present
+      become: true
+
+    - name: Ensure xdg-terminals directory exists
+      ansible.builtin.file:
+        path: "{{ user_home }}/.local/share/xdg-terminals"
+        state: directory
+        mode: "0755"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      become: false
+
+    - name: Deploy Ghostty desktop entry for xdg-terminal-exec
+      ansible.builtin.copy:
+        src: ghostty_ghostty.desktop
+        dest: "{{ user_home }}/.local/share/xdg-terminals/ghostty_ghostty.desktop"
+        mode: "0644"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      become: false
+
+    - name: Set xdg-terminals.list to Ghostty
+      ansible.builtin.copy:
+        content: "ghostty_ghostty.desktop\n"
+        dest: "{{ user_home }}/.config/xdg-terminals.list"
+        mode: "0644"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      become: false
+
+    - name: Set Ghostty as the default terminal (gsettings)
+      ansible.builtin.command:
+        cmd: "gsettings set org.gnome.desktop.default-applications.terminal exec '/snap/bin/ghostty --gtk-single-instance=true'"
+      become: false
+      changed_when: false
